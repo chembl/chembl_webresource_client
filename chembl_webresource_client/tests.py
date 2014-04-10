@@ -1,0 +1,53 @@
+__author__ = 'mnowotka'
+
+from chembl_webresource_client.settings import Settings
+from chembl_webresource_client import *
+import unittest
+
+class TestSequenceFunctions(unittest.TestCase):
+
+    def setUp(self):
+        Settings.Instance().WEBSERVICE_PROTOCOL = 'http'
+        Settings.Instance().WEBSERVICE_DOMAIN = 'ves-ebi-56.ebi.ac.uk:8787'
+        Settings.Instance().WEBSERVICE_PREFIX = '/chemblws'
+
+    def test_assays(self):
+        assays = AssayResource()
+        self.assertTrue(assays.status())
+        self.assertEqual(assays.get('CHEMBL1217643')['assayOrganism'], 'Homo sapiens')
+        self.assertEqual(len(assays.get(['CHEMBL1217643', 'CHEMBL1217644'])), 2)
+        self.assertEqual(len(assays.bioactivities('CHEMBL1217643')), 1)
+
+    def test_targets(self):
+        targets = TargetResource()
+        self.assertTrue(targets.status())
+        self.assertEqual(targets.get('CHEMBL2477')['targetType'], 'SINGLE PROTEIN')
+        self.assertTrue(len(targets.bioactivities('CHEMBL240')) > 10000)
+        all = targets.get_all()
+        self.assertTrue(len(all) > 10000)
+        self.assertTrue(all[0]['bioactivityCount'] >= all[-1]['bioactivityCount'])
+        self.assertEqual(targets.get(uniprot='Q13936')['proteinAccession'], 'Q13936')
+        self.assertEqual(len(targets.get(['CHEMBL240', 'CHEMBL2477'])), 2)
+        self.assertEqual(len(targets.approved_drugs('CHEMBL1824')),5)
+        self.assertEqual(targets.approved_drugs('CHEMBL1824')[1]['name'], 'PERTUZUMAB')
+
+    def test_compounds(self):
+        compounds = CompoundResource()
+        self.assertTrue(compounds.status())
+        self.assertEqual(compounds.get('CHEMBL1')['stdInChiKey'], 'GHBOEFUAGSHXPO-XZOTUCIWSA-N')
+        self.assertEqual(len(compounds.get(['CHEMBL%s' % x for x in range(1,11)])), 10)
+        self.assertEqual(compounds.get(stdinchikey='QFFGVLORLPOAEC-SNVBAGLBSA-N')['molecularFormula'], 'C19H21ClFN3O3')
+        self.assertEqual(compounds.get(smiles='COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56')[0]['stdInChiKey'], 'GHBOEFUAGSHXPO-UWXQAFAOSA-N')
+        self.assertTrue(len(compounds.similar_to('COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56', 70)) > 800)
+        self.assertTrue(len(compounds.substructure('COcccc')) > 6000)
+        self.assertTrue(len(compounds.bioactivities('CHEMBL1')) > 10)
+        self.assertEqual(len(compounds.forms('CHEMBL415863')), 2)
+        self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL415863'))), set(['CHEMBL415863', 'CHEMBL1207563']))
+        self.assertEqual(len(compounds.forms('CHEMBL1207563')), 2)
+        self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL1207563'))), set(['CHEMBL415863', 'CHEMBL1207563']))
+        self.assertEqual(len(compounds.forms('CHEMBL1078826')), 17)
+        self.assertEqual(len(compounds.drug_mechnisms('CHEMBL1642')), 3)
+        self.assertEqual(compounds.drug_mechnisms('CHEMBL1642')[1]['name'], 'Platelet-derived growth factor receptor beta')
+
+if __name__ == '__main__':
+    unittest.main()
