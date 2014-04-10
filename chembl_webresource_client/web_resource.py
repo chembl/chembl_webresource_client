@@ -131,7 +131,6 @@ class WebResource(object):
                 url = '%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, format)
             else:
                 url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, property, format)
-            print url
             return self._get_one(url, async, format)
 
 #-----------------------------------------------------------------------------------------------------------------------
