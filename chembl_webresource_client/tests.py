@@ -4,12 +4,14 @@ from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import *
 import unittest
 
+
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
-        Settings.Instance().WEBSERVICE_PROTOCOL = 'http'
-        Settings.Instance().WEBSERVICE_DOMAIN = 'ves-ebi-56.ebi.ac.uk:8787'
+        Settings.Instance().WEBSERVICE_PROTOCOL = 'https'
+        Settings.Instance().WEBSERVICE_DOMAIN = 'www.ebi.ac.uk'
         Settings.Instance().WEBSERVICE_PREFIX = '/chemblws'
+        Settings.Instance().TIMEOUT = 10
 
     def test_assays(self):
         assays = AssayResource()
@@ -42,12 +44,15 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(compounds.substructure('COcccc')) > 6000)
         self.assertTrue(len(compounds.bioactivities('CHEMBL1')) > 10)
         self.assertEqual(len(compounds.forms('CHEMBL415863')), 2)
-        self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL415863'))), set(['CHEMBL415863', 'CHEMBL1207563']))
+        self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL415863'))),
+                         {'CHEMBL415863', 'CHEMBL1207563'})
         self.assertEqual(len(compounds.forms('CHEMBL1207563')), 2)
-        self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL1207563'))), set(['CHEMBL415863', 'CHEMBL1207563']))
+        self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL1207563'))),
+                         {'CHEMBL415863', 'CHEMBL1207563'})
         self.assertEqual(len(compounds.forms('CHEMBL1078826')), 17)
         self.assertEqual(len(compounds.drug_mechnisms('CHEMBL1642')), 3)
-        self.assertEqual(compounds.drug_mechnisms('CHEMBL1642')[1]['name'], 'Platelet-derived growth factor receptor beta')
+        self.assertEqual(compounds.drug_mechnisms('CHEMBL1642')[1]['name'],
+                         'Platelet-derived growth factor receptor beta')
 
 if __name__ == '__main__':
     unittest.main()

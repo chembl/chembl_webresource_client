@@ -3,6 +3,7 @@ __author__ = 'mnowotka'
 #-----------------------------------------------------------------------------------------------------------------------
 
 import requests
+from requests.models import Response
 import requests_cache
 import grequests
 import sys
@@ -11,6 +12,7 @@ from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import __version__ as version
 
 #-----------------------------------------------------------------------------------------------------------------------
+
 
 class WebResource(object):
 
@@ -27,7 +29,7 @@ class WebResource(object):
     def get_service(self):
         try:
             res = requests.get('%s/status/' % Settings.Instance().webservice_root_url,
-                                                                                timeout=Settings.Instance().TIMEOUT)
+                               timeout=Settings.Instance().TIMEOUT)
             if not res.ok:
                 return None
             js = res.json()
@@ -60,78 +62,80 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _process_request(self, url, session, format, **kwargs):
+    def _process_request(self, url, session, frmt, **kwargs):
         try:
             res = session.get(url, **kwargs)
             if not res.ok:
                 return res.status_code
-            return res.json().values()[0] if format == 'json' else res.content
+            return res.json().values()[0] if frmt == 'json' else res.content
         except Exception:
             return None
 
-
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def bioactivities(self, chembl_id, format='json'):
+    def bioactivities(self, chembl_id, frmt='json'):
         session = self._get_session()
-        url = '%s/%s/%s/bioactivities.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, format)
-        return self._process_request(url, session, format, timeout=Settings.Instance().TIMEOUT)
+        url = '%s/%s/%s/bioactivities.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
+        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_val(self,x,format):
-        if format == 'json':
-            return x.json().values()[0] if (x and x.ok) else (x.status_code if x else None)
+    def get_val(self, x, frmt):
+        if type(x) is not Response:
+            return x
+        if frmt == 'json':
+            return x.json().values()[0] if x.ok else x.status_code
         else:
-            return x.content if (x and x.ok) else (x.status_code if x else None)
+            return x.content if x.ok else x.status_code
 
 #-----------------------------------------------------------------------------------------------------------------------
 
     def _apply(self, iterable, fn, *args, **kwargs):
-        return [fn(x, *args, **kwargs) for x in iterable if x ]
+        return [fn(x, *args, **kwargs) for x in iterable if x is not None]
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get(self, kname, keys, format='json', property=None):
+    def _get(self, kname, keys, frmt='json', prop=None):
         if isinstance(keys, list):
             if len(keys) > 10:
                 try:
-                    rs = (self.get_one(**{'format':format, kname:key, 'async':True, 'property': property}) for key in keys)
+                    rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
+                          for key in keys)
                     ret = grequests.map(rs)
-                    return self._apply(ret, self.get_val, format)
+                    return self._apply(ret, self.get_val, frmt)
                 except Exception:
                     return None
             else:
                 ret = []
                 for key in keys:
-                    ret.append(self.get_one(**{'format':format, kname:key, 'property': property}))
+                    ret.append(self.get_one(**{'frmt': frmt, kname: key, 'prop': prop}))
                 return ret
-        return self.get_one(**{'format':format, kname:keys, 'property': property})
+        return self.get_one(**{'frmt': frmt, kname: keys, 'prop': prop})
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get(self, chembl_id, format='json', property=None):
+    def get(self, chembl_id, frmt='json', prop=None):
         if chembl_id:
-            return self._get('chembl_id', chembl_id, format, property)
+            return self._get('chembl_id', chembl_id, frmt, prop)
         return None
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get_one(self, url, async, format):
+    def _get_one(self, url, async, frmt):
         session = self._get_session()
         if async:
             return grequests.get(url, session=session)
-        return self._process_request(url, session, format, timeout=Settings.Instance().TIMEOUT)
+        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_one(self, chembl_id, format='json', async=False, property=None):
+    def get_one(self, chembl_id, frmt='json', async=False, prop=None):
         if chembl_id:
-            if not property:
-                url = '%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, format)
+            if not prop:
+                url = '%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
             else:
-                url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, property, format)
-            return self._get_one(url, async, format)
+                url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name,
+                                          chembl_id, prop, frmt)
+            return self._get_one(url, async, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
-

@@ -10,44 +10,45 @@ from chembl_webresource_client.settings import Settings
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+
 class TargetResource(WebResource):
     name = 'targets'
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_all(self, format='json'):
+    def get_all(self, frmt='json'):
         session = self._get_session()
-        url = '%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, format)
-        return self._process_request(url, session, format, timeout=Settings.Instance().TIMEOUT)
+        url = '%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, frmt)
+        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
     def get(self, chembl_id=None, **kwargs):
-        format = kwargs.get('format', 'json')
+        frmt = kwargs.get('frmt', 'json')
         if chembl_id:
-            return super(TargetResource, self).get(chembl_id, format=format)
+            return super(TargetResource, self).get(chembl_id, frmt=frmt)
         if not 'uniprot' in kwargs:
             return None
         kname = 'uniprot'
-        return self._get(kname, kwargs[kname], format)
+        return self._get(kname, kwargs[kname], frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def approved_drugs(self, chembl_id=None, format='json'):
-        return super(TargetResource, self).get(chembl_id, format=format, property='approvedDrug')
+    def approved_drugs(self, chembl_id=None, frmt='json'):
+        return super(TargetResource, self).get(chembl_id, frmt=frmt, prop='approvedDrug')
 
 #-----------------------------------------------------------------------------------------------------------------------
 
     def get_one(self, chembl_id=None, **kwargs):
-        format = kwargs.get('format', 'json')
+        frmt = kwargs.get('frmt', 'json')
         async = kwargs.get('acync', False)
-        property = kwargs.get('property', None)
+        prop = kwargs.get('prop', None)
         if chembl_id:
-            return super(TargetResource, self).get_one(chembl_id=chembl_id, format=format, async=async, property=property)
+            return super(TargetResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
         if not 'uniprot' in kwargs:
             return None
         key = 'uniprot'
-        url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key],format)
-        return self._get_one(url, async, format)
+        url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
+        return self._get_one(url, async, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------

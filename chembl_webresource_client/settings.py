@@ -2,6 +2,7 @@ __author__ = 'mnowotka'
 
 from chembl_webresource_client.singleton import Singleton
 
+
 @Singleton
 class Settings:
     WEBSERVICE_PROTOCOL = 'https'
@@ -10,7 +11,7 @@ class Settings:
     CACHING = True
     FAST_SAVE = True
     CACHE_NAME = 'chembl_webresource_client'
-    TIMEOUT = 1.0
+    TIMEOUT = 3.0
 
     @property
     def webservice_root_url(self):

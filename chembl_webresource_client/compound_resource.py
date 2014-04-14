@@ -10,72 +10,73 @@ from chembl_webresource_client.settings import Settings
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+
 class CompoundResource(WebResource):
     name = 'compounds'
 
 #-----------------------------------------------------------------------------------------------------------------------
 
     def get(self, chembl_id=None, **kwargs):
-        format = kwargs.get('format', 'json')
+        frmt = kwargs.get('frmt', 'json')
         if chembl_id:
-            return super(CompoundResource, self).get(chembl_id, format=format)
+            return super(CompoundResource, self).get(chembl_id, frmt=frmt)
         if 'stdinchikey' in kwargs:
             kname = 'stdinchikey'
         elif 'smiles' in kwargs:
             kname = 'smiles'
         else:
             return None
-        return self._get(kname, kwargs[kname], format)
+        return self._get(kname, kwargs[kname], frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
     def get_one(self, chembl_id=None, **kwargs):
-        format = kwargs.get('format', 'json')
+        frmt = kwargs.get('frmt', 'json')
         async = kwargs.get('async', False)
-        property = kwargs.get('property', None)
+        prop = kwargs.get('prop', None)
         if chembl_id:
-            return super(CompoundResource, self).get_one(chembl_id=chembl_id, format=format, async=async, property=property)
+            return super(CompoundResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
         if 'stdinchikey' in kwargs:
             key = 'stdinchikey'
         elif 'smiles' in kwargs:
             key = 'smiles'
         else:
             return None
-        url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], format)
-        return self._get_one(url, async, format)
+        url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
+        return self._get_one(url, async, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def forms(self, chembl_id, format='json'):
-        return super(CompoundResource, self).get(chembl_id, format=format, property='form')
+    def forms(self, chembl_id, frmt='json'):
+        return super(CompoundResource, self).get(chembl_id, frmt=frmt, prop='form')
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def drug_mechnisms(self, chembl_id, format='json'):
-        return super(CompoundResource, self).get(chembl_id, format=format, property='drugMechanism')
+    def drug_mechnisms(self, chembl_id, frmt='json'):
+        return super(CompoundResource, self).get(chembl_id, frmt=frmt, prop='drugMechanism')
 
 #-----------------------------------------------------------------------------------------------------------------------
 
     def _get_method(self, struct, **kwargs):
-        format = kwargs.get('format', 'json')
+        frmt = kwargs.get('frmt', 'json')
         session = self._get_session()
         if 'simscore' in kwargs:
             simscore = kwargs['simscore']
             url = '%s/%s/similarity/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, struct,
-                                                                                                simscore, format)
+                                                 simscore, frmt)
         else:
-            url = '%s/%s/substructure/%s.%s' % (Settings.Instance().webservice_root_url, self.name, struct, format)
-        return self._process_request(url, session, format, timeout=Settings.Instance().TIMEOUT)
+            url = '%s/%s/substructure/%s.%s' % (Settings.Instance().webservice_root_url, self.name, struct, frmt)
+        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def substructure(self, struct, format='json'):
-        return self._get_method(struct, format=format)
+    def substructure(self, struct, frmt='json'):
+        return self._get_method(struct, frmt=frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def similar_to(self, struct, simscore, format='json'):
-        return self._get_method(struct, simscore=simscore, format=format)
+    def similar_to(self, struct, simscore, frmt='json'):
+        return self._get_method(struct, simscore=simscore, frmt=frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -84,12 +85,12 @@ class CompoundResource(WebResource):
             ids = chembl_id
             if isinstance(ids, list):
                 if len(ids) > 10:
-                    rs = (self.get_single_image(id, True, **kwargs) for id in ids)
+                    rs = (self.get_single_image(sid, True, **kwargs) for sid in ids)
                     ret = grequests.map(rs)
-                    return self._apply(ret, self.get_val, format)
+                    return self._apply(ret, self.get_val, None)
                 ret = []
-                for id in ids:
-                    ret.append(self.get_single_image(id, False, **kwargs))
+                for sid in ids:
+                    ret.append(self.get_single_image(sid, False, **kwargs))
                 return ret
             return self.get_single_image(ids, False, **kwargs)
 
@@ -100,10 +101,10 @@ class CompoundResource(WebResource):
         try:
             size = kwargs.get('size', 500)
             engine = kwargs.get('engine', 'rdkit')
-            ignoreCoords = kwargs.get('ignoreCoords', False)
+            ignore_coords = kwargs.get('ignoreCoords', False)
 
             query = '?engine=%s&dimensions=%s' % (engine, size)
-            if ignoreCoords:
+            if ignore_coords:
                 query += '&ignoreCoords=1'
 
             if chembl_id:
