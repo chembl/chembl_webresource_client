@@ -101,7 +101,7 @@ class WebResource(object):
                 try:
                     rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
                           for key in keys)
-                    ret = grequests.map(rs)
+                    ret = grequests.map(rs, size=50)
                     return self._apply(ret, self.get_val, frmt)
                 except Exception:
                     return None

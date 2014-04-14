@@ -86,7 +86,7 @@ class CompoundResource(WebResource):
             if isinstance(ids, list):
                 if len(ids) > 10:
                     rs = (self.get_single_image(sid, True, **kwargs) for sid in ids)
-                    ret = grequests.map(rs)
+                    ret = grequests.map(rs, size=50)
                     return self._apply(ret, self.get_val, None)
                 ret = []
                 for sid in ids:
