@@ -10,6 +10,8 @@ class Settings:
     WEBSERVICE_PREFIX = '/chemblws'
     CACHING = True
     FAST_SAVE = True
+    CONCURRENT_SIZE = 50
+    ASYNC_TRESHOLD = 10
     CACHE_NAME = 'chembl_webresource_client'
     TIMEOUT = 3.0
 

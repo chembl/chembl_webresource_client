@@ -95,21 +95,40 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+    def _get_async(self, kname, keys, frmt='json', prop=None):
+        try:
+	    rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
+	      for key in keys)
+	    return grequests.map(rs, size=min(Settings.Instance().CONCURRENT_SIZE, len(keys)))
+        except Exception:
+	    return None
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+    def get_async(self, kname, keys, frmt='json', prop=None):
+        ret = []
+        if sys.platform == 'darwin': # thank you, Steve
+		count = len(keys)
+		for i in range(start, count, Settings.Instance().CONCURRENT_SIZE):
+                    chunk = keys[i:i+Settings.Instance().CONCURRENT_SIZE]
+                    ret.update(self._get_async(kname, chunk, frmt, prop))
+        else:
+            ret = self._get_async(kname, keys, frmt, prop)
+        return self._apply(ret, self.get_val, frmt)
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+    def get_sync(self, kname, keys, frmt='json', prop=None):
+        return [self.get_one(**{'frmt': frmt, kname: key, 'prop': prop}) for key in keys]
+
+#-----------------------------------------------------------------------------------------------------------------------
+
     def _get(self, kname, keys, frmt='json', prop=None):
         if isinstance(keys, list):
-            if len(keys) > 10:
-                try:
-                    rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
-                          for key in keys)
-                    ret = grequests.map(rs, size=50)
-                    return self._apply(ret, self.get_val, frmt)
-                except Exception:
-                    return None
+            if len(keys) > Settings.Instance().ASYNC_TRESHOLD:
+                return self.get_async(kname, keys, frmt, prop)
             else:
-                ret = []
-                for key in keys:
-                    ret.append(self.get_one(**{'frmt': frmt, kname: key, 'prop': prop}))
-                return ret
+                return self.get_sync(kname, keys, frmt, prop)
         return self.get_one(**{'frmt': frmt, kname: keys, 'prop': prop})
 
 #-----------------------------------------------------------------------------------------------------------------------
