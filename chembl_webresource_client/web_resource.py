@@ -109,7 +109,7 @@ class WebResource(object):
         ret = []
         if sys.platform == 'darwin': # thank you, Steve
 		count = len(keys)
-		for i in range(start, count, Settings.Instance().CONCURRENT_SIZE):
+		for i in range(0, count, Settings.Instance().CONCURRENT_SIZE):
                     chunk = keys[i:i+Settings.Instance().CONCURRENT_SIZE]
                     ret.update(self._get_async(kname, chunk, frmt, prop))
         else:
