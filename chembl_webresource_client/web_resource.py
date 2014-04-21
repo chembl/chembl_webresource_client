@@ -111,7 +111,7 @@ class WebResource(object):
 		count = len(keys)
 		for i in range(0, count, Settings.Instance().CONCURRENT_SIZE):
                     chunk = keys[i:i+Settings.Instance().CONCURRENT_SIZE]
-                    ret.update(self._get_async(kname, chunk, frmt, prop))
+                    ret.extend(self._get_async(kname, chunk, frmt, prop))
         else:
             ret = self._get_async(kname, keys, frmt, prop)
         return self._apply(ret, self.get_val, frmt)
