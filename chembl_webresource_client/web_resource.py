@@ -18,11 +18,21 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+    def __init__(self):
+        self.cached_session = None
+        self.session = None
+
+#-----------------------------------------------------------------------------------------------------------------------
+
     def _get_session(self):
         s = Settings.Instance()
         if s.CACHING:
-            return requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite', fast_save=s.FAST_SAVE)
-        return requests.Session()
+            if not self.cached_session:
+                self.cached_session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite', fast_save=s.FAST_SAVE)
+            return self.cached_session
+        if not self.session:
+            self.session = requests.Session()
+        return self.session
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -95,25 +105,18 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get_async(self, kname, keys, frmt='json', prop=None):
+    def _get_async(self, kname, keys, frmt='json', prop=None, retry=0):
         try:
 	    rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
 	      for key in keys)
 	    return grequests.map(rs, size=min(Settings.Instance().CONCURRENT_SIZE, len(keys)))
         except Exception:
-	    return None
+            return []
 
 #-----------------------------------------------------------------------------------------------------------------------
 
     def get_async(self, kname, keys, frmt='json', prop=None):
-        ret = []
-        if sys.platform == 'darwin': # thank you, Steve
-		count = len(keys)
-		for i in range(0, count, Settings.Instance().CONCURRENT_SIZE):
-                    chunk = keys[i:i+Settings.Instance().CONCURRENT_SIZE]
-                    ret.extend(self._get_async(kname, chunk, frmt, prop))
-        else:
-            ret = self._get_async(kname, keys, frmt, prop)
+        ret = self._get_async(kname, keys, frmt, prop)
         return self._apply(ret, self.get_val, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -158,3 +161,4 @@ class WebResource(object):
             return self._get_one(url, async, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
+
