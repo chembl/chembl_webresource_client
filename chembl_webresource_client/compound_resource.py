@@ -52,7 +52,7 @@ class CompoundResource(WebResource):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def drug_mechnisms(self, chembl_id, frmt='json'):
+    def drug_mechanisms(self, chembl_id, frmt='json'):
         return super(CompoundResource, self).get(chembl_id, frmt=frmt, prop='drugMechanism')
 
 #-----------------------------------------------------------------------------------------------------------------------

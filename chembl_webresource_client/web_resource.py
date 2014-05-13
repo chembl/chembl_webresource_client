@@ -32,6 +32,9 @@ class WebResource(object):
             return self.cached_session
         if not self.session:
             self.session = requests.Session()
+            adapter = requests.adapters.HTTPAdapter(max_retries=3, pool_block=True)
+            s.mount('http://', adapter)
+            s.mount('https://', adapter)
         return self.session
 
 #-----------------------------------------------------------------------------------------------------------------------

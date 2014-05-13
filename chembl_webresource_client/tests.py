@@ -38,7 +38,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(compounds.status())
         self.assertEqual(compounds.get('CHEMBL1')['stdInChiKey'], 'GHBOEFUAGSHXPO-XZOTUCIWSA-N')
         self.assertEqual(len(compounds.get(['CHEMBL%s' % x for x in range(1,6)])), 5)
-	self.assertEqual(len(compounds.get(['CHEMBL%s' % x for x in range(1,301)])), 300)
+        self.assertEqual(len(compounds.get(['CHEMBL%s' % x for x in range(1,301)])), 300)
         self.assertEqual(compounds.get(stdinchikey='QFFGVLORLPOAEC-SNVBAGLBSA-N')['molecularFormula'], 'C19H21ClFN3O3')
         self.assertEqual(compounds.get(smiles='COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56')[0]['stdInChiKey'], 'GHBOEFUAGSHXPO-UWXQAFAOSA-N')
         self.assertTrue(len(compounds.similar_to('COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56', 70)) > 800)
@@ -51,8 +51,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL1207563'))),
                          {'CHEMBL415863', 'CHEMBL1207563'})
         self.assertEqual(len(compounds.forms('CHEMBL1078826')), 17)
-        self.assertEqual(len(compounds.drug_mechnisms('CHEMBL1642')), 3)
-        self.assertEqual(compounds.drug_mechnisms('CHEMBL1642')[1]['name'],
+        self.assertEqual(len(compounds.drug_mechanisms('CHEMBL1642')), 3)
+        self.assertEqual(compounds.drug_mechanisms('CHEMBL1642')[1]['name'],
                          'Platelet-derived growth factor receptor beta')
 
 if __name__ == '__main__':
