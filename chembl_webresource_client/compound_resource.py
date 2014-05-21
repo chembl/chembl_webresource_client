@@ -34,6 +34,8 @@ class CompoundResource(WebResource):
         frmt = kwargs.get('frmt', 'json')
         async = kwargs.get('async', False)
         prop = kwargs.get('prop', None)
+        method = 'get'
+        data = None
         if chembl_id:
             return super(CompoundResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
         if 'stdinchikey' in kwargs:
@@ -42,8 +44,13 @@ class CompoundResource(WebResource):
             key = 'smiles'
         else:
             return None
-        url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
-        return self._get_one(url, async, frmt)
+        if any(x in kwargs[key] for x in self.url_unsafe_characters):
+            url = '%s/%s/%s' % (Settings.Instance().webservice_root_url, self.name, key)
+            method = 'post'
+            data = {key : kwargs[key]}
+        else:
+            url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
+        return self._get_one(url, async, frmt, method, data)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -60,6 +67,15 @@ class CompoundResource(WebResource):
     def _get_method(self, struct, **kwargs):
         frmt = kwargs.get('frmt', 'json')
         session = self._get_session()
+        if any(x in struct for x in self.url_unsafe_characters):
+            data = {'smiles':struct}
+            if 'simscore' in kwargs:
+                data['simscore'] = kwargs['simscore']
+                url = '%s/%s/similarity' % (Settings.Instance().webservice_root_url, self.name)
+            else:
+                url = '%s/%s/substructure' % (Settings.Instance().webservice_root_url, self.name)
+            return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT, method='post',
+                data=data)
         if 'simscore' in kwargs:
             simscore = kwargs['simscore']
             url = '%s/%s/similarity/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, struct,

@@ -18,6 +18,15 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+    content_types = {
+        'json': 'application/json',
+        'xml': 'application/xml',
+    }
+
+    url_unsafe_characters = ['/', '#']
+
+#-----------------------------------------------------------------------------------------------------------------------
+
     def __init__(self):
         self.cached_session = None
         self.session = None
@@ -75,9 +84,12 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _process_request(self, url, session, frmt, **kwargs):
+    def _process_request(self, url, session, frmt, method='get', data=None, **kwargs):
         try:
-            res = session.get(url, **kwargs)
+            if method == 'get':
+                res = session.get(url, **kwargs)
+            else:
+                res = session.post(url, data=data, headers={'Accept': self.content_types[frmt]}, **kwargs)
             if not res.ok:
                 return res.status_code
             return res.json().values()[0] if frmt == 'json' else res.content
@@ -110,9 +122,9 @@ class WebResource(object):
 
     def _get_async(self, kname, keys, frmt='json', prop=None, retry=0):
         try:
-	    rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
+          rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
 	      for key in keys)
-	    return grequests.map(rs, size=min(Settings.Instance().CONCURRENT_SIZE, len(keys)))
+          return grequests.map(rs, size=min(Settings.Instance().CONCURRENT_SIZE, len(keys)))
         except Exception:
             return []
 
@@ -146,11 +158,14 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get_one(self, url, async, frmt):
+    def _get_one(self, url, async, frmt, method='get', data=None):
         session = self._get_session()
         if async:
-            return grequests.get(url, session=session)
-        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
+            if method == 'get':
+                return grequests.get(url, session=session)
+            else:
+                return grequests.post(url, session=session, data=data, headers={'Accept': self.content_types[frmt]})
+        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT, method=method, data=data)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
