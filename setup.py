@@ -14,7 +14,7 @@ except ImportError:
 
 setup(
     name='chembl_webresource_client',
-    version='0.6.1',
+    version='0.6.2',
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
@@ -26,6 +26,7 @@ setup(
         'requests==2.2.1',
         'requests-cache==0.4.4',
         'grequests==0.2.0',
+        'easydict',
     ],
     classifiers=['Development Status :: 2 - Pre-Alpha',
                  'Intended Audience :: Developers',
