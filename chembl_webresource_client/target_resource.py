@@ -41,7 +41,7 @@ class TargetResource(WebResource):
 
     def get_one(self, chembl_id=None, **kwargs):
         frmt = kwargs.get('frmt', 'json')
-        async = kwargs.get('acync', False)
+        async = kwargs.get('async', False)
         prop = kwargs.get('prop', None)
         if chembl_id:
             return super(TargetResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
