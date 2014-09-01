@@ -13,6 +13,7 @@ class Settings:
     CONCURRENT_SIZE = 50
     ASYNC_TRESHOLD = 10
     CACHE_NAME = 'chembl_webresource_client'
+    RESPECT_RATE_LIMIT = True
     TIMEOUT = 3.0
 
     @property

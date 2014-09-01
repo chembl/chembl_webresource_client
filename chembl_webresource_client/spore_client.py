@@ -2,9 +2,13 @@ from urllib import urlencode
 from urlparse import urljoin
 import json
 
+from chembl_webresource_client.settings import Settings
+import time
+import re
 import requests
 from easydict import EasyDict
 
+OFFICIAL_ENDPOINT = re.compile('^http(s)?://www(dev)?.ebi.ac.uk/chembl/api/utils/spore')
 
 def client_from_url(url, session=requests, base_url=None):
     """Builds a client from an url
@@ -22,7 +26,10 @@ def client_from_url(url, session=requests, base_url=None):
             schema['base_url'] = '/'.join(url.split('/')[:-1])
     if not schema['base_url'].endswith('/'):
         schema['base_url'] += '/'
-    return Client(description=schema, session=session)
+
+    official = True if OFFICIAL_ENDPOINT.match(url) else False
+
+    return Client(description=schema, session=session, official=official)
 
 
 def make_spore_function(client, method_definition):
@@ -93,15 +100,17 @@ class Client(object):
     a dotted dict, and a number of methods to interact with the service.
     """
 
-    def __init__(self, description, session=None):
+    def __init__(self, description, session=None, official = False):
         self.description = EasyDict(description)
         if session is None:
             session = requests
         self.session = session
+        self.official = official
 
         # for each method defined in the spore file, create a method on this
         # object.
-        for method, definition in [(m,d) for (m,d) in self.description.methods.items() if m.startswith('POST_') or m == 'GET_status']:
+        for method, definition in [(m,d) for (m,d) in self.description.methods.items() if
+                                   m.startswith('POST_') or m == 'GET_status']:
             spore_function = make_spore_function(self, definition)
             name = ''.join(method.split('_')[1:])
             spore_function.__name__ = name
@@ -141,5 +150,10 @@ class Client(object):
 
         # make the actual query to the resource
         resp = self.session.request(definition.method, url, **method_kw)
+        if (not hasattr(resp, 'from_cache') or not resp.from_cache) and (self.official or
+                                                                         Settings.Instance().RESPECT_RATE_LIMIT):
+            hourly_rate = int(resp.headers.get('x-hourlyratelimit-limit', 3600))
+            freq_s = 3600 / float(hourly_rate)
+            time.sleep(freq_s)
 
         return decode_response(resp, definition)

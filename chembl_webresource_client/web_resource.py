@@ -37,7 +37,8 @@ class WebResource(object):
         s = Settings.Instance()
         if s.CACHING:
             if not self.cached_session:
-                self.cached_session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite', fast_save=s.FAST_SAVE)
+                self.cached_session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite',
+                                                            fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST'))
             return self.cached_session
         if not self.session:
             self.session = requests.Session()
