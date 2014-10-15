@@ -20,11 +20,9 @@ requests_cache.install_cache('chembl_webresource_client')
 from chembl_webresource_client.assay_resource import AssayResource
 from chembl_webresource_client.target_resource import TargetResource
 from chembl_webresource_client.compound_resource import CompoundResource
-from chembl_webresource_client.utils import utils
 
 __all__ = [
     "AssayResource",
     "TargetResource",
     "CompoundResource",
-    "utils",
 ]
