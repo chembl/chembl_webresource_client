@@ -39,12 +39,17 @@ class WebResource(object):
             if not self.cached_session:
                 self.cached_session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite',
                                                             fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST'))
+                adapter = requests.adapters.HTTPAdapter(pool_connections=s.CONCURRENT_SIZE,
+                                                        pool_maxsize=s.CONCURRENT_SIZE, max_retries=3, pool_block=True)
+                self.cached_session.mount('http://', adapter)
+                self.cached_session.mount('https://', adapter)
             return self.cached_session
         if not self.session:
             self.session = requests.Session()
-            adapter = requests.adapters.HTTPAdapter(max_retries=3, pool_block=True)
-            s.mount('http://', adapter)
-            s.mount('https://', adapter)
+            adapter = requests.adapters.HTTPAdapter(pool_connections=s.CONCURRENT_SIZE,
+                                                        pool_maxsize=s.CONCURRENT_SIZE, max_retries=3, pool_block=True)
+            self.session.mount('http://', adapter)
+            self.session.mount('https://', adapter)
         return self.session
 
 #-----------------------------------------------------------------------------------------------------------------------

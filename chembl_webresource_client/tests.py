@@ -24,7 +24,7 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_targets(self):
         targets = TargetResource()
         self.assertTrue(targets.status())
-        self.assertEqual(targets.get('CHEMBL2477')['targetType'], 'SINGLE PROTEIN')
+        self.assertEqual(targets.get('CHEMBL2476')['targetType'], 'SINGLE PROTEIN')
         self.assertTrue(len(targets.bioactivities('CHEMBL240')) > 10000)
         all = targets.get_all()
         self.assertTrue(len(all) > 10000)
@@ -44,7 +44,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(compounds.get(smiles='COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56')[0]['stdInChiKey'], 'GHBOEFUAGSHXPO-UWXQAFAOSA-N')
         cs = compounds.get(smiles="C\C(=C/C=C/C(=C/C(=O)O)/C)\C=C\C1=C(C)CCCC1(C)C")
         self.assertTrue(len(cs) >= 9)
-        self.assertEqual(cs[0]['preferredCompoundName'], 'TRETINOIN')
+        self.assertEqual(cs[0]['preferredCompoundName'], 'ISOTRETINOIN')
         cs = compounds.get(smiles="COC1(CN2CCC1CC2)C#CC(C#N)(c3ccccc3)c4ccccc4")
         self.assertEqual(len(cs), 1)
         self.assertEqual(cs[0]['stdInChiKey'], 'MMAOIAFUZKMAOY-UHFFFAOYSA-N')
@@ -65,7 +65,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(compounds.forms('CHEMBL1078826')), 17)
         self.assertEqual(len(compounds.drug_mechanisms('CHEMBL1642')), 3)
         self.assertEqual(compounds.drug_mechanisms('CHEMBL1642')[1]['name'],
-                         'Platelet-derived growth factor receptor beta')
+                         'Stem cell growth factor receptor')
 
     def test_utils_format_conversion(self):
         smiles = 'O=C(Oc1ccccc1C(=O)O)C' # aspirin
@@ -88,13 +88,13 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIsNotNone(mrv)
         self.assertTrue('<cml><MDocument><MChemicalStruct>' in mrv)
         hdr = utils.hydrogenize(structure=str(mrv), parameters={"method":"HYDROGENIZE"}, input_format="mrv")
-        self.assertTrue('H H H H H H H H' in hdr)
+        self.assertEqual(hdr.count('<atom elementType="H"'), 8)
         cln = utils.clean(structure=mrv)
         self.assertTrue('<cml><MDocument><MChemicalStruct>' in cln)
         self.assertTrue('H H H H H H H H' not in cln)
         cml = "<cml><MDocument><MChemicalStruct><molecule molID=\"m1\"><atomArray><atom id=\"a1\" elementType=\"C\" x2=\"-3.1249866416667733\" y2=\"-0.5015733293207466\"/><atom id=\"a2\" elementType=\"C\" x2=\"-4.458533297665067\" y2=\"-1.2715733231607467\"/><atom id=\"a3\" elementType=\"C\" x2=\"-4.458533297665067\" y2=\"-2.81175997750592\"/><atom id=\"a4\" elementType=\"C\" x2=\"-3.1249866416667733\" y2=\"-3.58175997134592\"/><atom id=\"a5\" elementType=\"C\" x2=\"-1.7912533190033066\" y2=\"-2.81175997750592\"/><atom id=\"a6\" elementType=\"C\" x2=\"-1.7912533190033066\" y2=\"-1.2715733231607467\"/><atom id=\"a7\" elementType=\"C\" x2=\"-0.45751999633984003\" y2=\"-0.5013866626555733\"/><atom id=\"a8\" elementType=\"O\" x2=\"-0.45751999633984003\" y2=\"1.0384266583592534\"/><atom id=\"a9\" elementType=\"C\" x2=\"0.87583999299328\" y2=\"-1.2713866564955734\"/><atom id=\"a10\" elementType=\"C\" x2=\"0.87583999299328\" y2=\"-2.8113866441755735\"/></atomArray><bondArray><bond atomRefs2=\"a1 a2\" order=\"2\"/><bond atomRefs2=\"a2 a3\" order=\"1\"/><bond atomRefs2=\"a3 a4\" order=\"2\"/><bond atomRefs2=\"a4 a5\" order=\"1\"/><bond atomRefs2=\"a5 a6\" order=\"2\"/><bond atomRefs2=\"a6 a1\" order=\"1\"/><bond atomRefs2=\"a6 a7\" order=\"1\"/><bond atomRefs2=\"a7 a9\" order=\"1\"/><bond atomRefs2=\"a9 a10\" order=\"1\"/><bond atomRefs2=\"a7 a8\" order=\"1\"><bondStereo>W</bondStereo></bond></bondArray></molecule></MChemicalStruct></MDocument></cml>"
-        stereo_info =  json.loads(utils.cipStereoInfo(structure=cml))
-        self.assertEqual(stereo_info, {u'atomIndex': 6, u'chirality': u'S'})
+        stereo_info = json.loads(utils.cipStereoInfo(structure=cml))
+        self.assertEqual(stereo_info['tetraHedral'][0], {u'atomIndex': 6, u'chirality': u'S'})
 
     def test_utils_standardisation(self):
         mol = utils.smiles2ctab("[Na]OC(=O)c1ccccc1")
