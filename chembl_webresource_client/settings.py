@@ -16,6 +16,7 @@ class Settings:
     RESPECT_RATE_LIMIT = True
     TIMEOUT = 3.0
     UTILS_SPORE_URL = 'https://www.ebi.ac.uk/chembl/api/utils/spore'
+    PROXIES = None
 
     @property
     def webservice_root_url(self):

@@ -43,6 +43,8 @@ class WebResource(object):
                                                         pool_maxsize=s.CONCURRENT_SIZE, max_retries=3, pool_block=True)
                 self.cached_session.mount('http://', adapter)
                 self.cached_session.mount('https://', adapter)
+            if s.PROXIES:
+                self.cached_session.proxies = s.PROXIES    
             return self.cached_session
         if not self.session:
             self.session = requests.Session()
@@ -50,6 +52,8 @@ class WebResource(object):
                                                         pool_maxsize=s.CONCURRENT_SIZE, max_retries=3, pool_block=True)
             self.session.mount('http://', adapter)
             self.session.mount('https://', adapter)
+            if s.PROXIES:
+                self.session.proxies = s.PROXIES
         return self.session
 
 #-----------------------------------------------------------------------------------------------------------------------

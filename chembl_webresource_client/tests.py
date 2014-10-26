@@ -2,6 +2,7 @@ __author__ = 'mnowotka'
 
 from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import *
+from chembl_webresource_client.utils import utils
 import json
 import unittest
 
