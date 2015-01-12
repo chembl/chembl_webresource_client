@@ -14,12 +14,12 @@ except ImportError:
 
 setup(
     name='chembl_webresource_client',
-    version='0.7.0',
+    version='0.7.1',
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
     url='https://www.ebi.ac.uk/chembldb/index.php/ws',
-    license='CC BY-SA 3.0',
+    license='Apache Software License',
     packages=['chembl_webresource_client'],
     long_description=open('README.rst').read(),
     install_requires=[
@@ -30,7 +30,7 @@ setup(
     ],
     classifiers=['Development Status :: 2 - Pre-Alpha',
                  'Intended Audience :: Developers',
-                 'License :: OSI Approved :: MIT License',
+                 'License :: OSI Approved :: Apache Software License',
                  'Operating System :: POSIX :: Linux',
                  'Programming Language :: Python :: 2.7',
                  'Topic :: Scientific/Engineering :: Chemistry'],
