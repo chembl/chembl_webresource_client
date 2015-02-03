@@ -43,6 +43,7 @@ class CompoundResource(WebResource):
         elif 'smiles' in kwargs:
             key = 'smiles'
         else:
+            self.logger.warning('No identifier given.')
             return None
         if any(x in kwargs[key] for x in self.url_unsafe_characters):
             url = '%s/%s/%s' % (Settings.Instance().webservice_root_url, self.name, key)
@@ -129,7 +130,10 @@ class CompoundResource(WebResource):
                     return grequests.get(url, session=session)
                 res = session.get(url, timeout=Settings.Instance().TIMEOUT)
                 if not res.ok:
+                    self.logger.warning('Error when retrieving url: %s, status code: %s, msg: %s' %
+                              (res.url, res.status_code, res.text))
                     return res.status_code
+                self.logger.info(res.url)
                 return res.content
             return None
         except Exception:

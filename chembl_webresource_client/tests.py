@@ -5,6 +5,8 @@ from chembl_webresource_client import *
 from chembl_webresource_client.utils import utils
 import json
 import unittest
+import logging
+logging.basicConfig()
 
 
 class TestSequenceFunctions(unittest.TestCase):
@@ -31,7 +33,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(all) > 10000)
         self.assertTrue(all[0]['bioactivityCount'] >= all[-1]['bioactivityCount'])
         self.assertEqual(targets.get(uniprot='Q13936')['proteinAccession'], 'Q13936')
-        self.assertEqual(len(targets.get(['CHEMBL240', 'CHEMBL2477'])), 2)
+        self.assertEqual(len(targets.get(['CHEMBL240', 'CHEMBL1927'])), 2)
         self.assertEqual(len(targets.approved_drugs('CHEMBL1824')),5)
         self.assertEqual(targets.approved_drugs('CHEMBL1824')[1]['name'], 'PERTUZUMAB')
 
@@ -43,9 +45,9 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(compounds.get(['CHEMBL%s' % x for x in range(1,301)])), 300)
         self.assertEqual(compounds.get(stdinchikey='QFFGVLORLPOAEC-SNVBAGLBSA-N')['molecularFormula'], 'C19H21ClFN3O3')
         self.assertEqual(compounds.get(smiles='COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56')[0]['stdInChiKey'], 'GHBOEFUAGSHXPO-UWXQAFAOSA-N')
-        cs = compounds.get(smiles="C\C(=C/C=C/C(=C/C(=O)O)/C)\C=C\C1=C(C)CCCC1(C)C")
+        cs = compounds.get(smiles="C\C(=C\C(=O)O)\C=C\C=C(/C)\C=C\C1=C(C)CCCC1(C)C")
         self.assertTrue(len(cs) >= 9)
-        self.assertEqual(cs[0]['preferredCompoundName'], 'ISOTRETINOIN')
+        self.assertTrue('ISOTRETINOIN' in [c['preferredCompoundName'] for c in cs])
         cs = compounds.get(smiles="COC1(CN2CCC1CC2)C#CC(C#N)(c3ccccc3)c4ccccc4")
         self.assertEqual(len(cs), 1)
         self.assertEqual(cs[0]['stdInChiKey'], 'MMAOIAFUZKMAOY-UHFFFAOYSA-N')
@@ -65,8 +67,8 @@ class TestSequenceFunctions(unittest.TestCase):
                          {'CHEMBL415863', 'CHEMBL1207563'})
         self.assertEqual(len(compounds.forms('CHEMBL1078826')), 17)
         self.assertEqual(len(compounds.drug_mechanisms('CHEMBL1642')), 3)
-        self.assertEqual(compounds.drug_mechanisms('CHEMBL1642')[1]['name'],
-                         'Stem cell growth factor receptor')
+        self.assertTrue('Stem cell growth factor receptor' in [comp['name'] for
+                                                               comp in compounds.drug_mechanisms('CHEMBL1642')])
 
     def test_utils_format_conversion(self):
         smiles = 'O=C(Oc1ccccc1C(=O)O)C' # aspirin
@@ -151,8 +153,8 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_utils_json_images(self):
         aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
         js1 = json.loads(utils.smiles2json(aspirin))
-        self.assertEqual(len(js1), 33)
-        self.assertTrue('path' in js1[0] and 'stroke' in js1[0] and 'type' in js1[0])
+        self.assertEqual(len(js1), 34)
+        self.assertTrue('path' in js1[0] and 'fill' in js1[0] and 'type' in js1[0])
         mol = utils.smiles2ctab(aspirin)
         js2 = json.loads(utils.ctab2json(mol))
         self.assertEqual(len(js1), len(js2))

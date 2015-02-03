@@ -8,6 +8,7 @@ import requests_cache
 import grequests
 import sys
 import time
+import logging
 from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import __version__ as version
 
@@ -30,6 +31,7 @@ class WebResource(object):
     def __init__(self):
         self.cached_session = None
         self.session = None
+        self.logger = logging.getLogger(__name__)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -63,7 +65,11 @@ class WebResource(object):
             res = requests.get('%s/status/' % Settings.Instance().webservice_root_url,
                                timeout=Settings.Instance().TIMEOUT)
             if not res.ok:
+                self.logger.warning('Error when retrieving url: %s, status code: %s, msg: %s' %
+                              (res.url, res.status_code, res.text))
                 return None
+            self.logger.info(res.url)
+            self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
             js = res.json()
             if not 'service' in js:
                 return False
@@ -101,7 +107,11 @@ class WebResource(object):
             else:
                 res = session.post(url, data=data, headers={'Accept': self.content_types[frmt]}, **kwargs)
             if not res.ok:
+                self.logger.warning('Error when retrieving url: %s, status code: %s, msg: %s' %
+                              (res.url, res.status_code, res.text))
                 return res.status_code
+            self.logger.info(res.url)
+            self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
             return res.json().values()[0] if frmt == 'json' else res.content
         except Exception:
             return None

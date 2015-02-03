@@ -28,6 +28,7 @@ class TargetResource(WebResource):
         if chembl_id:
             return super(TargetResource, self).get(chembl_id, frmt=frmt)
         if not 'uniprot' in kwargs:
+            self.logger.warning('No identifier given')
             return None
         kname = 'uniprot'
         return self._get(kname, kwargs[kname], frmt)
@@ -46,6 +47,7 @@ class TargetResource(WebResource):
         if chembl_id:
             return super(TargetResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
         if not 'uniprot' in kwargs:
+            self.logger.warning('No identifier given')
             return None
         key = 'uniprot'
         url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)

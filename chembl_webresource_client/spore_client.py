@@ -18,7 +18,7 @@ def client_from_url(url, session=requests, base_url=None):
                     the requests module itself.
 
     """
-    schema = session.get(url).json()
+    schema = requests.get(url).json()
     if 'base_url' not in schema:
         if base_url:
             schema['base_url'] = base_url
