@@ -16,7 +16,13 @@ class Settings:
     RESPECT_RATE_LIMIT = True
     TIMEOUT = 3.0
     UTILS_SPORE_URL = 'https://www.ebi.ac.uk/chembl/api/utils/spore'
+    NEW_CLIENT_URL = 'https://www.ebi.ac.uk/chembl/api/data'
+    TEST_CASE_TIMEOUT = 10
+    MAX_LIMIT = 10
+    REPR_OUTPUT_SIZE = 5
+    MAX_URL_SIZE = 4000
     PROXIES = None
+    CLIENT_VERSION_PICKLE_KEY = 'chembl_webresource_client_version'
 
     @property
     def webservice_root_url(self):
