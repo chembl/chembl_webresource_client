@@ -161,8 +161,7 @@ class QuerySet(object):
             clone.query.set_limits(clone.limits[0], clone.limits[1])
             return clone
 
-        query = self.query.clone()
-        return query[k]
+        return self.query[k]
 
 #-----------------------------------------------------------------------------------------------------------------------
 

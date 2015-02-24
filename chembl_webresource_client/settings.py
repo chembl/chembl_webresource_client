@@ -18,7 +18,7 @@ class Settings:
     UTILS_SPORE_URL = 'https://www.ebi.ac.uk/chembl/api/utils/spore'
     NEW_CLIENT_URL = 'https://www.ebi.ac.uk/chembl/api/data'
     TEST_CASE_TIMEOUT = 10
-    MAX_LIMIT = 10
+    MAX_LIMIT = 20
     REPR_OUTPUT_SIZE = 5
     MAX_URL_SIZE = 4000
     PROXIES = None

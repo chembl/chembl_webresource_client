@@ -5,11 +5,13 @@ from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import *
 from chembl_webresource_client.utils import utils
 from chembl_webresource_client.new_client import new_client
+from decimal import Decimal
+import time
 import json
 import unittest
 import pytest
 import logging
-from random import randint
+#from random import randint
 logging.basicConfig()
 
 TIMEOUT = Settings.Instance().TEST_CASE_TIMEOUT
@@ -17,10 +19,16 @@ TIMEOUT = Settings.Instance().TEST_CASE_TIMEOUT
 class TestSequenceFunctions(unittest.TestCase):
 
     def setUp(self):
+        super(TestSequenceFunctions, self).setUp()
         Settings.Instance().WEBSERVICE_PROTOCOL = 'https'
         Settings.Instance().WEBSERVICE_DOMAIN = 'www.ebi.ac.uk'
         Settings.Instance().WEBSERVICE_PREFIX = '/chemblws'
         Settings.Instance().TIMEOUT = 10
+        self.startTime = time.time()
+
+    def tearDown(self):
+        t = time.time() - self.startTime
+        print "%s: %.3f" % (self.id(), t)
 
     def test_assays(self):
         assays = AssayResource()
@@ -76,8 +84,9 @@ class TestSequenceFunctions(unittest.TestCase):
                                                                comp in compounds.drug_mechanisms('CHEMBL1642')])
 
     @pytest.mark.timeout(TIMEOUT)
-    def test_activity_resource(self):
+    def test_activity_resource_lists(self):
         activity = new_client.activity
+        activity.set_format('json')
         count = len(activity.all())
         self.assertTrue(count)
         self.assertTrue(activity.filter(standard_type="Log Ki").filter(standard_value__gte=5).exists())
@@ -85,6 +94,10 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('c' in activity.get(66369)['canonical_smiles'])
         self.assertEquals([act['activity_id'] for act in activity.all().order_by('activity_id')[0:5]],
             [31863, 31864, 31865, 31866, 31867])
+
+    def test_activity_resource_details(self):
+        activity = new_client.activity
+        activity.set_format('json')
         random_index = 11000 #randint(0, count - 1) - too slow!
         random_elem = activity.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
@@ -93,6 +106,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('assay_chembl_id', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('assay_description', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('assay_type', random_elem, 'One of required fields not found in resource %s' % random_elem)
+        self.assertIn('bao_format', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('bao_endpoint', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('canonical_smiles', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('data_validity_comment', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -127,7 +141,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(assay.filter(assay_oragism="Sus scrofa").filter(assay_type="B").exists())
         self.assertEqual( [ass['bao_format'] for ass in assay.get(['CHEMBL615111', 'CHEMBL615112', 'CHEMBL615113'])],
         [u'BAO_0000019', u'BAO_0000019', u'BAO_0000019'])
-        random_index = randint(0, count - 1)
+        random_index = 4567 #randint(0, count - 1)
         random_elem = assay.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('assay_category', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -166,7 +180,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEquals(atc_class.get('H03AA03')['who_name'], 'combinations of levothyroxine and liothyronine')
         self.assertEquals([atc['level5'] for atc in atc_class.all().order_by('level5')[0:5]],
             [u'A01AA01', u'A01AA02', u'A01AA03', u'A01AA04', u'A01AA30'])
-        random_index = randint(0, count - 1)
+        random_index = 4321 #randint(0, count - 1)
         random_elem = atc_class.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('level1', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -189,7 +203,7 @@ class TestSequenceFunctions(unittest.TestCase):
                            binding_site.get([962, 963, 943])], [u'Pfam-A', u'Pfam-A', u'Pfam-A'])
         self.assertEquals([bind['site_id'] for bind in binding_site.all().order_by('site_id')[0:5]],
             [1, 2, 3, 4, 5])
-        random_index = randint(0, count - 1)
+        random_index = 1234 #randint(0, count - 1)
         random_elem = binding_site.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('site_id', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -208,7 +222,7 @@ class TestSequenceFunctions(unittest.TestCase):
                                                     biocomponent.get([6451, 6452, 6453])]]))
         self.assertEquals([biocomp['component_id'] for biocomp in biocomponent.all().order_by('component_id')[0:5]],
             [6287, 6288, 6289, 6290, 6291])
-        random_index = randint(0, count - 1)
+        random_index = 321 #randint(0, count - 1)
         random_elem = biocomponent.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('component_id', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -233,7 +247,7 @@ class TestSequenceFunctions(unittest.TestCase):
             [cell['cell_id'] for cell in cell_line.get([2,3])])
         self.assertEqual([cell['cell_id'] for cell in cell_line.get(cell_chembl_id=['CHEMBL3307242','CHEMBL3307243'])],
             [cell['cell_id'] for cell in cell_line.get(cell_id=[2,3])])
-        random_index = randint(0, count - 1)
+        random_index = 1234 #randint(0, count - 1)
         random_elem = cell_line.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('cell_description', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -257,7 +271,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(document.filter(doc_type='PUBLICATION').filter(year__gt=1985).filter(volume=5).exists())
         self.assertTrue(all([page[0] < page[1] for page in [(doc['first_page'], doc['last_page']) for doc in
                                                 document.get(['CHEMBL1121361', 'CHEMBL1121362', 'CHEMBL1121364'])]]))
-        random_index = randint(0, count - 1)
+        random_index = 7777 #randint(0, count - 1)
         random_elem = document.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('abstract', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -293,7 +307,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('mechanism_of_action' in mechanism.get(662))
         self.assertEqual([mec['mec_id'] for mec in mechanism.all().order_by('mec_id')[0:5]],
             [13, 14, 15, 16, 17])
-        random_index = randint(0, count - 1)
+        random_index = 1234 #randint(0, count - 1)
         random_elem = mechanism.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('action_type', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -313,8 +327,9 @@ class TestSequenceFunctions(unittest.TestCase):
         parseString(mechanism.filter(moleculer_mechanism=True)[0])
 
     @pytest.mark.timeout(TIMEOUT)
-    def test_molecule_resource(self):
+    def test_molecule_resource_lists(self):
         molecule = new_client.molecule
+        molecule.set_format('json')
         count = len(molecule.all())
         self.assertTrue(count)
         self.assertTrue(molecule.filter(molecule_properties__acd_logp__gte=1.9)
@@ -324,6 +339,11 @@ class TestSequenceFunctions(unittest.TestCase):
         range = molecule.filter(molecule_properties__full_mwt__range=[200,201])
         self.assertTrue(range.exists())
         self.assertTrue(700 < len(range) < 800)
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_molecule_resource_multiple(self):
+        molecule = new_client.molecule
+        molecule.set_format('json')
         ids_from_ids_no_name = set(map(lambda x: x['molecule_chembl_id'],
                                                         molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])))
         ids_from_ids_by_name = set(map(lambda x: x['molecule_chembl_id'],
@@ -347,6 +367,12 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEquals(ids_from_keys_no_name, ids_from_keys_by_name)
         self.assertEquals(ids_from_keys_by_name, ids_from_smiles_no_name)
         self.assertEquals(ids_from_smiles_no_name, ids_from_smiles_by_name)
+
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_molecule_resource_details(self):
+        molecule = new_client.molecule
+        molecule.set_format('json')
         with_components = molecule.get('CHEMBL1743070')
         self.assertIsNotNone(with_components)
         self.assertTrue(len(with_components['biocomponents']))
@@ -357,7 +383,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn("organism", component)
         self.assertIn("sequence", component)
         self.assertIn("tax_id", component)
-        random_index = randint(0, count - 1)
+        random_index = 11234 #randint(0, count - 1)
         random_elem = molecule.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('atc_classifications', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -442,7 +468,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(all([form['parent'] == 'True' for form in
                              molecule_form.get(['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])]))
         self.assertEquals(len(molecule_form.get(molecule_chembl_id=['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])), 3)
-        random_index = randint(0, count - 1)
+        random_index = 6543 #randint(0, count - 1)
         random_elem = molecule_form.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('parent', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -467,7 +493,7 @@ class TestSequenceFunctions(unittest.TestCase):
                         len(protein_class.filter(l6="CAMK protein kinase AMPK subfamily")))
         self.assertEqual([prot['protein_class_id'] for prot in protein_class.all().order_by('protein_class_id')[0:5]],
             [1, 2, 3, 4, 5])
-        random_index = randint(0, count - 1)
+        random_index = 800 #randint(0, count - 1)
         random_elem = protein_class.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('l1', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -487,10 +513,14 @@ class TestSequenceFunctions(unittest.TestCase):
         similarity = new_client.similarity
         #self.assertTrue(len(similarity.all()))
         res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70)
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
         count = len(res)
+        most_similar = res[0]
+        self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
+        self.assertEqual(most_similar['pref_name'], 'ASPIRIN')
         self.assertTrue('molecule_hierarchy' in res.filter(molecule_properties__acd_logp__gte=3.4).filter(molecule_properties__hbd__lte=5)[0])
-        random_index = randint(0, count - 1)
+        random_index = 6 #randint(0, count - 1)
         random_elem = res[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('availability_type', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -524,6 +554,24 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('similarity', random_elem, 'One of required fields not found in resource %s' % random_elem)
         res.set_format('xml')
         parseString(res[0])
+        res.set_format('json')
+        res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70).order_by('similarity')
+        less_similar = res[0]
+        self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
+        self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70)
+        most_similar = res[0]
+        self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
+        self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
+        self.assertEqual(len(res), 1060)
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).order_by('similarity')
+        self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        less_similar = res[0]
+        self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
+        res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).filter(molecule_properties__aromatic_rings=2)
+        self.assertEqual(len(res), 481)
+
 
     @pytest.mark.timeout(TIMEOUT)
     def test_source_resource(self):
@@ -532,7 +580,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(count)
         self.assertTrue(source.filter(src_short_name="ATLAS").exists())
         self.assertEquals( [src['src_id'] for src in source.all().order_by('src_id')[0:5]], [1,2,3,4,5])
-        random_index = randint(0, count - 1)
+        random_index = 5#randint(0, count - 1)
         random_elem = source.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('src_description', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -550,7 +598,7 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(res)
         self.assertTrue('med_chem_friendly' in res.filter(molecule_properties__full_mwt__gte=400)
                                                .filter(molecule_properties__num_alerts__gt=1)[0]['molecule_properties'])
-        random_index = randint(0, count - 1)
+        random_index = 80 #randint(0, count - 1)
         random_elem = res[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('availability_type', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -590,11 +638,13 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(target.all())
         self.assertTrue(count)
         self.assertTrue(target.filter(organism="Homo sapiens").filter(target_type="SINGLE PROTEIN").exists())
+        self.assertTrue(target.filter(target_components__accession="Q13936").exists())
+        self.assertEqual(len(target.filter(target_components__accession="Q13936")), 3)
         self.assertEquals( [t['pref_name'] for t in target.get(['CHEMBL1927', 'CHEMBL1929', 'CHEMBL1930'])],
         ['Thioredoxin reductase 1',
          'Xanthine dehydrogenase',
          'Vitamin k epoxide reductase complex subunit 1 isoform 1'])
-        random_index = randint(0, count - 1)
+        random_index = 8888 #randint(0, count - 1)
         random_elem = target.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('organism', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -615,7 +665,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual([targcomp['component_id'] for targcomp in target_component.all().order_by('component_id')[0:5]],
             [1, 2, 3, 4, 5])
         target_component.set_format('xml')
-        random_index = randint(0, count - 1)
+        random_index = 5432 #randint(0, count - 1)
         random_elem = target_component.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
         self.assertIn('accession', random_elem, 'One of required fields not found in resource %s' % random_elem)

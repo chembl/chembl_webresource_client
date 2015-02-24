@@ -23,7 +23,7 @@ class UrlQuery(object):
         self.model = model
         self.logger = logging.getLogger(__name__)
         self.base_url = Settings.Instance().NEW_CLIENT_URL + '/' +  model.name.lower()
-        self.start = None
+        self.start = 0
         self.stop = None
         self.count = None
         self.limit = Settings.Instance().MAX_LIMIT
@@ -50,10 +50,7 @@ class UrlQuery(object):
 
     def rewind(self):
         self.current_chunk = None
-        if self.start is not None:
-            self.current_offset = self.start
-        else:
-            self.current_offset = 0
+        self.current_offset = self.start
         self.current_index = 0
         self.current_page = 0
 
@@ -63,18 +60,17 @@ class UrlQuery(object):
         if not self.allows_list:
             return
         if start is not None and stop is not None:
-            if self.current_chunk and self.current_page == (start / self.limit) and \
-               self.current_page == (stop / self.limit) and start >= self.start and (stop - start) <= self.limit:
+            if self.current_chunk and start >= self.start and self.current_page == ((start - self.start ) / self.limit) and \
+               self.current_page == ((stop - self.start - 1) / self.limit):
                 self.logger.info('reusing chunk')
-                new_start = (start-self.start) - self.current_page * self.limit  if \
-                self.start is not None else start - self.current_page * self.limit
+                new_start = (start-self.start) - self.current_page * self.limit
                 self.current_chunk = self.current_chunk[new_start:]
             else:
                 self.logger.info('resetting chunk')
                 self.current_chunk = None
         elif self.current_index >= self.limit:
             self.current_chunk = None
-        self.start = start
+        self.start = start if start is not None else 0
         self.stop = stop
         if start is not None and stop is not None:
             self.count = stop - start
@@ -331,7 +327,7 @@ class UrlQuery(object):
     def _prepare_url_params(self):
         url_params = self.filters[:]
         url_params.extend(map(lambda x:('order_by', x), self.ordering ))
-        start = self.start if self.start is not None else 0
+        start = self.start
         url_params.extend([('limit', self.limit), ('offset', start + self.limit * self.current_page)])
         return url_params
 
@@ -349,7 +345,6 @@ class UrlQuery(object):
             res = self._get_session().post(self.base_url + '.' + self.frmt, data=data)
             self.logger.info(res.url)
             self.logger.info(data)
-            self.logger.info('Content: %s' % res.content)
             self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
             if not res.ok:
                 handle_http_error(res)
@@ -362,7 +357,7 @@ class UrlQuery(object):
                 self.current_chunk = [e.toxml() for e in xml.getElementsByTagName(self.collection_name)[0].childNodes]
                 page_meta = xml.getElementsByTagName('page_meta')[0]
                 self.api_total_count = int(page_meta.getElementsByTagName('total_count')[0].childNodes[0].data)
-        start = self.start if self.start else 0
+        start = self.start
         return self.current_chunk[:(self.stop - start) - self.current_index] if self.stop is not None else self.current_chunk
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -370,7 +365,7 @@ class UrlQuery(object):
     def next_page(self):
         if not self.allows_list:
             return
-        start = self.start if self.start is not None else 0
+        start = self.start
         self.current_index = start + self.limit * (self.current_page + 1)
         return self.get_page()
 
@@ -381,7 +376,7 @@ class UrlQuery(object):
             return
         if not self.current_page:
             return []
-        start = self.start if self.start is not None else 0
+        start = self.start
         self.current_index = start + self.limit * (self.current_page - 1)
         return self.get_page()
 
