@@ -1,6 +1,3 @@
-.. image:: https://badge.waffle.io/chembl/chembl_webresource_client.png?label=ready&title=Ready 
- :target: https://waffle.io/chembl/chembl_webresource_client
- :alt: 'Stories in Ready'
 chembl_webresource_client
 ======
 
@@ -11,6 +8,10 @@ chembl_webresource_client
 .. image:: https://pypip.in/d/chembl_webresource_client/badge.png
     :target: https://crate.io/packages/chembl_webresource_client/
     :alt: Number of PyPI downloads
+
+.. image:: https://badge.waffle.io/chembl/chembl_webresource_client.png?label=ready&title=Ready 
+ :target: https://waffle.io/chembl/chembl_webresource_client
+ :alt: 'Stories in Ready'
 
 This is chembl_webresource_client package developed at Chembl group, EMBL-EBI, Cambridge, UK.
 
