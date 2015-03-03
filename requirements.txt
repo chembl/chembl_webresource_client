@@ -1,0 +1,4 @@
+requests==2.2.1
+requests-cache==0.4.4
+grequests==0.2.0
+easydict
