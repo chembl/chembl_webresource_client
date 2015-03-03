@@ -5,7 +5,7 @@ chembl_webresource_client
     :target: https://crate.io/packages/chembl_webresource_client/
     :alt: Latest PyPI version
 
-.. image:: https://pypip.in/d/chembl_webresource_slient/badge.png
+.. image:: https://pypip.in/d/chembl_webresource_client/badge.png
     :target: https://crate.io/packages/chembl_webresource_client/
     :alt: Number of PyPI downloads
 
