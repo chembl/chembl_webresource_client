@@ -269,12 +269,12 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(document.all())
         self.assertTrue(count)
         self.assertTrue(document.filter(doc_type='PUBLICATION').filter(year__gt=1985).filter(volume=5).exists())
+        self.assertTrue(document.order_by('authors').exists())
         self.assertTrue(all([page[0] < page[1] for page in [(doc['first_page'], doc['last_page']) for doc in
                                                 document.get(['CHEMBL1121361', 'CHEMBL1121362', 'CHEMBL1121364'])]]))
         random_index = 7777 #randint(0, count - 1)
         random_elem = document.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get %s element from the list" % random_index)
-        self.assertIn('abstract', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('authors', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('doc_type', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource %s' % random_elem)
@@ -339,6 +339,12 @@ class TestSequenceFunctions(unittest.TestCase):
         range = molecule.filter(molecule_properties__full_mwt__range=[200,201])
         self.assertTrue(range.exists())
         self.assertTrue(700 < len(range) < 800)
+        exact = molecule.filter(molecule_structures__canonical_smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
+        self.assertEqual(len(exact),1)
+        self.assertEqual(map(lambda x: x['molecule_chembl_id'], exact), ['CHEMBL446858'])
+        flex = molecule.filter(molecule_structures__canonical_smiles__flexmatch="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
+        self.assertEqual(len(flex),2)
+        self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], flex)), set(['CHEMBL446858', 'CHEMBL1']))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_resource_multiple(self):
