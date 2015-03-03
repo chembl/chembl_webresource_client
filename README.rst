@@ -1,3 +1,6 @@
+.. image:: https://badge.waffle.io/chembl/chembl_webresource_client.png?label=ready&title=Ready 
+ :target: https://waffle.io/chembl/chembl_webresource_client
+ :alt: 'Stories in Ready'
 chembl_webresource_client
 ======
 
