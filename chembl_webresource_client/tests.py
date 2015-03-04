@@ -75,10 +75,10 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(compounds.bioactivities('CHEMBL1')) > 10)
         self.assertEqual(len(compounds.forms('CHEMBL415863')), 2)
         self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL415863'))),
-                         {'CHEMBL415863', 'CHEMBL1207563'})
+                         set(['CHEMBL415863', 'CHEMBL1207563']))
         self.assertEqual(len(compounds.forms('CHEMBL1207563')), 2)
         self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL1207563'))),
-                         {'CHEMBL415863', 'CHEMBL1207563'})
+                         set(['CHEMBL415863', 'CHEMBL1207563']))
         self.assertEqual(len(compounds.forms('CHEMBL1078826')), 17)
         self.assertEqual(len(compounds.drug_mechanisms('CHEMBL1642')), 3)
         self.assertTrue('Stem cell growth factor receptor' in [comp['name'] for
