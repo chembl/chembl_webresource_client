@@ -3,8 +3,7 @@ python:
   - "2.7"
 # command to install dependencies
 install:
-  - pip install .
-  - pip install -r requirements.txt
+  - pip install chembl_webresource_client/
   
 script:
   - python chembl_webresource_client/tests.py
