@@ -29,7 +29,7 @@ setup(
         'grequests==0.2.0',
         'easydict',
     ],
-    tests_require = ['pytest', 'pytest-timeout'],
+    tests_require = ['pytest-timeout'],
     classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: Apache Software License',
