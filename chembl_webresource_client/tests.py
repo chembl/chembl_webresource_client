@@ -13,6 +13,7 @@ import pytest
 import logging
 #from random import randint
 logging.basicConfig()
+logging.basicConfig(level=logging.INFO)
 
 TIMEOUT = Settings.Instance().TEST_CASE_TIMEOUT
 
