@@ -24,7 +24,8 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=[
         'six',
-        'requests==2.2.1',
+        'urllib3',
+        'requests==2.5.3',
         'requests-cache==0.4.4',
         'grequests==0.2.0',
         'easydict',
