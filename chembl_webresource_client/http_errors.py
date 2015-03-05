@@ -72,6 +72,21 @@ class HttpNotImplemented(BaseHttpException):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+class HttpBadGateway(BaseHttpException):
+    pass
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+class HttpServiceUnavailable(BaseHttpException):
+    pass
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+class HttpGatewayTimeout(BaseHttpException):
+    pass
+
+#-----------------------------------------------------------------------------------------------------------------------
+
 status_to_exception = {
     400: HttpBadRequest,
     401: HttpUnauthorized,
@@ -83,7 +98,10 @@ status_to_exception = {
     422: HttpUnprocessableEntity,
     429: HttpTooManyRequests,
     500: HttpApplicationError,
-    501: HttpNotImplemented
+    501: HttpNotImplemented,
+    502: HttpBadGateway,
+    503: HttpServiceUnavailable,
+    504: HttpGatewayTimeout,
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
