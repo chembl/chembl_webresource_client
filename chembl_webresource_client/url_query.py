@@ -10,6 +10,8 @@ import logging
 import mimetypes
 from chembl_webresource_client.cache import monkeypatch_requests_cache
 from chembl_webresource_client.http_errors import handle_http_error
+from requests.packages.urllib3.util import Retry
+from requests.adapters import HTTPAdapter
 
 mimetypes.init()
 monkeypatch_requests_cache()
@@ -315,11 +317,15 @@ class UrlQuery(object):
     def _get_session(self):
         s = Settings.Instance()
         if not self.session:
+            retry = Retry(total=Settings.Instance().TOTAL_RETRIES, backoff_factor=Settings.Instance().BACKOFF_FACTOR)
+            adapter = requests.adapters.HTTPAdapter(max_retries=retry)
             self.session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite',
                 fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
             if s.PROXIES:
                 self.session.proxies = s.PROXIES
             self.session.headers.update({'X_HTTP_METHOD_OVERRIDE' : 'get'})
+            self.session.mount('http://', adapter)
+            self.session.mount('https://', adapter)
         return self.session
 
 #-----------------------------------------------------------------------------------------------------------------------
