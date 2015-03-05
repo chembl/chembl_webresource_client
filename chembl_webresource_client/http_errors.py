@@ -9,6 +9,9 @@ class BaseHttpException(Exception):
         self.url = url
         self.content = content
 
+    def __str__(self):
+        return 'Error for url %s, server response: %s' % (self.url, self.content)
+
     def __repr__(self):
         return 'Error for url %s, server response: %s' % (self.url, self.content)
 
