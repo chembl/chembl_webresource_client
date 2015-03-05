@@ -24,6 +24,7 @@ class TestSequenceFunctions(unittest.TestCase):
         Settings.Instance().WEBSERVICE_PROTOCOL = 'https'
         Settings.Instance().WEBSERVICE_DOMAIN = 'www.ebi.ac.uk'
         Settings.Instance().WEBSERVICE_PREFIX = '/chemblws'
+        Settings.Instance().CONCURRENT_SIZE = 4
         Settings.Instance().NEW_CLIENT_URL = 'https://wwwdev.ebi.ac.uk/chembl/api/data'
         Settings.Instance().TIMEOUT = 10
         self.startTime = time.time()

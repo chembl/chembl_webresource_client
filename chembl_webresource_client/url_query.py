@@ -319,7 +319,8 @@ class UrlQuery(object):
         if not self.session:
             retry = Retry(total=Settings.Instance().TOTAL_RETRIES, backoff_factor=Settings.Instance().BACKOFF_FACTOR,
                     status_forcelist=(range(400, 421) + range(500, 505)))
-            adapter = requests.adapters.HTTPAdapter(max_retries=retry)
+            size = Settings.Instance().CONCURRENT_SIZE
+            adapter = requests.adapters.HTTPAdapter(pool_connections=size, pool_maxsize=size, pool_block=True, max_retries=retry)
             self.session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite',
                 fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
             if s.PROXIES:
