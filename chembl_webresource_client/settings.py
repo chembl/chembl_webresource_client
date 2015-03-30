@@ -19,6 +19,7 @@ class Settings:
     TIMEOUT = 3.0
     UTILS_SPORE_URL = 'https://www.ebi.ac.uk/chembl/api/utils/spore'
     NEW_CLIENT_URL = 'https://www.ebi.ac.uk/chembl/api/data'
+    NEW_CLIENT_TIMEOUT = None
     TEST_CASE_TIMEOUT = 10
     MAX_LIMIT = 20
     REPR_OUTPUT_SIZE = 5

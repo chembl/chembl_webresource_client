@@ -30,6 +30,7 @@ class UrlQuery(object):
         self.count = None
         self.limit = Settings.Instance().MAX_LIMIT
         self.max_url_size = Settings.Instance().MAX_URL_SIZE
+        self.timeout = Settings.Instance().NEW_CLIENT_TIMEOUT
         self.current_offset = 0
         self.current_index = 0
         self.current_chunk = None
@@ -261,7 +262,7 @@ class UrlQuery(object):
             url = self.base_url + '/'  + quote(str(ids))
             if len(url) > self.max_url_size:
                 raise Exception('URL %s is longer than allowed %s characters' % (url, self.max_url_size))
-            res = self._get_session().get(url, headers=headers)
+            res = self._get_session().get(url, headers=headers, timeout=self.timeout)
             self.logger.info(res.url)
             self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
             if not res.ok:
@@ -287,13 +288,13 @@ class UrlQuery(object):
                 old_url = url
                 url += ';' + quote(str(id))
                 if len(url) > self.max_url_size:
-                    res = self._get_session().get(old_url, headers=headers)
+                    res = self._get_session().get(old_url, headers=headers, timeout=self.timeout)
                     self.logger.info(res.url)
                     self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
                     if not res.ok:
                         handle_http_error(res)
                     self._gather_results(res, ret)
-        res = self._get_session().get(url, headers=headers)
+        res = self._get_session().get(url, headers=headers, timeout=self.timeout)
         self.logger.info(res.url)
         self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
         if res.ok:
@@ -317,10 +318,11 @@ class UrlQuery(object):
     def _get_session(self):
         s = Settings.Instance()
         if not self.session:
-            retry = Retry(total=Settings.Instance().TOTAL_RETRIES, backoff_factor=Settings.Instance().BACKOFF_FACTOR,
+            retry = Retry(total=s.TOTAL_RETRIES, backoff_factor=s.BACKOFF_FACTOR,
                     status_forcelist=(range(400, 421) + range(500, 505)))
-            size = Settings.Instance().CONCURRENT_SIZE
-            adapter = requests.adapters.HTTPAdapter(pool_connections=size, pool_maxsize=size, pool_block=True, max_retries=retry)
+            size = s.CONCURRENT_SIZE
+            adapter = requests.adapters.HTTPAdapter(pool_connections=size, pool_maxsize=size, pool_block=True,
+                max_retries=retry)
             self.session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite',
                 fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
             if s.PROXIES:
@@ -350,7 +352,7 @@ class UrlQuery(object):
         if not self.current_chunk or self.current_page != (self.current_index / self.limit):
             self.current_page = (self.current_index / self.limit)
             data = self._prepare_url_params()
-            res = self._get_session().post(self.base_url + '.' + self.frmt, data=data)
+            res = self._get_session().post(self.base_url + '.' + self.frmt, data=data, timeout=self.timeout)
             self.logger.info(res.url)
             self.logger.info(data)
             self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
