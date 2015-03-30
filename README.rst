@@ -1,15 +1,27 @@
 chembl_webresource_client
 ======
 
-.. image:: https://pypip.in/v/chembl_webresource_client/badge.png
-    :target: https://crate.io/packages/chembl_webresource_client/
-    :alt: Latest PyPI version
+.. image:: https://pypip.in/version/chembl_webresource_client/badge.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Latest Version
 
-.. image:: https://pypip.in/d/chembl_webresource_client/badge.png
-    :target: https://crate.io/packages/chembl_webresource_client/
-    :alt: Number of PyPI downloads
+.. image:: https://pypip.in/download/chembl_webresource_client/badge.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Downloads
 
-.. image:: https://badge.waffle.io/chembl/chembl_webresource_client.png?label=ready&title=Ready 
+.. image:: https://pypip.in/py_versions/chembl_webresource_client/badge.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Supported Python versions
+
+.. image:: https://pypip.in/status/chembl_webresource_client/badge.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Development Status
+
+.. image:: https://pypip.in/license/chembl_webresource_client/badge.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: License
+
+.. image:: https://badge.waffle.io/chembl/chembl_webresource_client.png?label=ready&title=Ready&style=flat 
  :target: https://waffle.io/chembl/chembl_webresource_client
  :alt: 'Stories in Ready'
 
