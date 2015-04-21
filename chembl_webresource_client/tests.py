@@ -661,6 +661,15 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('target_chembl_id', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('target_type', random_elem, 'One of required fields not found in resource %s' % random_elem)
         self.assertIn('target_components', random_elem, 'One of required fields not found in resource %s' % random_elem)
+        has_components = target.get('CHEMBL247')
+        target_component = has_components['target_components'][0]
+        self.assertIn('accession', target_component, 'One of required fields not found in resource %s' % target_component)
+        self.assertIn('component_id', target_component, 'One of required fields not found in resource %s' % target_component)
+        self.assertIn('component_type', target_component, 'One of required fields not found in resource %s' % target_component)
+        self.assertIn('target_component_synonyms', target_component, 'One of required fields not found in resource %s' % target_component)
+        synonym = target_component['target_component_synonyms'][0]
+        self.assertIn('component_synonym', synonym, 'One of required fields not found in resource %s' % synonym)
+        self.assertIn('syn_type', synonym, 'One of required fields not found in resource %s' % synonym)
         target.set_format('xml')
         parseString(target.all()[0])
 
@@ -672,6 +681,11 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('sequence' in target_component.get(1295))
         self.assertEqual([targcomp['component_id'] for targcomp in target_component.all().order_by('component_id')[0:5]],
             [1, 2, 3, 4, 5])
+        has_synonyms = target_component.get(375)
+        self.assertIn('target_component_synonyms', has_synonyms, 'One of required fields not found in resource %s' % has_synonyms)
+        synonym = has_synonyms['target_component_synonyms'][0]
+        self.assertIn('component_synonym', synonym, 'One of required fields not found in resource %s' % synonym)
+        self.assertIn('syn_type', synonym, 'One of required fields not found in resource %s' % synonym)
         target_component.set_format('xml')
         random_index = 5432 #randint(0, count - 1)
         random_elem = target_component.all()[random_index]
