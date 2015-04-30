@@ -757,7 +757,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_utils_standardisation(self):
         mol = utils.smiles2ctab("[Na]OC(=O)c1ccccc1")
-        br = utils.breakbonds(mol)
+        br = utils.breakBonds(mol)
         smiles = utils.ctab2smiles(br).split()[2]
         self.assertEqual(smiles, '[Na+].O=C([O-])c1ccccc1')
         mol = utils.smiles2ctab("C(C(=O)[O-])(Cc1n[n-]nn1)(C[NH3+])(C[N+](=O)[O-])")
