@@ -327,7 +327,7 @@ class UrlQuery(object):
                 fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
             if s.PROXIES:
                 self.session.proxies = s.PROXIES
-            self.session.headers.update({'X_HTTP_METHOD_OVERRIDE' : 'get'})
+            self.session.headers.update({"X-HTTP-Method-Override": "GET"})
             self.session.mount('http://', adapter)
             self.session.mount('https://', adapter)
         return self.session
