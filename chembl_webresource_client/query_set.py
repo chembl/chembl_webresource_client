@@ -32,7 +32,7 @@ class QuerySet(object):
             self.query = query
         self.logger = logging.getLogger(__name__)
         self.chunk = None
-        self.current_index = None
+        self.current_index = 0
         self.can_filter = True
         self.limits = None
 
@@ -116,7 +116,7 @@ class QuerySet(object):
                 raise StopIteration
             self.current_index = 0
 
-        ret =  self.chunk[self.current_index]
+        ret = self.chunk[self.current_index]
         self.current_index += 1
         return ret
 
