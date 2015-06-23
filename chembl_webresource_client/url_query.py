@@ -52,9 +52,9 @@ class UrlQuery(object):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def rewind(self):
-        self.start = 0
-        self.stop = None
-        self.count = None
+        if self.stop and self.stop - self.start == 1:
+            self.start = 0
+            self.stop = None
         self.current_chunk = None
         self.current_offset = self.start
         self.current_index = 0

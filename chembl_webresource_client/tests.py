@@ -376,6 +376,12 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_molecule_resource_details(self):
         molecule = new_client.molecule
         molecule.set_format('json')
+        approved_drugs = molecule.filter(max_phase=4)
+        approved_drugs_count = len(approved_drugs)
+        self.assertTrue(approved_drugs_count > 2000)
+        len(approved_drugs[123])
+        self.assertEquals(len([m for m in approved_drugs[2:5]]), 3)
+        self.assertEqual(len([m for m in approved_drugs]), approved_drugs_count)
         with_components = molecule.get('CHEMBL1743070')
         self.assertIsNotNone(with_components)
         therapeutic = with_components['biotherapeutic']
@@ -519,7 +525,9 @@ class TestSequenceFunctions(unittest.TestCase):
     @pytest.mark.timeout(TIMEOUT)
     def test_similarity_resource(self):
         similarity = new_client.similarity
-        #self.assertTrue(len(similarity.all()))
+        res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(res.exists())
         res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
@@ -600,7 +608,11 @@ class TestSequenceFunctions(unittest.TestCase):
     @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource(self):
         substructure = new_client.substructure
-        #self.assertTrue(len(substructure.all()))
+        res = substructure.filter(smiles="CCC#C\C=C/CCC")
+        self.assertTrue(res.exists())
+        slice = res[:6]
+        self.assertEquals(len([m for m in slice]), 6)
+        self.assertTrue(len(res) > 10)
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(res.exists())
         count = len(res)
