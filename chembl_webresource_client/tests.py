@@ -376,6 +376,12 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_molecule_resource_details(self):
         molecule = new_client.molecule
         molecule.set_format('json')
+        chembl125_smiles = 'CCCCCCCCCCCCCCCCOP(=O)([O-])OCC[N+](C)(C)C'
+        self.assertEqual(molecule.get(chembl125_smiles)['molecule_chembl_id'], 'CHEMBL125')
+        self.assertEqual(molecule.filter(smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
+        self.assertEqual(molecule.filter(molecule_structures__canonical_smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
+        self.assertEqual(molecule.filter(molecule_structures__canonical_smiles__exact=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
+        self.assertEqual(molecule.filter(molecule_structures__canonical_smiles__flexmatch=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
         approved_drugs = molecule.filter(max_phase=4)
         approved_drugs_count = len(approved_drugs)
         self.assertTrue(approved_drugs_count > 2000)
