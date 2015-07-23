@@ -1,10 +1,9 @@
 language: python
 
+sudo: false
+
 python:
 - 2.7
-
-before_install:
- - sudo apt-get update -qq
 
  # download and install miniconda
  - wget http://repo.continuum.io/miniconda/Miniconda-3.5.5-Linux-x86_64.sh -O miniconda.sh;
