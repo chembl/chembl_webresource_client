@@ -328,7 +328,7 @@ class UrlQuery(object):
         s = Settings.Instance()
         if not self.session:
             retry = Retry(total=s.TOTAL_RETRIES, backoff_factor=s.BACKOFF_FACTOR,
-                    status_forcelist=(range(400, 421) + range(500, 505)))
+                    status_forcelist=(list(range(400, 421)) + list(range(500, 505))))
             size = s.CONCURRENT_SIZE
             adapter = requests.adapters.HTTPAdapter(pool_connections=size, pool_maxsize=size, pool_block=True,
                 max_retries=retry)

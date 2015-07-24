@@ -1,5 +1,6 @@
 __author__ = 'mnowotka'
 
+from six.moves import xrange as range
 from xml.dom.minidom import parseString
 from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import *
@@ -533,10 +534,10 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_similarity_resource(self):
         similarity = new_client.similarity
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
-        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
         res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70)
-        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
         count = len(res)
         most_similar = res[0]
@@ -581,15 +582,15 @@ class TestSequenceFunctions(unittest.TestCase):
         res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70).order_by('similarity')
         less_similar = res[0]
         self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
-        self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70)
         most_similar = res[0]
         self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
         self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
         self.assertEqual(len(res), 1060)
-        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).order_by('similarity')
-        self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in xrange(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         less_similar = res[0]
         self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).filter(molecule_properties__aromatic_rings=2)
