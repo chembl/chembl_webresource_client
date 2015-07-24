@@ -2,7 +2,13 @@ __author__ = 'mnowotka'
 
 from chembl_webresource_client.settings import Settings
 from xml.dom.minidom import parseString
-from urllib import quote, urlencode
+
+try:
+    from urllib import urlencode
+    from urllib import quote
+except ImportError:
+    from urllib.parse import urlencode
+    from urllib.parse import quote
 import requests
 import requests_cache
 import six
