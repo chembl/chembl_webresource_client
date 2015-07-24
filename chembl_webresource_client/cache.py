@@ -9,7 +9,7 @@ def create_key(self, request):
     if request.body:
         key.update(_to_bytes(request.body))
     if request.headers and 'Accept' in request.headers:
-        key.update(request.headers['Accept'])
+        key.update(_to_bytes(request.headers['Accept']))
     return key.hexdigest()
 
 def monkeypatch_requests_cache():

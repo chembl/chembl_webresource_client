@@ -12,6 +12,7 @@ except ImportError:
 import requests
 import requests_cache
 import six
+from six import string_types
 import logging
 import mimetypes
 from chembl_webresource_client.cache import monkeypatch_requests_cache
@@ -189,7 +190,7 @@ class UrlQuery(object):
     def add_filters(self, **kwargs):
         if not self.allows_list:
             return
-        self.filters.extend([(key, quote(value) if isinstance(value, basestring) else value)
+        self.filters.extend([(key, quote(value) if isinstance(value, string_types) else value)
                              for key, value in kwargs.items()])
         self.set_limits(None, None)
 
