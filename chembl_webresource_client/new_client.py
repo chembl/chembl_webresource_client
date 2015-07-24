@@ -1,6 +1,9 @@
 __author__ = 'mnowotka'
 
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 import requests
 import requests_cache
 from chembl_webresource_client.spore_client import Client, make_spore_function
