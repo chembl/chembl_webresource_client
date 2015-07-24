@@ -135,7 +135,7 @@ class Client(object):
         # needed
         path = definition.path
         for kw in method_kw.keys():
-            key = ':%s' % kw
+            key = ':{0}'.format(kw)
             if key in path and kw != 'data':
                 path = path.replace(key, method_kw.pop(kw))
 

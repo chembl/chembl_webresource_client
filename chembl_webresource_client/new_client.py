@@ -26,7 +26,7 @@ def client_from_url(url, base_url=None):
     """
     res = requests.get(url)
     if not res.ok:
-        raise Exception('Error getting schema from url %s with status %s and msg %s' % (url, res.status_code, res.text))
+        raise Exception('Error getting schema from url {0} with status {1} and msg {2}'.format(url, res.status_code, res.text))
     schema = res.json()
     if 'base_url' not in schema:
         if base_url:

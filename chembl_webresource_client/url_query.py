@@ -209,7 +209,7 @@ class UrlQuery(object):
             return
         available_formats = self.model.formats or ('json', 'xml')
         if frmt not in available_formats:
-            raise Exception('%s is not an available format (%s)' % (frmt, available_formats))
+            raise Exception('{0} is not an available format ({1})'.format(frmt, available_formats))
         self.frmt = frmt
         self.rewind()
 
@@ -264,10 +264,10 @@ class UrlQuery(object):
         if not isinstance(ids, (list, tuple)):
             url = self.base_url + '/'  + quote(str(ids))
             if len(url) > self.max_url_size:
-                raise Exception('URL %s is longer than allowed %s characters' % (url, self.max_url_size))
+                raise Exception('URL {0} is longer than allowed {1} characters'.format(url, self.max_url_size))
             res = self._get_session().get(url, headers=headers, timeout=self.timeout)
             self.logger.info(res.url)
-            self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
+            self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
             if not res.ok:
                 handle_http_error(res)
             if self.frmt == 'json':
@@ -281,25 +281,25 @@ class UrlQuery(object):
         ret = []
         url = self.base_url + '/set/'
         if len(url) > self.max_url_size:
-            raise Exception('URL %s is longer than allowed %s characters' % (url, self.max_url_size))
+            raise Exception('URL {0} is longer than allowed {1} characters'.format(url, self.max_url_size))
         for id in ids:
             if url.endswith('/'):
                 url += quote(str(id))
                 if len(url) > self.max_url_size:
-                    raise Exception('URL %s is longer than allowed %s characters' % (url, self.max_url_size))
+                    raise Exception('URL {0} is longer than allowed {1} characters'.format(url, self.max_url_size))
             else:
                 old_url = url
                 url += ';' + quote(str(id))
                 if len(url) > self.max_url_size:
                     res = self._get_session().get(old_url, headers=headers, timeout=self.timeout)
                     self.logger.info(res.url)
-                    self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
+                    self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
                     if not res.ok:
                         handle_http_error(res)
                     self._gather_results(res, ret)
         res = self._get_session().get(url, headers=headers, timeout=self.timeout)
         self.logger.info(res.url)
-        self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
+        self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
         if res.ok:
             self._gather_results(res, ret)
         else:
@@ -358,7 +358,7 @@ class UrlQuery(object):
             res = self._get_session().post(self.base_url + '.' + self.frmt, data=data, timeout=self.timeout)
             self.logger.info(res.url)
             self.logger.info(data)
-            self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
+            self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
             if not res.ok:
                 handle_http_error(res)
             if self.frmt == 'json':

@@ -29,7 +29,7 @@ class Settings:
 
     @property
     def webservice_root_url(self):
-        return '%s://%s%s' % (self.WEBSERVICE_PROTOCOL, self.WEBSERVICE_DOMAIN, self.WEBSERVICE_PREFIX)
+        return '{0}://{1}{2}'.format(self.WEBSERVICE_PROTOCOL, self.WEBSERVICE_DOMAIN, self.WEBSERVICE_PREFIX)
 
     def clear_cache(self):
         from requests_cache import clear

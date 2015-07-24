@@ -62,14 +62,14 @@ class WebResource(object):
 
     def get_service(self):
         try:
-            res = requests.get('%s/status/' % Settings.Instance().webservice_root_url,
-                               timeout=Settings.Instance().TIMEOUT)
+            res = requests.get('{0}/status/'.format(Settings.Instance().webservice_root_url,
+                               timeout=Settings.Instance().TIMEOUT))
             if not res.ok:
-                self.logger.warning('Error when retrieving url: %s, status code: %s, msg: %s' %
-                              (res.url, res.status_code, res.text))
+                self.logger.warning('Error when retrieving url: {0}, status code: {1}, msg: {2}'.format(
+                    res.url, res.status_code, res.text))
                 return None
             self.logger.info(res.url)
-            self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
+            self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
             js = res.json()
             if not 'service' in js:
                 return False
@@ -107,11 +107,11 @@ class WebResource(object):
             else:
                 res = session.post(url, data=data, headers={'Accept': self.content_types[frmt]}, **kwargs)
             if not res.ok:
-                self.logger.warning('Error when retrieving url: %s, status code: %s, msg: %s' %
-                              (res.url, res.status_code, res.text))
+                self.logger.warning('Error when retrieving url: {0}, status code: {1}, msg: {2}'.format(
+                    res.url, res.status_code, res.text))
                 return res.status_code
             self.logger.info(res.url)
-            self.logger.info('From cache: %s' % (res.from_cache if hasattr(res, 'from_cache') else False))
+            self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
             return res.json().values()[0] if frmt == 'json' else res.content
         except Exception:
             return None
@@ -120,7 +120,7 @@ class WebResource(object):
 
     def bioactivities(self, chembl_id, frmt='json'):
         session = self._get_session()
-        url = '%s/%s/%s/bioactivities.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
+        url = '{0}/{1}/{2}/bioactivities.{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
         return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -192,9 +192,9 @@ class WebResource(object):
     def get_one(self, chembl_id, frmt='json', async=False, prop=None):
         if chembl_id:
             if not prop:
-                url = '%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
+                url = '{0}/{1}/{2}.{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
             else:
-                url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name,
+                url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name,
                                           chembl_id, prop, frmt)
             return self._get_one(url, async, frmt)
 

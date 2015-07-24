@@ -60,8 +60,8 @@ class QuerySet(object):
         if pickled_version:
             current_version = __version__
             if current_version != pickled_version:
-                msg = ("Pickled queryset version %s does not match the current version %s" %
-                       (pickled_version, current_version))
+                msg = ("Pickled queryset version {0} does not match the current version {1}" .format(
+                    pickled_version, current_version))
         else:
             msg = "Pickled queryset version is not specified."
 
@@ -72,7 +72,7 @@ class QuerySet(object):
 
     def __repr__(self):
         if not self.query.allows_multiple:
-            return '%s resource' % self.model.name
+            return '{0} resource'.format(self.model.name)
         clone = self._clone()
         data = list(clone[:Settings.Instance().REPR_OUTPUT_SIZE])
         length = len(self)
@@ -157,7 +157,7 @@ class QuerySet(object):
             else:
                 stop = None
             clone.limits = (start, stop) if start is not None else (0, stop)
-            self.logger.info('__getitem__, self.limits = %s, k = %s' % (clone.limits, k))
+            self.logger.info('__getitem__, self.limits = {0}, k = {1}'.format(clone.limits, k))
             clone.query.set_limits(clone.limits[0], clone.limits[1])
             return clone
 

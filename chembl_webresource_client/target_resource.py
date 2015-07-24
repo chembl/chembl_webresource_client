@@ -18,7 +18,7 @@ class TargetResource(WebResource):
 
     def get_all(self, frmt='json'):
         session = self._get_session()
-        url = '%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, frmt)
+        url = '{0}/{1}.{2}'.format(Settings.Instance().webservice_root_url, self.name, frmt)
         return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ class TargetResource(WebResource):
             self.logger.warning('No identifier given')
             return None
         key = 'uniprot'
-        url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
+        url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
         return self._get_one(url, async, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------

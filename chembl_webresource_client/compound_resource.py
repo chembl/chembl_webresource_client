@@ -46,11 +46,11 @@ class CompoundResource(WebResource):
             self.logger.warning('No identifier given.')
             return None
         if any(x in kwargs[key] for x in self.url_unsafe_characters):
-            url = '%s/%s/%s' % (Settings.Instance().webservice_root_url, self.name, key)
+            url = '{0}/{1}/{2}'.format(Settings.Instance().webservice_root_url, self.name, key)
             method = 'post'
             data = {key : kwargs[key]}
         else:
-            url = '%s/%s/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
+            url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
         return self._get_one(url, async, frmt, method, data)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -72,17 +72,17 @@ class CompoundResource(WebResource):
             data = {'smiles':struct}
             if 'simscore' in kwargs:
                 data['simscore'] = kwargs['simscore']
-                url = '%s/%s/similarity' % (Settings.Instance().webservice_root_url, self.name)
+                url = '{0}/{1}/similarity'.format(Settings.Instance().webservice_root_url, self.name)
             else:
-                url = '%s/%s/substructure' % (Settings.Instance().webservice_root_url, self.name)
+                url = '{0}/{1}/substructure'.format(Settings.Instance().webservice_root_url, self.name)
             return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT, method='post',
                 data=data)
         if 'simscore' in kwargs:
             simscore = kwargs['simscore']
-            url = '%s/%s/similarity/%s/%s.%s' % (Settings.Instance().webservice_root_url, self.name, struct,
+            url = '{0}/{1}/similarity/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, struct,
                                                  simscore, frmt)
         else:
-            url = '%s/%s/substructure/%s.%s' % (Settings.Instance().webservice_root_url, self.name, struct, frmt)
+            url = '{0}/{1}/substructure/{2}.{3}'.format(Settings.Instance().webservice_root_url, self.name, struct, frmt)
         return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -120,18 +120,18 @@ class CompoundResource(WebResource):
             engine = kwargs.get('engine', 'rdkit')
             ignore_coords = kwargs.get('ignoreCoords', False)
 
-            query = '?engine=%s&dimensions=%s' % (engine, size)
+            query = '?engine={0}&dimensions={1}'.format(engine, size)
             if ignore_coords:
                 query += '&ignoreCoords=1'
 
             if chembl_id:
-                url = '%s/%s/%s/image%s' % (Settings.Instance().webservice_root_url, self.name, chembl_id, query)
+                url = '{0}/{1}/{2}/image{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, query)
                 if async:
                     return grequests.get(url, session=session)
                 res = session.get(url, timeout=Settings.Instance().TIMEOUT)
                 if not res.ok:
-                    self.logger.warning('Error when retrieving url: %s, status code: %s, msg: %s' %
-                              (res.url, res.status_code, res.text))
+                    self.logger.warning('Error when retrieving url: {0}, status code: {1}, msg: {2}'.format(
+                        res.url, res.status_code, res.text))
                     return res.status_code
                 self.logger.info(res.url)
                 return res.content
