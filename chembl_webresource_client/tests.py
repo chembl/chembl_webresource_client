@@ -448,25 +448,25 @@ class TestSequenceFunctions(unittest.TestCase):
         atc_query = ['CHEMBL1073','CHEMBL1201496']
         molecules = new_client.molecule.get(atc_query)
         self.assertEqual(len(molecules),2)
-        longest_chembl_smiles = "CC.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC1OC(CO)C(O)C(O)C1O)C(O)CO.CCCCCCCCCCCCCCCC" \
-                                "[NH2+]OC(CO)C(O)C(OC2OC(CO)C(O)C(O)C2O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(O" \
-                                "C3OC(CO)C(O)C(O)C3O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC4OC(CO)C(O)C(O)C4O" \
-                                ")C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC5OC(CO)C(O)C(O)C5O)C(O)CO.CCCCCCCCCCC" \
-                                "CCCCC[NH2+]OC(CO)C(O)C(OC6OC(CO)C(O)C(O)C6O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(" \
-                                "O)C(OC7OC(CO)C(O)C(O)C7O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC8OC(CO)C(O)C(" \
-                                "O)C8O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC9OC(CO)C(O)C(O)C9O)C(O)CO.CCCCCC" \
-                                "CCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%10OC(CO)C(O)C(O)C%10O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+" \
-                                "]OC(CO)C(O)C(OC%11OC(CO)C(O)C(O)C%11O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC" \
-                                "%12OC(CO)C(O)C(O)C%12O)C(O)CO.CCCCCCCCCC(C(=O)NCCc%13ccc(OP(=S)(Oc%14ccc(CCNC(=O)" \
-                                "C(CCCCCCCCC)P(=O)(O)[O-])cc%14)N(C)\N=C\c%15ccc(Op%16(Oc%17ccc(\C=N\N(C)P(=S)(Oc%" \
-                                "18ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%18)Oc%19ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O" \
-                                ")[O-])cc%19)cc%17)np(Oc%20ccc(\C=N\N(C)P(=S)(Oc%21ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O" \
-                                ")[O-])cc%21)Oc%22ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%22)cc%20)(Oc%23ccc(\C=N" \
-                                "\N(C)P(=S)(Oc%24ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%24)Oc%25ccc(CCNC(=O)C(CCC" \
-                                "CCCCCC)P(=O)(O)[O-])cc%25)cc%23)np(Oc%26ccc(\C=N\N(C)P(=S)(Oc%27ccc(CCNC(=O)C(CCC" \
-                                "CCCCCC)P(=O)(O)[O-])cc%27)Oc%28ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%28)cc%26)(" \
-                                "Oc%29ccc(\C=N\N(C)P(=S)(Oc%30ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%30)Oc%31ccc(" \
-                                "CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%31)cc%29)n%16)cc%15)cc%13)P(=O)(O)[O-]"
+        longest_chembl_smiles = r"CC.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC1OC(CO)C(O)C(O)C1O)C(O)CO.CCCCCCCCCCCCCCCC" \
+                                r"[NH2+]OC(CO)C(O)C(OC2OC(CO)C(O)C(O)C2O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(O" \
+                                r"C3OC(CO)C(O)C(O)C3O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC4OC(CO)C(O)C(O)C4O" \
+                                r")C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC5OC(CO)C(O)C(O)C5O)C(O)CO.CCCCCCCCCCC" \
+                                r"CCCCC[NH2+]OC(CO)C(O)C(OC6OC(CO)C(O)C(O)C6O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(" \
+                                r"O)C(OC7OC(CO)C(O)C(O)C7O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC8OC(CO)C(O)C(" \
+                                r"O)C8O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC9OC(CO)C(O)C(O)C9O)C(O)CO.CCCCCC" \
+                                r"CCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%10OC(CO)C(O)C(O)C%10O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+" \
+                                r"]OC(CO)C(O)C(OC%11OC(CO)C(O)C(O)C%11O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC" \
+                                r"%12OC(CO)C(O)C(O)C%12O)C(O)CO.CCCCCCCCCC(C(=O)NCCc%13ccc(OP(=S)(Oc%14ccc(CCNC(=O)" \
+                                r"C(CCCCCCCCC)P(=O)(O)[O-])cc%14)N(C)\N=C\c%15ccc(Op%16(Oc%17ccc(\C=N\N(C)P(=S)(Oc%" \
+                                r"18ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%18)Oc%19ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O" \
+                                r")[O-])cc%19)cc%17)np(Oc%20ccc(\C=N\N(C)P(=S)(Oc%21ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O" \
+                                r")[O-])cc%21)Oc%22ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%22)cc%20)(Oc%23ccc(\C=N" \
+                                r"\N(C)P(=S)(Oc%24ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%24)Oc%25ccc(CCNC(=O)C(CCC" \
+                                r"CCCCCC)P(=O)(O)[O-])cc%25)cc%23)np(Oc%26ccc(\C=N\N(C)P(=S)(Oc%27ccc(CCNC(=O)C(CCC" \
+                                r"CCCCCC)P(=O)(O)[O-])cc%27)Oc%28ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%28)cc%26)(" \
+                                r"Oc%29ccc(\C=N\N(C)P(=S)(Oc%30ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%30)Oc%31ccc(" \
+                                r"CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%31)cc%29)n%16)cc%15)cc%13)P(=O)(O)[O-]"
 
         res_1 = molecule.get(longest_chembl_smiles)
         self.assertEqual(res_1['molecule_chembl_id'], 'CHEMBL1172371')
