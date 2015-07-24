@@ -4,7 +4,10 @@ __author__ = 'mnowotka'
 
 import requests
 import requests_cache
-import grequests
+try:
+    import grequests
+except:
+    grequests = None
 from chembl_webresource_client.web_resource import WebResource
 from chembl_webresource_client.settings import Settings
 

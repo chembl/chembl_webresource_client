@@ -4,7 +4,10 @@ __author__ = 'mnowotka'
 
 import requests
 import requests_cache
-import grequests
+try:
+    import grequests
+except:
+    grequests = None
 from chembl_webresource_client.web_resource import WebResource
 from chembl_webresource_client.settings import Settings
 
@@ -101,7 +104,7 @@ class CompoundResource(WebResource):
         if chembl_id:
             ids = chembl_id
             if isinstance(ids, list):
-                if len(ids) > 10:
+                if grequests and len(ids) > 10:
                     rs = (self.get_single_image(sid, True, **kwargs) for sid in ids)
                     ret = grequests.map(rs, size=50)
                     return self._apply(ret, self.get_val, None)
@@ -126,7 +129,7 @@ class CompoundResource(WebResource):
 
             if chembl_id:
                 url = '{0}/{1}/{2}/image{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, query)
-                if async:
+                if async and grequests:
                     return grequests.get(url, session=session)
                 res = session.get(url, timeout=Settings.Instance().TIMEOUT)
                 if not res.ok:

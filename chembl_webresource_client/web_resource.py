@@ -5,7 +5,10 @@ __author__ = 'mnowotka'
 import requests
 from requests.models import Response
 import requests_cache
-import grequests
+try:
+    import grequests
+except:
+    grequests = None
 import sys
 import time
 import logging
@@ -163,7 +166,7 @@ class WebResource(object):
 
     def _get(self, kname, keys, frmt='json', prop=None):
         if isinstance(keys, list):
-            if len(keys) > Settings.Instance().ASYNC_TRESHOLD:
+            if len(keys) > Settings.Instance().ASYNC_TRESHOLD and grequests:
                 return self.get_async(kname, keys, frmt, prop)
             else:
                 return self.get_sync(kname, keys, frmt, prop)
@@ -180,7 +183,7 @@ class WebResource(object):
 
     def _get_one(self, url, async, frmt, method='get', data=None):
         session = self._get_session()
-        if async:
+        if async and grequests:
             if method == 'get':
                 return grequests.get(url, session=session)
             else:
