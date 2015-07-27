@@ -94,7 +94,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(activity.filter(standard_type="Log Ki").filter(standard_value__gte=5).exists())
         self.assertTrue(activity.filter(target_chembl_id="CHEMBL333").exists())
         self.assertTrue('c' in activity.get(66369)['canonical_smiles'])
-        self.assertEquals([act['activity_id'] for act in activity.all().order_by('activity_id')[0:5]],
+        self.assertEqual([act['activity_id'] for act in activity.all().order_by('activity_id')[0:5]],
             [31863, 31864, 31865, 31866, 31867])
 
     def test_activity_resource_details(self):

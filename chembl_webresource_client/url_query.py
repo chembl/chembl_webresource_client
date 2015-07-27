@@ -76,7 +76,7 @@ class UrlQuery(object):
             if self.current_chunk and start >= self.start and self.current_page == ((start - self.start ) / self.limit) and \
                self.current_page == ((stop - self.start - 1) / self.limit):
                 self.logger.info('reusing chunk')
-                new_start = (start-self.start) - self.current_page * self.limit
+                new_start = int((start-self.start) - self.current_page * self.limit)
                 self.current_chunk = self.current_chunk[new_start:]
             else:
                 self.logger.info('resetting chunk')
@@ -277,7 +277,8 @@ class UrlQuery(object):
             url = self.base_url + '/'  + quote(str(ids))
             if len(url) > self.max_url_size:
                 raise Exception('URL {0} is longer than allowed {1} characters'.format(url, self.max_url_size))
-            res = self._get_session().get(url, headers=headers, timeout=self.timeout)
+            with self._get_session() as session:
+                res = session.get(url, headers=headers, timeout=self.timeout)
             self.logger.info(res.url)
             self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
             if not res.ok:
@@ -303,13 +304,15 @@ class UrlQuery(object):
                 old_url = url
                 url += ';' + quote(str(id))
                 if len(url) > self.max_url_size:
-                    res = self._get_session().get(old_url, headers=headers, timeout=self.timeout)
+                    with self._get_session() as session:
+                        res = session.get(old_url, headers=headers, timeout=self.timeout)
                     self.logger.info(res.url)
                     self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
                     if not res.ok:
                         handle_http_error(res)
                     self._gather_results(res, ret)
-        res = self._get_session().get(url, headers=headers, timeout=self.timeout)
+        with self._get_session() as session:
+            res = session.get(url, headers=headers, timeout=self.timeout)
         self.logger.info(res.url)
         self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
         if res.ok:
@@ -367,7 +370,8 @@ class UrlQuery(object):
         if not self.current_chunk or self.current_page != (self.current_index / self.limit):
             self.current_page = (self.current_index / self.limit)
             data = self._prepare_url_params()
-            res = self._get_session().post(self.base_url + '.' + self.frmt, data=data, timeout=self.timeout)
+            with self._get_session() as session:
+                res = session.post(self.base_url + '.' + self.frmt, data=data, timeout=self.timeout)
             self.logger.info(res.url)
             self.logger.info(data)
             self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
