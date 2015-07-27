@@ -122,9 +122,9 @@ class WebResource(object):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def bioactivities(self, chembl_id, frmt='json'):
-        session = self._get_session()
         url = '{0}/{1}/{2}/bioactivities.{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
-        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
+        with self._get_session() as session:
+            return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -182,13 +182,13 @@ class WebResource(object):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def _get_one(self, url, async, frmt, method='get', data=None):
-        session = self._get_session()
-        if async and grequests:
-            if method == 'get':
-                return grequests.get(url, session=session)
-            else:
-                return grequests.post(url, session=session, data=data, headers={'Accept': self.content_types[frmt]})
-        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT, method=method, data=data)
+        with self._get_session() as session:
+            if async and grequests:
+                if method == 'get':
+                    return grequests.get(url, session=session)
+                else:
+                    return grequests.post(url, session=session, data=data, headers={'Accept': self.content_types[frmt]})
+            return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT, method=method, data=data)
 
 #-----------------------------------------------------------------------------------------------------------------------
 

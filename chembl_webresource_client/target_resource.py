@@ -20,9 +20,9 @@ class TargetResource(WebResource):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def get_all(self, frmt='json'):
-        session = self._get_session()
         url = '{0}/{1}.{2}'.format(Settings.Instance().webservice_root_url, self.name, frmt)
-        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
+        with self._get_session() as session:
+            return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
 

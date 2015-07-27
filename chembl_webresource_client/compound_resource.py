@@ -70,23 +70,23 @@ class CompoundResource(WebResource):
 
     def _get_method(self, struct, **kwargs):
         frmt = kwargs.get('frmt', 'json')
-        session = self._get_session()
-        if any(x in struct for x in self.url_unsafe_characters):
-            data = {'smiles':struct}
+        with self._get_session() as session:
+            if any(x in struct for x in self.url_unsafe_characters):
+                data = {'smiles':struct}
+                if 'simscore' in kwargs:
+                    data['simscore'] = kwargs['simscore']
+                    url = '{0}/{1}/similarity'.format(Settings.Instance().webservice_root_url, self.name)
+                else:
+                    url = '{0}/{1}/substructure'.format(Settings.Instance().webservice_root_url, self.name)
+                return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT, method='post',
+                    data=data)
             if 'simscore' in kwargs:
-                data['simscore'] = kwargs['simscore']
-                url = '{0}/{1}/similarity'.format(Settings.Instance().webservice_root_url, self.name)
+                simscore = kwargs['simscore']
+                url = '{0}/{1}/similarity/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, struct,
+                                                     simscore, frmt)
             else:
-                url = '{0}/{1}/substructure'.format(Settings.Instance().webservice_root_url, self.name)
-            return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT, method='post',
-                data=data)
-        if 'simscore' in kwargs:
-            simscore = kwargs['simscore']
-            url = '{0}/{1}/similarity/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, struct,
-                                                 simscore, frmt)
-        else:
-            url = '{0}/{1}/substructure/{2}.{3}'.format(Settings.Instance().webservice_root_url, self.name, struct, frmt)
-        return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
+                url = '{0}/{1}/substructure/{2}.{3}'.format(Settings.Instance().webservice_root_url, self.name, struct, frmt)
+            return self._process_request(url, session, frmt, timeout=Settings.Instance().TIMEOUT)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -117,7 +117,6 @@ class CompoundResource(WebResource):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def get_single_image(self, chembl_id, async, **kwargs):
-        session = self._get_session()
         try:
             size = kwargs.get('size', 500)
             engine = kwargs.get('engine', 'rdkit')
@@ -129,9 +128,10 @@ class CompoundResource(WebResource):
 
             if chembl_id:
                 url = '{0}/{1}/{2}/image{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, query)
-                if async and grequests:
-                    return grequests.get(url, session=session)
-                res = session.get(url, timeout=Settings.Instance().TIMEOUT)
+                with self._get_session() as session:
+                    if async and grequests:
+                        return grequests.get(url, session=session)
+                    res = session.get(url, timeout=Settings.Instance().TIMEOUT)
                 if not res.ok:
                     self.logger.warning('Error when retrieving url: {0}, status code: {1}, msg: {2}'.format(
                         res.url, res.status_code, res.text))
