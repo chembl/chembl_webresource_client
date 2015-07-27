@@ -115,7 +115,7 @@ class WebResource(object):
                 return res.status_code
             self.logger.info(res.url)
             self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
-            return res.json().values()[0] if frmt == 'json' else res.content
+            return list(res.json().values())[0] if frmt == 'json' else res.content
         except Exception:
             return None
 
@@ -132,7 +132,7 @@ class WebResource(object):
         if type(x) is not Response:
             return x
         if frmt == 'json':
-            return x.json().values()[0] if x.ok else x.status_code
+            return list(x.json().values())[0] if x.ok else x.status_code
         else:
             return x.content if x.ok else x.status_code
 

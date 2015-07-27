@@ -179,8 +179,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(atc_class.filter(level1="H")) >= len(atc_class.filter(level2="H03")) >=
                         len(atc_class.filter(level3="H03A")) >= len(atc_class.filter(level4="H03AA")) >=
                         len(atc_class.filter(level5="H03AA03")))
-        self.assertEquals(atc_class.get('H03AA03')['who_name'], 'combinations of levothyroxine and liothyronine')
-        self.assertEquals([atc['level5'] for atc in atc_class.all().order_by('level5')[0:5]],
+        self.assertEqual(atc_class.get('H03AA03')['who_name'], 'combinations of levothyroxine and liothyronine')
+        self.assertEqual([atc['level5'] for atc in atc_class.all().order_by('level5')[0:5]],
             [u'A01AA01', u'A01AA02', u'A01AA03', u'A01AA04', u'A01AA30'])
         random_index = 4321 #randint(0, count - 1)
         random_elem = atc_class.all()[random_index]
@@ -201,9 +201,9 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(binding_site.all())
         self.assertTrue(count)
         self.assertTrue('site_name' in binding_site.all()[0])
-        self.assertEquals([site['site_components'][0]['domain']['domain_type'] for site in
+        self.assertEqual([site['site_components'][0]['domain']['domain_type'] for site in
                            binding_site.get([962, 963, 943])], [u'Pfam-A', u'Pfam-A', u'Pfam-A'])
-        self.assertEquals([bind['site_id'] for bind in binding_site.all().order_by('site_id')[0:5]],
+        self.assertEqual([bind['site_id'] for bind in binding_site.all().order_by('site_id')[0:5]],
             [1, 2, 3, 4, 5])
         random_index = 1234 #randint(0, count - 1)
         random_elem = binding_site.all()[random_index]
@@ -367,11 +367,11 @@ class TestSequenceFunctions(unittest.TestCase):
             'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
             'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])))
 
-        self.assertEquals(ids_from_ids_no_name, ids_from_ids_by_name)
-        self.assertEquals(ids_from_ids_by_name, ids_from_keys_no_name)
-        self.assertEquals(ids_from_keys_no_name, ids_from_keys_by_name)
-        self.assertEquals(ids_from_keys_by_name, ids_from_smiles_no_name)
-        self.assertEquals(ids_from_smiles_no_name, ids_from_smiles_by_name)
+        self.assertEqual(ids_from_ids_no_name, ids_from_ids_by_name)
+        self.assertEqual(ids_from_ids_by_name, ids_from_keys_no_name)
+        self.assertEqual(ids_from_keys_no_name, ids_from_keys_by_name)
+        self.assertEqual(ids_from_keys_by_name, ids_from_smiles_no_name)
+        self.assertEqual(ids_from_smiles_no_name, ids_from_smiles_by_name)
 
 
     @pytest.mark.timeout(TIMEOUT)
@@ -388,7 +388,7 @@ class TestSequenceFunctions(unittest.TestCase):
         approved_drugs_count = len(approved_drugs)
         self.assertTrue(approved_drugs_count > 2000)
         len(approved_drugs[123])
-        self.assertEquals(len([m for m in approved_drugs[2:5]]), 3)
+        self.assertEqual(len([m for m in approved_drugs[2:5]]), 3)
         self.assertEqual(len([m for m in approved_drugs]), approved_drugs_count)
         with_components = molecule.get('CHEMBL1743070')
         self.assertIsNotNone(with_components)
@@ -489,7 +489,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(count)
         self.assertTrue(all([form['parent'] == 'True' for form in
                              molecule_form.get(['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])]))
-        self.assertEquals(len(molecule_form.get(molecule_chembl_id=['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])), 3)
+        self.assertEqual(len(molecule_form.get(molecule_chembl_id=['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])), 3)
         random_index = 6543 #randint(0, count - 1)
         random_elem = molecule_form.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
@@ -603,7 +603,7 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(source.all())
         self.assertTrue(count)
         self.assertTrue(source.filter(src_short_name="ATLAS").exists())
-        self.assertEquals( [src['src_id'] for src in source.all().order_by('src_id')[0:5]], [1,2,3,4,5])
+        self.assertEqual( [src['src_id'] for src in source.all().order_by('src_id')[0:5]], [1,2,3,4,5])
         random_index = 5#randint(0, count - 1)
         random_elem = source.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
@@ -619,7 +619,7 @@ class TestSequenceFunctions(unittest.TestCase):
         res = substructure.filter(smiles="CCC#C\C=C/CCC")
         self.assertTrue(res.exists())
         slice = res[:6]
-        self.assertEquals(len([m for m in slice]), 6)
+        self.assertEqual(len([m for m in slice]), 6)
         self.assertTrue(len(res) > 10)
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(res.exists())
@@ -668,7 +668,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(target.filter(organism="Homo sapiens").filter(target_type="SINGLE PROTEIN").exists())
         self.assertTrue(target.filter(target_components__accession="Q13936").exists())
         self.assertEqual(len(target.filter(target_components__accession="Q13936")), 3)
-        self.assertEquals( [t['pref_name'] for t in target.get(['CHEMBL1927', 'CHEMBL1929', 'CHEMBL1930'])],
+        self.assertEqual( [t['pref_name'] for t in target.get(['CHEMBL1927', 'CHEMBL1929', 'CHEMBL1930'])],
         ['Thioredoxin reductase 1',
          'Xanthine dehydrogenase',
          'Vitamin k epoxide reductase complex subunit 1 isoform 1'])
