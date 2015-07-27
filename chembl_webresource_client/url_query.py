@@ -73,8 +73,8 @@ class UrlQuery(object):
         if not self.allows_list:
             return
         if start is not None and stop is not None:
-            if self.current_chunk and start >= self.start and self.current_page == ((start - self.start ) / self.limit) and \
-               self.current_page == ((stop - self.start - 1) / self.limit):
+            if self.current_chunk and start >= self.start and self.current_page == int((start - self.start ) / self.limit) and \
+               self.current_page == int((stop - self.start - 1) / self.limit):
                 self.logger.info('reusing chunk')
                 new_start = int((start-self.start) - self.current_page * self.limit)
                 self.current_chunk = self.current_chunk[new_start:]
@@ -228,16 +228,16 @@ class UrlQuery(object):
         if self.count and self.current_index > self.count:
             raise StopIteration
         if not self.current_chunk:
-            self.current_page = self.current_index / self.limit
+            self.current_page = int(self.current_index / self.limit)
             self.get_page()
         if not self.current_chunk:
             raise StopIteration
         try:
-            ret = self.current_chunk[self.current_index - self.limit * self.current_page]
+            ret = self.current_chunk[int(self.current_index - self.limit * self.current_page)]
         except IndexError:
             raise StopIteration
         self.current_index += 1
-        if self.current_page != (self.current_index / self.limit):
+        if self.current_page != int(self.current_index / self.limit):
             self.next_page()
         return ret
 
@@ -367,8 +367,8 @@ class UrlQuery(object):
         if (self.stop is not None and self.current_index >= self.stop) or \
            (self.api_total_count and self.current_index >= self.api_total_count):
             return []
-        if not self.current_chunk or self.current_page != (self.current_index / self.limit):
-            self.current_page = (self.current_index / self.limit)
+        if not self.current_chunk or self.current_page != int(self.current_index / self.limit):
+            self.current_page = int(self.current_index / self.limit)
             data = self._prepare_url_params()
             with self._get_session() as session:
                 res = session.post(self.base_url + '.' + self.frmt, data=data, timeout=self.timeout)
@@ -395,7 +395,7 @@ class UrlQuery(object):
         if not self.allows_list:
             return
         start = self.start
-        self.current_index = start + self.limit * (self.current_page + 1)
+        self.current_index = int(start + self.limit * (self.current_page + 1))
         return self.get_page()
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -406,7 +406,7 @@ class UrlQuery(object):
         if not self.current_page:
             return []
         start = self.start
-        self.current_index = start + self.limit * (self.current_page - 1)
+        self.current_index = int(start + self.limit * (self.current_page - 1))
         return self.get_page()
 
 #-----------------------------------------------------------------------------------------------------------------------
