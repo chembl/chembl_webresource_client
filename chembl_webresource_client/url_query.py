@@ -252,7 +252,7 @@ class UrlQuery(object):
         if args:
             return self._get_by_ids(args[0])
         if kwargs and self.allows_list:
-            return self._get_by_names(*kwargs.items()[0])
+            return self._get_by_names(*list(kwargs.items())[0])
 
 #-----------------------------------------------------------------------------------------------------------------------
 

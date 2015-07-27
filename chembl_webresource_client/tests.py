@@ -290,8 +290,8 @@ class TestSequenceFunctions(unittest.TestCase):
     @pytest.mark.timeout(TIMEOUT)
     def test_image_resource(self):
         image = new_client.image
-        self.assertTrue(image.get('CHEMBL1').startswith('\x89PNG\r\n'))
-        self.assertTrue(image.get('CHEMBL450200').startswith('\x89PNG\r\n'))
+        self.assertTrue(image.get('CHEMBL1').startswith(b'\x89PNG\r\n'))
+        self.assertTrue(image.get('CHEMBL450200').startswith(b'\x89PNG\r\n'))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_mechanism_resource(self):
@@ -339,7 +339,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(700 < len(range) < 800)
         exact = molecule.filter(molecule_structures__canonical_smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
         self.assertEqual(len(exact),1)
-        self.assertEqual(map(lambda x: x['molecule_chembl_id'], exact), ['CHEMBL446858'])
+        self.assertEqual(list(map(lambda x: x['molecule_chembl_id'], exact)), ['CHEMBL446858'])
         flex = molecule.filter(molecule_structures__canonical_smiles__flexmatch="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
         self.assertEqual(len(flex),2)
         self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], flex)), set(['CHEMBL446858', 'CHEMBL1']))
@@ -724,7 +724,7 @@ class TestSequenceFunctions(unittest.TestCase):
         new_client.molecule.set_format('json')
         molecules = new_client.molecule.filter(atc_classifications__level5__startswith='A10')
         self.assertTrue(molecules.exists())
-        molecule_ids = map(lambda d: d['molecule_chembl_id'], molecules)
+        molecule_ids = list(map(lambda d: d['molecule_chembl_id'], molecules))
         activities = new_client.activity.filter(molecule_chembl_id__in=molecule_ids)
         self.assertTrue(activities.exists())
         activities_1 = new_client.activity.get(molecule_chembl_id=molecule_ids)
