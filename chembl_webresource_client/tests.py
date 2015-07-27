@@ -747,15 +747,15 @@ class TestSequenceFunctions(unittest.TestCase):
         parseString(chembl_id_lookup.filter(entity_type="COMPOUND").filter(status="ACTIVE")[0])
 
     def test_utils_format_conversion(self):
-        smiles = b'O=C(Oc1ccccc1C(=O)O)C' # aspirin
+        smiles = 'O=C(Oc1ccccc1C(=O)O)C' # aspirin
         ctab = utils.smiles2ctab(smiles)
         self.assertIsNotNone(ctab)
         canonical_smiles = utils.ctab2smiles(ctab).split()[2]
-        self.assertEqual(canonical_smiles, b'CC(=O)Oc1ccccc1C(=O)O')
+        self.assertEqual(canonical_smiles, 'CC(=O)Oc1ccccc1C(=O)O')
         inchi = utils.ctab2inchi(ctab)
-        self.assertEqual(inchi, b'InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)')
+        self.assertEqual(inchi, 'InChI=1S/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)')
         inchiKey = utils.inchi2inchiKey(inchi)
-        self.assertEqual(inchiKey, b'BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
+        self.assertEqual(inchiKey, 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
         ctab2 = utils.inchi2ctab(inchi)
         self.assertIsNotNone(ctab2)
         smiles2 = utils.ctab2smiles(ctab2).split()[2]
@@ -779,23 +779,23 @@ class TestSequenceFunctions(unittest.TestCase):
         mol = utils.smiles2ctab("[Na]OC(=O)c1ccccc1")
         br = utils.breakBonds(mol)
         smiles = utils.ctab2smiles(br).split()[2]
-        self.assertEqual(smiles, b'[Na+].O=C([O-])c1ccccc1')
+        self.assertEqual(smiles, '[Na+].O=C([O-])c1ccccc1')
         mol = utils.smiles2ctab("C(C(=O)[O-])(Cc1n[n-]nn1)(C[NH3+])(C[N+](=O)[O-])")
         ne = utils.neutralise(mol)
         smiles = utils.ctab2smiles(ne).split()[2]
-        self.assertEqual(smiles, b'NCC(Cc1nn[nH]n1)(C[N+](=O)[O-])C(=O)O')
+        self.assertEqual(smiles, 'NCC(Cc1nn[nH]n1)(C[N+](=O)[O-])C(=O)O')
         mol = utils.smiles2ctab("Oc1nccc2cc[nH]c(=N)c12")
         ru = utils.rules(mol)
         smiles = utils.ctab2smiles(ru).split()[2]
-        self.assertEqual(smiles, b'Nc1nccc2cc[nH]c(=O)c12')
+        self.assertEqual(smiles, 'Nc1nccc2cc[nH]c(=O)c12')
         mol = utils.smiles2ctab("[Na+].OC(=O)Cc1ccc(CN)cc1.OS(=O)(=O)C(F)(F)F")
         un = utils.unsalt(mol)
         smiles = utils.ctab2smiles(un).split()[2]
-        self.assertEqual(smiles, b'NCc1ccc(CC(=O)O)cc1')
+        self.assertEqual(smiles, 'NCc1ccc(CC(=O)O)cc1')
         mol = utils.smiles2ctab("[Na]OC(=O)Cc1ccc(C[NH3+])cc1.c1nnn[n-]1.O")
         st = utils.standardise(mol)
         smiles = utils.ctab2smiles(st).split()[2]
-        self.assertEqual(smiles, b'NCc1ccc(CC(=O)O)cc1')
+        self.assertEqual(smiles, 'NCc1ccc(CC(=O)O)cc1')
 
     def test_utils_calculations(self):
         aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
@@ -820,11 +820,11 @@ class TestSequenceFunctions(unittest.TestCase):
         aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
         fingerprints = utils.sdf2fps(aspirin)
         parts = fingerprints.split()
-        self.assertEqual(parts[0], b'#FPS1')
-        self.assertEqual(parts[1], b'#num_bits=2048')
+        self.assertEqual(parts[0], '#FPS1')
+        self.assertEqual(parts[1], '#num_bits=2048')
         self.assertTrue(parts[2].startswith('#software='))
         self.assertEqual(len(parts[3]), 512)
-        self.assertEqual(parts[4], b'BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
+        self.assertEqual(parts[4], 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
 
     def test_utils_json_images(self):
         aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
@@ -847,11 +847,11 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_utils_raster_images(self):
         aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
         img1 = utils.smiles2image(aspirin)
-        self.assertEqual(img1[0:4], b'\x89PNG')
+        self.assertEqual(img1[0:4], '\x89PNG')
         self.assertTrue(len(img1) > 5000)
         mol = utils.smiles2ctab(aspirin)
         img2 = utils.ctab2image(mol)
-        self.assertEqual(img2[0:4], b'\x89PNG')
+        self.assertEqual(img2[0:4], '\x89PNG')
         self.assertTrue(len(img2) > 5000)
 
     def test_utils_mcs(self):
@@ -876,7 +876,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(any(z_coords))
 
     def test_utils_osra(self):
-        aspirin = b'CC(=O)Oc1ccccc1C(=O)O'
+        aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
         im = utils.smiles2image(aspirin)
         mol = utils.image2ctab(im)
         smiles = utils.ctab2smiles(mol).split()[2]

@@ -54,7 +54,10 @@ def make_spore_function(client, method_definition):
 
 def decode_response(resp, definition):
     """Decode the response if we know how to handle it"""
-    return resp.content
+    try:
+        return resp.content.decode()
+    except:
+        return resp.content
 
 
 def define_format(kw, definition):
