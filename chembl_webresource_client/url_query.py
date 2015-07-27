@@ -356,7 +356,7 @@ class UrlQuery(object):
         url_params = self.filters[:]
         url_params.extend(map(lambda x:('order_by', x), self.ordering ))
         start = self.start
-        url_params.extend([('limit', self.limit), ('offset', start + self.limit * self.current_page)])
+        url_params.extend([('limit', self.limit), ('offset', int(start + self.limit * self.current_page))])
         return url_params
 
 #-----------------------------------------------------------------------------------------------------------------------
