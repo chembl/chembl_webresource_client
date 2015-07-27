@@ -847,11 +847,11 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_utils_raster_images(self):
         aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
         img1 = utils.smiles2image(aspirin)
-        self.assertEqual(img1[0:4], '\x89PNG')
+        self.assertEqual(img1[0:4], b'\x89PNG')
         self.assertTrue(len(img1) > 5000)
         mol = utils.smiles2ctab(aspirin)
         img2 = utils.ctab2image(mol)
-        self.assertEqual(img2[0:4], '\x89PNG')
+        self.assertEqual(img2[0:4], b'\x89PNG')
         self.assertTrue(len(img2) > 5000)
 
     def test_utils_mcs(self):
