@@ -1,23 +1,23 @@
 chembl_webresource_client
 ======
 
-.. image:: https://pypip.in/version/chembl_webresource_client/badge.svg
+.. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Latest Version
 
-.. image:: https://pypip.in/download/chembl_webresource_client/badge.svg
+.. image:: https://img.shields.io/pypi/dm/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Downloads
 
-.. image:: https://pypip.in/py_versions/chembl_webresource_client/badge.svg
+.. image:: https://img.shields.io/pypi/pyversions/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Supported Python versions
 
-.. image:: https://pypip.in/status/chembl_webresource_client/badge.svg
+.. image:: https://img.shields.io/pypi/status/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Development Status
 
-.. image:: https://pypip.in/license/chembl_webresource_client/badge.svg
+.. image:: https://img.shields.io/pypi/l/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: License
 
