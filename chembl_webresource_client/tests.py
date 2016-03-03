@@ -6,13 +6,14 @@ from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import *
 from chembl_webresource_client.utils import utils
 from chembl_webresource_client.new_client import new_client
+from chembl_webresource_client.unichem import unichem_client as unichem
 from decimal import Decimal
 import time
 import json
 import unittest
 import pytest
 import logging
-#from random import randint
+from random import randint
 logging.basicConfig()
 logging.basicConfig(level=logging.INFO)
 
@@ -91,6 +92,8 @@ class TestSequenceFunctions(unittest.TestCase):
         activity.set_format('json')
         count = len(activity.all())
         self.assertTrue(count)
+        self.assertNotEqual(activity.all().order_by('assay_type')[0]['activity_id'],activity.all().order_by('-assay_type')[0]['activity_id'])
+        self.assertNotEqual(activity.all().order_by('published_relation')[0]['activity_id'],activity.all().order_by('-published_relation')[0]['activity_id'])
         self.assertTrue(activity.filter(standard_type="Log Ki").filter(standard_value__gte=5).exists())
         self.assertTrue(activity.filter(target_chembl_id="CHEMBL333").exists())
         self.assertTrue('c' in activity.get(66369)['canonical_smiles'])
@@ -141,6 +144,8 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(assay.all())
         self.assertTrue(count)
         self.assertTrue(assay.filter(assay_oragism="Sus scrofa").filter(assay_type="B").exists())
+        self.assertNotEqual(assay.all().order_by('assay_category')[0]['assay_chembl_id'], assay.all().order_by('-assay_category')[0]['assay_chembl_id'])
+        self.assertNotEqual(assay.all().order_by('assay_strain')[0]['assay_chembl_id'], assay.all().order_by('-assay_strain')[0]['assay_chembl_id'])
         self.assertEqual( [ass['bao_format'] for ass in assay.get(['CHEMBL615111', 'CHEMBL615112', 'CHEMBL615113'])],
         [u'BAO_0000019', u'BAO_0000019', u'BAO_0000019'])
         random_index = 4567 #randint(0, count - 1)
@@ -172,6 +177,16 @@ class TestSequenceFunctions(unittest.TestCase):
         parseString(assay.filter(confidence_score__gte=8)[0])
 
     @pytest.mark.timeout(TIMEOUT)
+    def test_assay_search(self):
+        assay = new_client.assay
+        assay.set_format('json')
+        count = len(assay.all())
+        res = assay.search('inhibitor')
+        self.assertTrue(len(res) > 6000)
+        self.assertTrue(len(res) < count)
+        self.assertTrue('inhibitor' in res[0]['description'])
+
+    @pytest.mark.timeout(TIMEOUT)
     def test_atc_class_resource(self):
         atc_class = new_client.atc_class
         count = len(atc_class.all())
@@ -182,6 +197,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(atc_class.get('H03AA03')['who_name'], 'combinations of levothyroxine and liothyronine')
         self.assertEqual([atc['level5'] for atc in atc_class.all().order_by('level5')[0:5]],
             [u'A01AA01', u'A01AA02', u'A01AA03', u'A01AA04', u'A01AA30'])
+        self.assertEqual(atc_class.all().order_by('level1')[0]['level1'], "A")
+        self.assertEqual(atc_class.all().order_by('-level1')[0]['level1'], "V")
         random_index = 4321 #randint(0, count - 1)
         random_elem = atc_class.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
@@ -238,6 +255,11 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(count)
         self.assertTrue(cell_line.filter(cell_name__startswith="MDA").exists())
         self.assertTrue('efo_id' in cell_line.get(1))
+        self.assertNotEqual(cell_line.all().order_by('cell_chembl_id')[0]['cell_id'], cell_line.all().order_by('-cell_chembl_id')[0]['cell_id'])
+        self.assertNotEqual(cell_line.all().order_by('cell_source_organism')[0]['cell_id'], cell_line.all().order_by('-cell_source_organism')[0]['cell_id'])
+        self.assertNotEqual(cell_line.all().order_by('cell_source_tax_id')[0]['cell_id'], cell_line.all().order_by('-cell_source_tax_id')[0]['cell_id'])
+        self.assertNotEqual(cell_line.all().order_by('cell_source_tissue')[0]['cell_id'], cell_line.all().order_by('-cell_source_tissue')[0]['cell_id'])
+        self.assertNotEqual(cell_line.all().order_by('cellosaurus_id')[0]['cell_id'], cell_line.all().order_by('-cellosaurus_id')[0]['cell_id'])
         self.assertEqual([cell['cell_id'] for cell in cell_line.all().order_by('cell_id')[0:5]],
             [1, 2, 3, 4, 5])
         self.assertEqual([cell['cell_id'] for cell in cell_line.get(['CHEMBL3307242','CHEMBL3307243'])],
@@ -259,6 +281,83 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('efo_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         cell_line.set_format('xml')
         parseString(cell_line.filter(cellosaurus_id="CVCL_0417")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_go_slim_resource(self):
+        go_slim = new_client.go_slim
+        count = len(go_slim.all())
+        self.assertTrue(count)
+        self.assertTrue(go_slim.filter(aspect="F").filter(class_level__gte=3).exists())
+        self.assertEqual(go_slim.order_by('aspect')[0]['aspect'], "C")
+        self.assertTrue(all(['cellular_component  organelle' in x['path'] for x in go_slim.get(['GO:0000229','GO:0005730'])]))
+        random_index = 205
+        random_elem = go_slim.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('aspect', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('class_level', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('go_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('parent_go_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('path', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        go_slim.set_format('xml')
+        parseString(go_slim.filter(pref_name="nucleolus")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_drug_indication_resource(self):
+        drug_indication = new_client.drug_indication
+        count = len(drug_indication.all())
+        self.assertTrue(count)
+        self.assertTrue(all([x['efo_term'].startswith('OSTEOARTHRITIS') for x in drug_indication.filter(max_phase_for_ind__lte=3, efo_term__startswith='OSTEOARTHRITIS')]))
+        self.assertTrue(drug_indication.order_by('mesh_id')[0]['mesh_id'].startswith('D0000'))
+        self.assertTrue(all([x['efo_id'].startswith('EFO:000') for x in drug_indication.get([22614, 22615])]))
+        random_index = 2345
+        random_elem = drug_indication.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('drugind_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('efo_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('efo_term', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('indication_refs', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('max_phase_for_ind', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('mesh_heading', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('mesh_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        indication_refs = drug_indication.get(molecule_chembl_id=['CHEMBL606'])[0]['indication_refs'][0]
+        self.assertIn('ref_id', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
+        self.assertIn('ref_type', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
+        self.assertIn('ref_url', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
+        drug_indication.set_format('xml')
+        parseString(drug_indication.filter(molecule_chembl_id="CHEMBL1201460")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_metabolism_resource(self):
+        metabolism = new_client.metabolism
+        count = len(metabolism.all())
+        self.assertTrue(count)
+        self.assertTrue(metabolism.filter(met_conversion__startswith='hydroxylation', met_comment__icontains='liver', enzyme_name__isnull=False).exists())
+        self.assertEqual(metabolism.order_by('-pathway_id')[0]['pathway_id'], 3)
+        self.assertTrue(all([x['met_conversion'] == 'O-demethylation' for x in metabolism.get([149,151])]))
+        random_index = 123
+        random_elem = metabolism.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('drug_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('enzyme_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('met_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('met_conversion', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('met_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('metabolism_refs', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('metabolite_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('pathway_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('pathway_key', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('substrate_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('target_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        metabolism_refs = metabolism.get(target_chembl_id=['CHEMBL612545'])[0]['metabolism_refs'][0]
+        self.assertIn('ref_id', metabolism_refs, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('ref_type', metabolism_refs, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('ref_url', metabolism_refs, 'One of required fields not found in resource {0}'.format(random_elem))
+        metabolism.set_format('xml')
+        parseString(metabolism.filter(substrate_chembl_id="CHEMBL1071")[0])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_document_resource(self):
@@ -336,7 +435,7 @@ class TestSequenceFunctions(unittest.TestCase):
                                 .exists())
         range = molecule.filter(molecule_properties__full_mwt__range=[200,201])
         self.assertTrue(range.exists())
-        self.assertTrue(700 < len(range) < 800)
+        self.assertTrue(700 < len(range) < 900, 'len(range) is {0} but should be between 700 and 800'.format(len(range)))
         exact = molecule.filter(molecule_structures__canonical_smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
         self.assertEqual(len(exact),1)
         self.assertEqual(list(map(lambda x: x['molecule_chembl_id'], exact)), ['CHEMBL446858'])
@@ -344,6 +443,17 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(flex),2)
         self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], flex)), set(['CHEMBL446858', 'CHEMBL1']))
         self.assertTrue(len(molecule.filter(biotherapeutic__isnull=True)) > len(molecule.filter(biotherapeutic__isnull=False)))
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_molecule_search(self):
+        molecule = new_client.molecule
+        molecule.set_format('json')
+        res = molecule.search('aspirin')
+        self.assertEqual(len(res),4)
+        self.assertEqual(res[0]['molecule_chembl_id'],'CHEMBL25')
+        self.assertEqual(res[0]['pref_name'],'ASPIRIN')
+        self.assertEqual(res[3]['molecule_chembl_id'],'CHEMBL2260549')
+        self.assertEqual(res[3]['pref_name'],'ASPIRIN EUGENOL ESTER')
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_resource_multiple(self):
@@ -449,28 +559,28 @@ class TestSequenceFunctions(unittest.TestCase):
         atc_query = ['CHEMBL1073','CHEMBL1201496']
         molecules = new_client.molecule.get(atc_query)
         self.assertEqual(len(molecules),2)
-        longest_chembl_smiles = r"CC.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC1OC(CO)C(O)C(O)C1O)C(O)CO.CCCCCCCCCCCCCCCC" \
-                                r"[NH2+]OC(CO)C(O)C(OC2OC(CO)C(O)C(O)C2O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(O" \
-                                r"C3OC(CO)C(O)C(O)C3O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC4OC(CO)C(O)C(O)C4O" \
-                                r")C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC5OC(CO)C(O)C(O)C5O)C(O)CO.CCCCCCCCCCC" \
-                                r"CCCCC[NH2+]OC(CO)C(O)C(OC6OC(CO)C(O)C(O)C6O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(" \
-                                r"O)C(OC7OC(CO)C(O)C(O)C7O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC8OC(CO)C(O)C(" \
-                                r"O)C8O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC9OC(CO)C(O)C(O)C9O)C(O)CO.CCCCCC" \
-                                r"CCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%10OC(CO)C(O)C(O)C%10O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+" \
-                                r"]OC(CO)C(O)C(OC%11OC(CO)C(O)C(O)C%11O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC" \
-                                r"%12OC(CO)C(O)C(O)C%12O)C(O)CO.CCCCCCCCCC(C(=O)NCCc%13ccc(OP(=S)(Oc%14ccc(CCNC(=O)" \
-                                r"C(CCCCCCCCC)P(=O)(O)[O-])cc%14)N(C)\N=C\c%15ccc(Op%16(Oc%17ccc(\C=N\N(C)P(=S)(Oc%" \
-                                r"18ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%18)Oc%19ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O" \
-                                r")[O-])cc%19)cc%17)np(Oc%20ccc(\C=N\N(C)P(=S)(Oc%21ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O" \
-                                r")[O-])cc%21)Oc%22ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%22)cc%20)(Oc%23ccc(\C=N" \
-                                r"\N(C)P(=S)(Oc%24ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%24)Oc%25ccc(CCNC(=O)C(CCC" \
-                                r"CCCCCC)P(=O)(O)[O-])cc%25)cc%23)np(Oc%26ccc(\C=N\N(C)P(=S)(Oc%27ccc(CCNC(=O)C(CCC" \
-                                r"CCCCCC)P(=O)(O)[O-])cc%27)Oc%28ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%28)cc%26)(" \
-                                r"Oc%29ccc(\C=N\N(C)P(=S)(Oc%30ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%30)Oc%31ccc(" \
-                                r"CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%31)cc%29)n%16)cc%15)cc%13)P(=O)(O)[O-]"
+        longest_chembl_smiles = r"CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC1OC(CO)C(O)C(O)C1O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+" \
+                                r"]OC(CO)C(O)C(OC2OC(CO)C(O)C(O)C2O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC3OC(CO" \
+                                r")C(O)C(O)C3O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC4OC(CO)C(O)C(O)C4O)C(O)CO.C" \
+                                r"CCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC5OC(CO)C(O)C(O)C5O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]" \
+                                r"OC(CO)C(O)C(OC6OC(CO)C(O)C(O)C6O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC7OC(CO)" \
+                                r"C(O)C(O)C7O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC8OC(CO)C(O)C(O)C8O)C(O)CO.CC" \
+                                r"CCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC9OC(CO)C(O)C(O)C9O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]O" \
+                                r"C(CO)C(O)C(OC%10OC(CO)C(O)C(O)C%10O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%11O" \
+                                r"C(CO)C(O)C(O)C%11O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%12OC(CO)C(O)C(O)C%12" \
+                                r"O)C(O)CO.CCCCCCCCCC(C(=O)NCCc%13ccc(OP(=S)(Oc%14ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-" \
+                                r"])cc%14)N(C)\N=C\c%15ccc(Op%16(Oc%17ccc(\C=N\N(C)P(=S)(Oc%18ccc(CCNC(=O)C(CCCCCCCCC" \
+                                r")P(=O)(O)[O-])cc%18)Oc%19ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%19)cc%17)np(Oc%20c" \
+                                r"cc(\C=N\N(C)P(=S)(Oc%21ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%21)Oc%22ccc(CCNC(=O)" \
+                                r"C(CCCCCCCCC)P(=O)(O)[O-])cc%22)cc%20)(Oc%23ccc(\C=N\N(C)P(=S)(Oc%24ccc(CCNC(=O)C(CC" \
+                                r"CCCCCCC)P(=O)(O)[O-])cc%24)Oc%25ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%25)cc%23)np" \
+                                r"(Oc%26ccc(\C=N\N(C)P(=S)(Oc%27ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%27)Oc%28ccc(C" \
+                                r"CNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%28)cc%26)(Oc%29ccc(\C=N\N(C)P(=S)(Oc%30ccc(CCNC(" \
+                                r"=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%30)Oc%31ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%31)c" \
+                                r"c%29)n%16)cc%15)cc%13)P(=O)(O)[O-]"
 
         res_1 = molecule.get(longest_chembl_smiles)
-        self.assertEqual(res_1['molecule_chembl_id'], 'CHEMBL1172371')
+        self.assertEqual(res_1['molecule_chembl_id'], 'CHEMBL1628285')
         res_2 = molecule.filter(molecule_structures__canonical_smiles=longest_chembl_smiles)
         self.assertEqual(len(res_2), 1)
         self.assertEqual(res_1, res_2[0])
@@ -544,7 +654,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
         self.assertEqual(most_similar['pref_name'], 'ASPIRIN')
         self.assertTrue('molecule_hierarchy' in res.filter(molecule_properties__acd_logp__gte=3.4).filter(molecule_properties__hbd__lte=5)[0])
-        random_index = 6 #randint(0, count - 1)
+        random_index = 5 #randint(0, count - 1)
         random_elem = res[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('availability_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -587,14 +697,14 @@ class TestSequenceFunctions(unittest.TestCase):
         most_similar = res[0]
         self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
         self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
-        self.assertEqual(len(res), 1060)
+        self.assertTrue(len(res) > 1000)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).order_by('similarity')
         self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         less_similar = res[0]
         self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).filter(molecule_properties__aromatic_rings=2)
-        self.assertEqual(len(res), 481)
+        self.assertTrue(len(res) >  480)
 
 
     @pytest.mark.timeout(TIMEOUT)
@@ -624,8 +734,6 @@ class TestSequenceFunctions(unittest.TestCase):
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(res.exists())
         count = len(res)
-        self.assertTrue('med_chem_friendly' in res.filter(molecule_properties__full_mwt__gte=400)
-                                               .filter(molecule_properties__num_alerts__gt=1)[0]['molecule_properties'])
         random_index = 80 #randint(0, count - 1)
         random_elem = res[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
@@ -668,6 +776,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(target.filter(organism="Homo sapiens").filter(target_type="SINGLE PROTEIN").exists())
         self.assertTrue(target.filter(target_components__accession="Q13936").exists())
         self.assertEqual(len(target.filter(target_components__accession="Q13936")), 3)
+        self.assertNotEqual(target.all().order_by('species_group_flag')[0]['target_chembl_id'],target.all().order_by('-species_group_flag')[0]['target_chembl_id'])
+        self.assertNotEqual(target.all().order_by('target_chembl_id')[0]['target_chembl_id'],target.all().order_by('-target_chembl_id')[0]['target_chembl_id'])
         self.assertEqual( [t['pref_name'] for t in target.get(['CHEMBL1927', 'CHEMBL1929', 'CHEMBL1930'])],
         ['Thioredoxin reductase 1',
          'Xanthine dehydrogenase',
@@ -694,6 +804,14 @@ class TestSequenceFunctions(unittest.TestCase):
         parseString(target.all()[0])
 
     @pytest.mark.timeout(TIMEOUT)
+    def test_target_search(self):
+        target = new_client.target
+        target.set_format('json')
+        res = target.search('lipoxygenase')
+        self.assertEqual(len(res), 23)
+        self.assertEquals(res[0]['pref_name'], 'Lipoxygenase')
+
+    @pytest.mark.timeout(TIMEOUT)
     def test_target_component_resource(self):
         target_component = new_client.target_component
         count = len(target_component.all())
@@ -715,6 +833,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('component_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('component_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('go_slims', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         parseString(target_component.all()[0])
@@ -738,6 +857,9 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(chembl_id_lookup.filter(entity_type="TARGET").exists())
         random_index = 5678#randint(0, count - 1)
         random_elem = chembl_id_lookup.all()[random_index]
+        self.assertNotEqual(chembl_id_lookup.all().order_by('chembl_id')[0]['chembl_id'], chembl_id_lookup.all().order_by('-chembl_id')[0]['chembl_id'])
+        self.assertNotEqual(chembl_id_lookup.all().order_by('entity_type')[0]['chembl_id'], chembl_id_lookup.all().order_by('-entity_type')[0]['chembl_id'])
+        self.assertNotEqual(chembl_id_lookup.all().order_by('status')[0]['chembl_id'], chembl_id_lookup.all().order_by('-status')[0]['chembl_id'])
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('entity_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -745,6 +867,165 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('resource_url', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         chembl_id_lookup.set_format('xml')
         parseString(chembl_id_lookup.filter(entity_type="COMPOUND").filter(status="ACTIVE")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_chembl_id_lookup_search(self):
+        chembl_id_lookup = new_client.chembl_id_lookup
+        chembl_id_lookup.set_format('json')
+        res = chembl_id_lookup.search('morphine')
+        self.assertTrue(800 < len(res) < 1000)
+        by_score = sorted([x for x in res],key=lambda x:x['score'], reverse=True)
+        self.assertEqual(by_score[0]['chembl_id'], 'CHEMBL70')
+        self.assertEqual(by_score[0]['entity_type'], 'COMPOUND')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_src_compound_ids_from_compound_id(self):
+        ret = unichem.get('CHEMBL12',1)
+        self.assertTrue(len(ret) > 10)
+        self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
+        self.assertEqual(ret[0]['src_id'],'1')
+        ret = unichem.get('CHEMBL12',1,2)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['src_compound_id'], 'DB00829')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_src_compound_ids_all_from_compound_id(self):
+        ret = unichem.get('CHEMBL12', 1, all=True)
+        self.assertTrue(len(ret) > 10)
+        self.assertTrue('diazepam' in [x['src_compound_id'] for x in ret])
+        ret = unichem.get('CHEMBL12', 1, 2, all=True)
+        self.assertEqual(len(ret),2)
+        self.assertTrue('DB00829' in [x['src_compound_id'] for x in ret])
+        self.assertTrue('DB07699' in [x['src_compound_id'] for x in ret])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_mapping(self):
+        ret = unichem.map(4,1)
+        self.assertTrue(len(ret)>4000)
+        self.assertTrue('CHEMBL2333444' in [x['1'] for x in ret])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_src_compound_ids_from_inchi_key(self):
+        ret = unichem.get('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
+        self.assertTrue(len(ret) > 10)
+        self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_src_compound_ids_all_from_inchi_key(self):
+        ret = unichem.get('AAOVKJBEBIDNHE-UHFFFAOYSA-N', all=True)
+        self.assertTrue(len(ret) > 10)
+        self.assertTrue('diazepam' in [x['src_compound_id'] for x in ret])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_all_src_ids(self):
+        ret = unichem.src()
+        self.assertTrue(len(ret) > 25)
+        self.assertTrue('1' in [x['src_id'] for x in ret])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_source_information(self):
+        ret = unichem.src(1)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['name_label'],'ChEMBL')
+        self.assertEqual(ret[0]['name'],'chembl')
+        self.assertEqual(ret[0]['src_id'],'1')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_structure(self):
+        ret = unichem.structure('CHEMBL12',1)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['standardinchi'], 'InChI=1S/C16H13ClN2O/c1-19-14-8-7-12(17)9-13(14)16(18-10-15(19)20)11-5-3-2-4-6-11/h2-9H,10H2,1H3')
+        self.assertEqual(ret[0]['standardinchikey'], 'AAOVKJBEBIDNHE-UHFFFAOYSA-N')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_structure_all(self):
+        ret = unichem.structure('CHEMBL12',1, all=True)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['assignment'], '1')
+        self.assertEqual(ret[0]['standardinchi'], 'InChI=1S/C16H13ClN2O/c1-19-14-8-7-12(17)9-13(14)16(18-10-15(19)20)11-5-3-2-4-6-11/h2-9H,10H2,1H3')
+        self.assertEqual(ret[0]['standardinchikey'], 'AAOVKJBEBIDNHE-UHFFFAOYSA-N')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_url_for_src_compound_ids_from_src_compound_id(self):
+        ret = unichem.get('CHEMBL12',1, 2, url=True)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['url'], 'http://www.drugbank.ca/drugs/DB00829')
+        ret = unichem.get('CHEMBL490',1, 15, url=True)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['url'], 'https://www.surechembl.org/chemical/SCHEMBL27799')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_src_compound_ids_all_from_obsolete_compound_id(self):
+        ret = unichem.get('DB07699',2)
+        self.assertTrue(len(ret) > 25)
+        self.assertTrue('J2.044C' in [x['src_compound_id'] for x in ret])
+        ret = unichem.get('DB07699',2,1)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['assignment'], '1')
+        self.assertEqual(ret[0]['UCI'], '304698')
+        self.assertEqual(ret[0]['src_compound_id'], 'CHEMBL12')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_src_compound_ids_from_inchi_key(self):
+        ret = unichem.get('AAOVKJBEBIDNHE-UHFFFAOYSA-N', verbose=True)
+        self.assertTrue(len(ret) > 20)
+        self.assertTrue('https://www.ebi.ac.uk/chembl/' in [x['src_url'] for x in ret])
+        self.assertTrue('aux_for_url' in ret[0])
+        self.assertTrue('base_id_url' in ret[0])
+        self.assertTrue('base_id_url_available' in ret[0])
+        self.assertTrue('description' in ret[0])
+        self.assertTrue('name' in ret[0])
+        self.assertTrue('name_label' in ret[0])
+        self.assertTrue('name_long' in ret[0])
+        self.assertTrue('src_compound_id' in ret[0])
+        self.assertTrue('src_id' in ret[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_auxiliary_mappings(self):
+        ret = unichem.map(20)
+        self.assertTrue(len(ret) > 1500)
+        self.assertTrue('Vinblastine.html' in [x['auxiliary data'] for x in ret])
+        self.assertTrue('gsk1070916' in [x['src_compound_id'] for x in ret])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_connectivity_data_from_inchi_key(self):
+        ret = unichem.connectivity('QJVHTELASVOWBE-YBABNSIOSA-N',c=4,h=1)
+        self.assertEqual(len(ret),1)
+        self.assertTrue(len(ret['1']) > 500)
+        self.assertTrue('CHEMBL295075' in [x[0] for x in ret['1']])
+        ret = unichem.connectivity('QJVHTELASVOWBE-YBABNSIOSA-N',a=1,c=3)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(len(ret['1']),1)
+        self.assertTrue(len(ret['1'][0]['src_matches']) > 20)
+        self.assertEqual(ret['1'][0]['Full Query InChIKey'], 'QJVHTELASVOWBE-YBABNSIOSA-N')
+        self.assertEqual(ret['1'][0]['Full Query InChI'], 'InChI=1S/C16H19N3O5S.C8H9NO5/c1-16(2)11(15(23)24)19-13(22)10(14(19)25-16)18-12(21)9(17)7-3-5-8(20)6-4-7;10-2-1-4-7(8(12)13)9-5(11)3-6(9)14-4/h3-6,9-11,14,20H,17H2,1-2H3,(H,18,21)(H,23,24);1,6-7,10H,2-3H2,(H,12,13)/b;4-1-/t9?,10-,11+,14-;6-,7-/m11/s1')
+        self.assertEqual(ret['1'][0]['name_long'], 'ChEMBL')
+        ret = unichem.connectivity('QJVHTELASVOWBE',a=1,c=3)
+        self.assertEqual(len(ret),1)
+        self.assertEqual(len(ret['1']),1)
+        self.assertTrue(len(ret['1'][0]['src_matches']) > 20)
+        self.assertEqual(ret['1'][0]['Full Query InChIKey'], 'QJVHTELASVOWBE')
+        self.assertEqual(ret['1'][0]['Full Query InChI'], 'InChI=1S/C16H19N3O5S.C8H9NO5/c1-16(2)11(15(23)24)19-13(22)10(14(19)25-16)18-12(21)9(17)7-3-5-8(20)6-4-7;10-2-1-4-7(8(12)13)9-5(11)3-6(9)14-4/h3-6,9-11,14,20H,17H2,1-2H3,(H,18,21)(H,23,24);1,6-7,10H,2-3H2,(H,12,13)')
+        self.assertEqual(ret['1'][0]['name_long'], 'ChEMBL')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_connectivity_data_from_src_compound_id(self):
+        ret = unichem.connectivity('CHEMBL121',1,c=4,h=1)
+        self.assertEqual(len(ret),1)
+        self.assertTrue(len(ret['1']) > 400)
+        self.assertTrue('SCHEMBL2355017' in [x[0] for x in ret['1']])
+        ret = unichem.connectivity('CHEMBL121',1)
+        self.assertEqual(len(ret),1)
+        self.assertTrue(len(ret['1'][0]['src_matches']) > 2)
+        self.assertEqual(ret['1'][0]['Full Query InChIKey'], 'YASAKCUCGLMORW-UHFFFAOYSA-N')
+        self.assertEqual(ret['1'][0]['Full Query InChI'], 'InChI=1S/C18H19N3O3S/c1-21(16-4-2-3-9-19-16)10-11-24-14-7-5-13(6-8-14)12-15-17(22)20-18(23)25-15/h2-9,15H,10-12H2,1H3,(H,20,22,23)')
+        self.assertEqual(ret['1'][0]['name_long'], 'ChEMBL')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_unichem_get_inchi_from_inchi_key(self):
+        ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
+        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['standardinchi'], 'InChI=1S/C16H13ClN2O/c1-19-14-8-7-12(17)9-13(14)16(18-10-15(19)20)11-5-3-2-4-6-11/h2-9H,10H2,1H3')
 
     def test_utils_format_conversion(self):
         smiles = 'O=C(Oc1ccccc1C(=O)O)C' # aspirin

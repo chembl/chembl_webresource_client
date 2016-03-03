@@ -10,10 +10,11 @@ from chembl_webresource_client.url_query import UrlQuery
 #-----------------------------------------------------------------------------------------------------------------------
 
 class Model(object):
-    def __init__(self, name, collection_name = None, formats=('json', 'xml')):
+    def __init__(self, name, collection_name = None, formats=('json', 'xml'), searchable=False):
         self.name = name
         self.collection_name = collection_name
         self.formats = formats
+        self.searchable=searchable
 
 #This class is based on Django QuerySet (https://github.com/django/django/blob/master/django/db/models/query.py)
 
@@ -35,6 +36,7 @@ class QuerySet(object):
         self.current_index = 0
         self.can_filter = True
         self.limits = None
+        self.searched = False
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -193,6 +195,14 @@ class QuerySet(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+    def search(self, query):
+        self.searched = True
+        clone = self._clone()
+        clone.query.search(query)
+        return clone
+
+#-----------------------------------------------------------------------------------------------------------------------
+
     def filter(self, **kwargs):
         if not self.query.allows_multiple:
             return None
@@ -205,6 +215,7 @@ class QuerySet(object):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def order_by(self, *field_names):
+        assert not self.searched, "Cannot order search results"
         if not self.query.allows_multiple:
             return None
         clone = self._clone()

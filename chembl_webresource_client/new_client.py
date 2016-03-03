@@ -44,15 +44,19 @@ def client_from_url(url, base_url=None):
     client.description = EasyDict(schema)
     client.official = False # TODO: change
 
+    keys = client.description.methods.keys()
     for method, definition in [(m,d) for (m,d) in client.description.methods.items() if
                                (m.startswith('POST_') or m.startswith('GET_')) and m.endswith('_detail')]:
+        searchable = False
+        if method.replace('dispatch_detail', 'get_search') in keys:
+            searchable = True
         name = definition['resource_name']
         collection_name = definition['collection_name']
         formats = [format for format in definition['formats'] if format not in ('jsonp', 'html')]
         default_format = definition['default_format'].split('/')[-1]
         if not name:
             continue
-        model = Model(name, collection_name, formats)
+        model = Model(name, collection_name, formats, searchable)
         qs = QuerySet(model=model)
         if default_format != 'xml':
             qs.set_format(default_format)

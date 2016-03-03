@@ -1,6 +1,9 @@
 __author__ = 'mnowotka'
 
 from chembl_webresource_client.singleton import Singleton
+from chembl_webresource_client import __version__
+
+default_cache_name = '.chembl_ws_client__' + str(__version__)
 
 
 @Singleton
@@ -14,11 +17,13 @@ class Settings:
     BACKOFF_FACTOR = 2
     CONCURRENT_SIZE = 50
     ASYNC_TRESHOLD = 10
-    CACHE_NAME = 'chembl_webresource_client'
+    CACHE_EXPIRE = 60 * 60 * 24
+    CACHE_NAME = default_cache_name
     RESPECT_RATE_LIMIT = True
     TIMEOUT = 3.0
     UTILS_SPORE_URL = 'https://www.ebi.ac.uk/chembl/api/utils/spore'
     NEW_CLIENT_URL = 'https://www.ebi.ac.uk/chembl/api/data'
+    UNICHEM_URL = 'https://www.ebi.ac.uk/unichem/rest'
     NEW_CLIENT_TIMEOUT = None
     TEST_CASE_TIMEOUT = 10
     MAX_LIMIT = 20

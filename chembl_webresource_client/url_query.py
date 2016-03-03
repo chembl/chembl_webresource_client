@@ -9,6 +9,7 @@ try:
 except ImportError:
     from urllib.parse import urlencode
     from urllib.parse import quote
+import os, os.path
 import requests
 import requests_cache
 import six
@@ -35,6 +36,7 @@ class UrlQuery(object):
         self.start = 0
         self.stop = None
         self.count = None
+        self.searchable = model.searchable
         self.limit = Settings.Instance().MAX_LIMIT
         self.max_url_size = Settings.Instance().MAX_URL_SIZE
         self.timeout = Settings.Instance().NEW_CLIENT_TIMEOUT
@@ -117,6 +119,8 @@ class UrlQuery(object):
         result.stop = self.stop
         result.count = self.count
         result.limit = self.limit
+        result.searchable = self.searchable
+        result.base_url = self.base_url
         result.allows_list = self.allows_list
         result.allows_multiple = self.allows_multiple
         result.max_url_size = self.max_url_size
@@ -192,6 +196,16 @@ class UrlQuery(object):
             return
         self.filters.extend([(key, quote(value) if isinstance(value, string_types) else value)
                              for key, value in kwargs.items()])
+        self.set_limits(None, None)
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+    def search(self, query):
+        assert self.searchable, "This resource is not searchable"
+        assert not self.filters, "You can add filters to refine search but you can't search among prefiltered results"
+        self.filters = [('q', quote(query))]
+        self.ordering = []
+        self.base_url += '/search'
         self.set_limits(None, None)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -341,8 +355,10 @@ class UrlQuery(object):
             size = s.CONCURRENT_SIZE
             adapter = requests.adapters.HTTPAdapter(pool_connections=size, pool_maxsize=size, pool_block=True,
                 max_retries=retry)
-            self.session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite',
-                fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
+            home_directory = os.path.expanduser('~')
+            self.session = requests_cache.CachedSession(os.path.join(home_directory, s.CACHE_NAME), backend='sqlite',
+                expire_after=s.CACHE_EXPIRE, fast_save=s.FAST_SAVE,
+                allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
             if s.PROXIES:
                 self.session.proxies = s.PROXIES
             self.session.headers.update({"X-HTTP-Method-Override": "GET"})
