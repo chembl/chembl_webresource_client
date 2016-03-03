@@ -50,7 +50,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(all[0]['bioactivityCount'] >= all[-1]['bioactivityCount'])
         self.assertEqual(targets.get(uniprot='Q13936')['proteinAccession'], 'Q13936')
         self.assertEqual(len(targets.get(['CHEMBL240', 'CHEMBL1927'])), 2)
-        self.assertEqual(len(targets.approved_drugs('CHEMBL1824')),5)
+        self.assertEqual(len(targets.approved_drugs('CHEMBL1824')),26)
         self.assertEqual(targets.approved_drugs('CHEMBL1824')[1]['name'], 'PERTUZUMAB')
 
     def test_compounds(self):
@@ -81,7 +81,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(compounds.forms('CHEMBL1207563')), 2)
         self.assertEqual(set(map(lambda x: x['chemblId'],compounds.forms('CHEMBL1207563'))),
                          set(['CHEMBL415863', 'CHEMBL1207563']))
-        self.assertEqual(len(compounds.forms('CHEMBL1078826')), 17)
+        self.assertEqual(len(compounds.forms('CHEMBL1078826')), 20)
         self.assertEqual(len(compounds.drug_mechanisms('CHEMBL1642')), 3)
         self.assertTrue('Stem cell growth factor receptor' in [comp['name'] for
                                                                comp in compounds.drug_mechanisms('CHEMBL1642')])
