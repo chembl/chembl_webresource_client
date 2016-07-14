@@ -734,7 +734,7 @@ class TestSequenceFunctions(unittest.TestCase):
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(res.exists())
         count = len(res)
-        random_index = 80 #randint(0, count - 1)
+        random_index = 70 #randint(0, count - 1)
         random_elem = res[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('availability_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -883,7 +883,7 @@ class TestSequenceFunctions(unittest.TestCase):
         ret = unichem.get('CHEMBL12',1)
         self.assertTrue(len(ret) > 10)
         self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
-        self.assertEqual(ret[0]['src_id'],'1')
+        self.assertEqual(ret[0]['src_id'],'10')
         ret = unichem.get('CHEMBL12',1,2)
         self.assertEqual(len(ret),1)
         self.assertEqual(ret[0]['src_compound_id'], 'DB00829')
