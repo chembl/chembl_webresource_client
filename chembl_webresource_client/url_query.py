@@ -398,7 +398,7 @@ class UrlQuery(object):
                 self.current_chunk = json_data[self.collection_name]
                 self.api_total_count = json_data['page_meta']['total_count']
             else:
-                xml = parseString(res.text)
+                xml = parseString(res.text.encode('utf-8'))
                 self.current_chunk = [e.toxml() for e in xml.getElementsByTagName(self.collection_name)[0].childNodes]
                 page_meta = xml.getElementsByTagName('page_meta')[0]
                 self.api_total_count = int(page_meta.getElementsByTagName('total_count')[0].childNodes[0].data)

@@ -221,7 +221,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual([site['site_components'][0]['domain']['domain_type'] for site in
                            binding_site.get([962, 963, 943])], [u'Pfam-A', u'Pfam-A', u'Pfam-A'])
         self.assertEqual([bind['site_id'] for bind in binding_site.all().order_by('site_id')[0:5]],
-            [1, 2, 3, 4, 5])
+            [2, 3, 4, 5, 6])
         random_index = 1234 #randint(0, count - 1)
         random_elem = binding_site.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
@@ -229,7 +229,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('site_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('site_components', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         binding_site.set_format('xml')
-        parseString(binding_site.get(1))
+        parseString(binding_site.get(3))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_biotherapeutic_resource(self):
@@ -279,6 +279,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('cellosaurus_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('clo_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('efo_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('cl_lincs_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         cell_line.set_format('xml')
         parseString(cell_line.filter(cellosaurus_id="CVCL_0417")[0])
 
@@ -358,6 +359,49 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('ref_url', metabolism_refs, 'One of required fields not found in resource {0}'.format(random_elem))
         metabolism.set_format('xml')
         parseString(metabolism.filter(substrate_chembl_id="CHEMBL1071")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_tissue_resource(self):
+        tissue = new_client.tissue
+        count = len(tissue.all())
+        self.assertTrue(count)
+        self.assertTrue(tissue.filter(pref_name__istartswith='blood').exists())
+        self.assertTrue(tissue.order_by('efo_id').exists())
+        random_index = 2 #randint(0, count - 1)
+        random_elem = tissue.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('efo_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('tissue_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('uberon_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        tissue.set_format('xml')
+        parseString(tissue.filter(efo_id__startswith="EFO")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_target_relations(self):
+        target_relation = new_client.target_relation
+        count = len(target_relation.all())
+        self.assertTrue(count)
+        self.assertTrue(target_relation.filter(target_chembl_id='CHEMBL2096621',relationship='OVERLAPS WITH').exists())
+        self.assertEqual(target_relation.order_by('relationship')[0]['relationship'],'EQUIVALENT TO')
+        random_index = 4321 #randint(0, count - 1)
+        random_elem = target_relation.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list of {1} elements".format(random_index, count))
+        self.assertIn('related_target_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('relationship', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('target_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        target_relation.set_format('xml')
+        parseString(target_relation.filter(relationship='EQUIVALENT TO')[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_document_search(self):
+        document = new_client.document
+        document.set_format('json')
+        count = len(document.all())
+        res = document.search('cytokine')
+        self.assertTrue(len(res) > 300)
+        self.assertTrue(len(res) < count)
+        self.assertTrue('cytokine' in res[0]['abstract'])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_document_resource(self):
@@ -493,7 +537,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(molecule.filter(smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
         self.assertEqual(molecule.filter(molecule_structures__canonical_smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
         self.assertEqual(molecule.filter(molecule_structures__canonical_smiles__exact=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
-        self.assertEqual(molecule.filter(molecule_structures__canonical_smiles__flexmatch=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
+        self.assertTrue('CHEMBL125' in x['molecule_chembl_id'] for x in molecule.filter(molecule_structures__canonical_smiles__flexmatch=chembl125_smiles))
         approved_drugs = molecule.filter(max_phase=4)
         approved_drugs_count = len(approved_drugs)
         self.assertTrue(approved_drugs_count > 2000)
@@ -549,6 +593,10 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('usan_stem_definition', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('usan_substem', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('usan_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('withdrawn_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('withdrawn_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('withdrawn_country', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('withdrawn_reason', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertEqual(len(molecule.get('CHEMBL1475')['atc_classifications']),2)
         self.assertTrue(molecule.filter(atc_classifications__level5='C07AB01').exists())
         self.assertEqual(len(molecule.filter(atc_classifications__level5='C07AB01')), 1)
@@ -597,19 +645,19 @@ class TestSequenceFunctions(unittest.TestCase):
         molecule_form = new_client.molecule_form
         count = len(molecule_form.all())
         self.assertTrue(count)
-        self.assertTrue(all([form['parent'] == 'True' for form in
+        self.assertTrue(all([form['is_parent'] == 'True' for form in
                              molecule_form.get(['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])]))
         self.assertEqual(len(molecule_form.get(molecule_chembl_id=['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])), 3)
         random_index = 6543 #randint(0, count - 1)
         random_elem = molecule_form.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('parent', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('is_parent', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         known_forms = molecule_form.get('CHEMBL211471')
         self.assertEqual(len(known_forms['molecule_forms']), 3)
         self.assertEqual(set([form['molecule_chembl_id'] for form in known_forms['molecule_forms']]),
                                                                 set(["CHEMBL54126", "CHEMBL278020", "CHEMBL211471"]))
-        self.assertTrue(any(form['parent'] == 'True' for form in known_forms['molecule_forms']))
+        self.assertTrue(any(form['is_parent'] == 'True' for form in known_forms['molecule_forms']))
         molecule_form.set_format('xml')
         parseString(molecule_form.all()[0])
 
@@ -646,10 +694,17 @@ class TestSequenceFunctions(unittest.TestCase):
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
+        res = similarity.filter(smiles='[O--].[Fe++].OCC1OC(OC2C(CO)OC(OC3C(O)C(CO)OC(OCC4OC(OCC5OC(O)C(O)C(OC6OC(CO)C(O)C(OC7OC(COC8OC(COC9OC(CO)C(O)C(O)C9O)C(O)C(O)C8O)C(O)C(OC8OC(CO)C(O)C(OC9OC(CO)C(O)C(OC%10OC(COC%11OC(COC%12OC(COC%13OC(COC%14OC(COC%15OC(CO)C(O)C(O)C%15O)C(O)C(OC%15OC(CO)C(O)C%15O)C%14O)C(O)C(O)C%13O)C(O)C(O)C%12O)C(O)C(O)C%11O)C(O)C(OC%11OC(CO)C(O)C(O)C%11O)C%10O)C9O)C8O)C7O)C6O)C5O)C(O)C(O)C4O)C3O)C2O)C(O)C1O', similarity=70)
+        self.assertTrue(res.exists())
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(len(res) > 90)
+        res = similarity.filter(smiles="CC(C)OC(=O)[C@H](C)N[P@](=O)(OC[C@H]1O[C@@H](N2C=CC(=O)NC2=O)[C@](C)(F)[C@@H]1O)Oc3ccccc3", similarity=70)
+        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
+        self.assertTrue(res.exists())
         res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
-        count = len(res)
+        _ = len(res)
         most_similar = res[0]
         self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
         self.assertEqual(most_similar['pref_name'], 'ASPIRIN')
@@ -734,7 +789,7 @@ class TestSequenceFunctions(unittest.TestCase):
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(res.exists())
         count = len(res)
-        random_index = 70 #randint(0, count - 1)
+        random_index = 80 #randint(0, count - 1)
         random_elem = res[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('availability_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -796,6 +851,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('accession', target_component, 'One of required fields not found in resource {0}'.format(target_component))
         self.assertIn('component_id', target_component, 'One of required fields not found in resource {0}'.format(target_component))
         self.assertIn('component_type', target_component, 'One of required fields not found in resource {0}'.format(target_component))
+        self.assertIn('relationship', target_component, 'One of required fields not found in resource {0}'.format(target_component))
+        self.assertIn('component_description', target_component, 'One of required fields not found in resource {0}'.format(target_component))
         self.assertIn('target_component_synonyms', target_component, 'One of required fields not found in resource {0}'.format(target_component))
         synonym = target_component['target_component_synonyms'][0]
         self.assertIn('component_synonym', synonym, 'One of required fields not found in  resource {0}'.format(synonym))
@@ -873,7 +930,7 @@ class TestSequenceFunctions(unittest.TestCase):
         chembl_id_lookup = new_client.chembl_id_lookup
         chembl_id_lookup.set_format('json')
         res = chembl_id_lookup.search('morphine')
-        self.assertTrue(800 < len(res) < 1000)
+        self.assertTrue(800 < len(res) < 1100, 'len(res) is actually {0}'.format(len(res)))
         by_score = sorted([x for x in res],key=lambda x:x['score'], reverse=True)
         self.assertEqual(by_score[0]['chembl_id'], 'CHEMBL70')
         self.assertEqual(by_score[0]['entity_type'], 'COMPOUND')
@@ -883,7 +940,7 @@ class TestSequenceFunctions(unittest.TestCase):
         ret = unichem.get('CHEMBL12',1)
         self.assertTrue(len(ret) > 10)
         self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
-        self.assertEqual(ret[0]['src_id'],'10')
+        self.assertEqual(ret[0]['src_id'],'1')
         ret = unichem.get('CHEMBL12',1,2)
         self.assertEqual(len(ret),1)
         self.assertEqual(ret[0]['src_compound_id'], 'DB00829')
@@ -1129,11 +1186,11 @@ class TestSequenceFunctions(unittest.TestCase):
         aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
         img1 = utils.smiles2image(aspirin)
         self.assertEqual(img1[0:4], b'\x89PNG')
-        self.assertTrue(len(img1) > 5000)
+        self.assertTrue(len(img1) > 3000, 'len(img1) = %s' % len(img1))
         mol = utils.smiles2ctab(aspirin)
         img2 = utils.ctab2image(mol)
         self.assertEqual(img2[0:4], b'\x89PNG')
-        self.assertTrue(len(img2) > 5000)
+        self.assertTrue(len(img2) > 3000, 'len(img2) = %s' % len(img2))
 
     def test_utils_mcs(self):
         smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C", "CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC", "c1(C=O)cc(OC)c(O)cc1"]
