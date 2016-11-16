@@ -286,9 +286,16 @@ class UrlQuery(object):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def _get_by_ids(self, ids):
-        headers = {'Accept': mimetypes.types_map['.'+self.frmt]}
+        if self.frmt in ('mol', 'sdf'):
+            headers = {'Accept': 'chemical/x-mdl-molfile'}
+        else:
+            headers = {'Accept': mimetypes.types_map['.'+self.frmt]}
+        self.logger.info('headers:')
+        self.logger.info(headers)
         if not isinstance(ids, (list, tuple)):
             url = self.base_url + '/'  + quote(str(ids))
+            if self.frmt in ('mol', 'sdf'):
+                url += '.sdf'
             if len(url) > self.max_url_size:
                 raise Exception('URL {0} is longer than allowed {1} characters'.format(url, self.max_url_size))
             with self._get_session() as session:
@@ -299,7 +306,7 @@ class UrlQuery(object):
                 handle_http_error(res)
             if self.frmt == 'json':
                 return res.json()
-            elif self.frmt in ('xml', 'html', 'svg', 'txt'):
+            elif self.frmt in ('xml', 'html', 'svg', 'txt', 'mol', 'sdf'):
                 return res.text
             return res.content
         if not self.allows_multiple:
@@ -341,6 +348,9 @@ class UrlQuery(object):
         if self.frmt == 'json':
             json_data = request.json()
             ret.extend(json_data[self.collection_name])
+        elif self.frmt in ('mol', 'sdf'):
+            sdf_data = request.text.encode('utf-8')
+            ret.extend(sdf_data.split('$$$$\n'))
         else:
             xml = parseString(request.text)
             ret.extend([e.toxml() for e in xml.getElementsByTagName(self.collection_name)[0].childNodes])
@@ -397,6 +407,25 @@ class UrlQuery(object):
                 json_data = res.json()
                 self.current_chunk = json_data[self.collection_name]
                 self.api_total_count = json_data['page_meta']['total_count']
+            elif self.frmt in ('mol', 'sdf'):
+                sdf_data = res.text.encode('utf-8')
+                self.current_chunk = sdf_data.split('$$$$\n')
+                with self._get_session() as session:
+                    res = session.post(self.base_url + '.json', data=data, timeout=self.timeout)
+                self.logger.info(res.url)
+                self.logger.info(data)
+                self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
+                if not res.ok:
+                    handle_http_error(res)
+                json_data = res.json()
+                self.api_total_count = json_data['page_meta']['total_count']
+                aux_data = json_data[self.collection_name]
+                for idx, mol in enumerate(aux_data):
+                    if not mol['molecule_structures']:
+                        self.logger.info((idx, mol['molecule_chembl_id']))
+                        self.current_chunk.insert(idx, None)
+                self.logger.info(aux_data)
+                self.logger.info(self.current_chunk)
             else:
                 xml = parseString(res.text.encode('utf-8'))
                 self.current_chunk = [e.toxml() for e in xml.getElementsByTagName(self.collection_name)[0].childNodes]

@@ -72,7 +72,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(cs[0]['chemblId'], 'CHEMBL319317')
         self.assertTrue(len(compounds.similar_to('COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56', 70)) > 800)
         self.assertTrue(len(compounds.similar_to('C\C(=C/C=C/C(=C/C(=O)O)/C)\C=C\C1=C(C)CCCC1(C)C', 70)) > 200)
-        self.assertTrue(len(compounds.substructure('COcccc')) > 6000)
+        self.assertTrue(len(compounds.substructure('COcccc')) > 4000, str(len(compounds.substructure('COcccc'))))
         self.assertTrue(len(compounds.substructure('C\C(=C/C=C/C(=C/C(=O)O)/C)\C=C\C1=C(C)CCCC1(C)C')) >= 100)
         self.assertTrue(len(compounds.bioactivities('CHEMBL1')) > 10)
         self.assertEqual(len(compounds.forms('CHEMBL415863')), 2)
@@ -384,6 +384,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(count)
         self.assertTrue(target_relation.filter(target_chembl_id='CHEMBL2096621',relationship='OVERLAPS WITH').exists())
         self.assertEqual(target_relation.order_by('relationship')[0]['relationship'],'EQUIVALENT TO')
+        self.assertTrue(len(target_relation.get('CHEMBL2096621')['target_relations']) == 4, str(target_relation.get('CHEMBL2096621')))
         random_index = 4321 #randint(0, count - 1)
         random_elem = target_relation.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list of {1} elements".format(random_index, count))
@@ -402,6 +403,70 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(res) > 300)
         self.assertTrue(len(res) < count)
         self.assertTrue('cytokine' in res[0]['abstract'])
+        res = document.search('activators')
+        self.assertTrue('activity' in res[0]['abstract'])
+        self.assertTrue('activators' not in res[0]['abstract'])
+        act_count = len(res)
+        self.assertTrue(act_count > 38000)
+        self.assertTrue(act_count < count)
+        res = document.filter(abstract__icontains="activators")
+        self.assertTrue('activators' in res[0]['abstract'])
+        act_count_1 = len(res)
+        self.assertTrue(act_count_1 < act_count)
+        self.assertTrue(act_count_1 > 300)
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_document_similarity_resource(self):
+        document_similarity = new_client.document_similarity
+        count = len(document_similarity.all())
+        self.assertTrue(count)
+        self.assertTrue(document_similarity.filter(document_1_chembl_id='CHEMBL1122254').exists())
+        self.assertTrue(document_similarity.filter(document_1_chembl_id='CHEMBL1122702').order_by('tid_tani').exists())
+
+        self.assertEqual(len(document_similarity.filter(document_1_chembl_id='CHEMBL1124609')), 50)
+        self.assertEqual(document_similarity.filter(document_1_chembl_id='CHEMBL1147570').order_by('tid_tani')[0]['tid_tani'], "0.0000")
+        self.assertEqual(document_similarity.filter(document_1_chembl_id='CHEMBL1147570').order_by('-tid_tani')[0]['tid_tani'], "1.0000")
+        self.assertEqual(document_similarity.filter(document_1_chembl_id='CHEMBL1122254').order_by('mol_tani')[0]['mol_tani'], "0.0000")
+        self.assertEqual(document_similarity.filter(document_1_chembl_id='CHEMBL1122254').order_by('-mol_tani')[0]['mol_tani'], "0.0100")
+
+        random_index = 444444
+        random_elem = document_similarity.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('document_1_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('document_2_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('mol_tani', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('tid_tani', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+
+        document_similarity.set_format('xml')
+        parseString(document_similarity.filter(document_2_chembl_id='CHEMBL1123409')[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_document_term_resource(self):
+        document_term = new_client.document_term
+        count = len(document_term.all())
+        self.assertTrue(count)
+        self.assertTrue(document_term.filter(document_chembl_id='CHEMBL1129239').exists())
+
+        terms_for_doc = document_term.filter(document_chembl_id='CHEMBL1124199').order_by('-score')
+        self.assertTrue(all(Decimal(terms_for_doc[i]['score']) >= Decimal(terms_for_doc[i+1]['score']) for i in range(len(terms_for_doc)-1)), [Decimal(r['score']) for r in terms_for_doc])
+        self.assertTrue(len(terms_for_doc) >= 10)
+        self.assertEqual(terms_for_doc[0]['term_text'], 'inverse agonist activity')
+        self.assertTrue('pentylenetetrazole-induced convulsions' in [x['term_text'] for x in terms_for_doc])
+
+        docs_for_term = document_term.filter(term_text='inverse agonist activity').order_by('-score')
+        self.assertTrue(len(docs_for_term) >= 7)
+        self.assertTrue(all([x['term_text'] == 'inverse agonist activity' for x in docs_for_term]))
+        self.assertEqual(docs_for_term[0]['document_chembl_id'], 'CHEMBL1124199')
+
+        random_index = 123456
+        random_elem = document_term.all()[random_index]
+        self.assertIn('term_text', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('score', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+
+        document_term.set_format('xml')
+        parseString(document_term.filter(document_chembl_id='CHEMBL1124205')[0])
+
 
     @pytest.mark.timeout(TIMEOUT)
     def test_document_resource(self):
@@ -429,6 +494,38 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         document.set_format('xml')
         parseString(document.filter(journal="J. Med. Chem.")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_compound_structural_alert_resource(self):
+        compound_structural_alert = new_client.compound_structural_alert
+        compound_structural_alert.set_format('json')
+        count = len(compound_structural_alert.all())
+        self.assertTrue(count)
+        self.assertTrue(compound_structural_alert.filter(alert__alert_set__priority=8).exists())
+        self.assertTrue(300000 < len(compound_structural_alert.
+            filter(alert__alert_set__priority__lte=5).
+            filter(alert__alert_set__set_name='Dundee').
+            filter(alert__smarts__startswith='C').
+            filter(alert_name='imine')) < 300100)
+
+        self.assertTrue(all([x['alert']['alert_set']['set_name']==u'MLSMR' for x in compound_structural_alert.get([1, 3])]))
+
+        self.assertEqual(compound_structural_alert.order_by('-alert__alertset__priority')[0]['alert']['alert_set']['priority'], 8)
+        self.assertEqual(compound_structural_alert.order_by('alert__alertset__priority')[0]['alert']['alert_set']['priority'], 1)
+
+        random_index = 891 #randint(0, count - 1)
+        random_elem = compound_structural_alert.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('alert', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('cpd_str_alert_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+
+        compound_structural_alert.set_format('xml')
+        parseString(compound_structural_alert.filter(molecule_chembl_id='CHEMBL266429')[0])
+
+        compound_structural_alert.set_format('png')
+        self.assertTrue(compound_structural_alert.get(1).startswith(b'\x89PNG\r\n'))
+        self.assertTrue(compound_structural_alert.get(2).startswith(b'\x89PNG\r\n'))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_image_resource(self):
@@ -487,6 +584,23 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(flex),2)
         self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], flex)), set(['CHEMBL446858', 'CHEMBL1']))
         self.assertTrue(len(molecule.filter(biotherapeutic__isnull=True)) > len(molecule.filter(biotherapeutic__isnull=False)))
+
+        molecule.set_format('sdf')
+        molstring =  molecule.all()[0]
+        inchi_from_molstring = utils.ctab2inchi(molstring)
+        molecule.set_format('json')
+        inchi_from_chembl = molecule.all()[0]['molecule_structures']['standard_inchi']
+        self.assertEqual(inchi_from_molstring, inchi_from_chembl)
+
+        molecule.set_format('json')
+        self.assertFalse(molecule.all()[17]['molecule_structures'])
+        molecule.set_format('sdf')
+        self.assertIsNone(molecule.all()[17])
+
+        molecule.set_format('json')
+        self.assertFalse(molecule.all()[19]['molecule_structures'])
+        molecule.set_format('sdf')
+        self.assertIsNone(molecule.all()[19])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_search(self):
@@ -597,6 +711,9 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('withdrawn_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('withdrawn_country', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('withdrawn_reason', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('hba_lipinski', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('hbd_lipinski', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('num_lipinski_ro5_violations', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertEqual(len(molecule.get('CHEMBL1475')['atc_classifications']),2)
         self.assertTrue(molecule.filter(atc_classifications__level5='C07AB01').exists())
         self.assertEqual(len(molecule.filter(atc_classifications__level5='C07AB01')), 1)
@@ -640,6 +757,13 @@ class TestSequenceFunctions(unittest.TestCase):
                             .filter(molecule_properties__aromatic_rings=4)
                             .filter(oral=True)[0])
 
+        molecule.set_format('sdf')
+        molstring = str(molecule.get('CHEMBL25'))
+        inchi_from_molstring = utils.ctab2inchi(molstring)
+        molecule.set_format('json')
+        inchi_from_chembl = molecule.get('CHEMBL25')['molecule_structures']['standard_inchi']
+        self.assertEqual(inchi_from_molstring, inchi_from_chembl)
+
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_form_resource(self):
         molecule_form = new_client.molecule_form
@@ -648,11 +772,26 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(all([form['is_parent'] == 'True' for form in
                              molecule_form.get(['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])]))
         self.assertEqual(len(molecule_form.get(molecule_chembl_id=['CHEMBL328730', 'CHEMBL80863', 'CHEMBL80176'])), 3)
+        self.assertTrue(len(molecule_form.filter(parent_chembl_id='CHEMBL660')) > 3)
+        asp = molecule_form.filter(molecule_chembl_id='CHEMBL25')
+        self.assertTrue(len(asp) == 1)
+        self.assertTrue(asp[0]['molecule_chembl_id'] == 'CHEMBL25')
+        self.assertTrue(asp[0]['parent_chembl_id'] == 'CHEMBL25')
+        via = molecule_form.filter(parent_chembl_id='CHEMBL192')
+        self.assertTrue(len(via) == 2)
+        self.assertTrue(via[0]['molecule_chembl_id'] == 'CHEMBL192')
+        self.assertTrue(via[0]['parent_chembl_id'] == 'CHEMBL192')
+        self.assertTrue(via[0]['is_parent'] == 'True')
+        self.assertTrue(via[1]['molecule_chembl_id'] == 'CHEMBL1737')
+        self.assertTrue(via[1]['parent_chembl_id'] == 'CHEMBL192')
+        self.assertTrue(via[1]['is_parent'] == 'False')
+
         random_index = 6543 #randint(0, count - 1)
         random_elem = molecule_form.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('is_parent', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('parent_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         known_forms = molecule_form.get('CHEMBL211471')
         self.assertEqual(len(known_forms['molecule_forms']), 3)
         self.assertEqual(set([form['molecule_chembl_id'] for form in known_forms['molecule_forms']]),
@@ -857,6 +996,16 @@ class TestSequenceFunctions(unittest.TestCase):
         synonym = target_component['target_component_synonyms'][0]
         self.assertIn('component_synonym', synonym, 'One of required fields not found in  resource {0}'.format(synonym))
         self.assertIn('syn_type', synonym, 'One of required fields not found in  resource {0}'.format(synonym))
+        gene_name = 'GABRB2'
+        targets_for_gene = target.filter(target_components__target_component_synonyms__component_synonym__icontains=gene_name)
+        self.assertEqual(len(targets_for_gene), 14)
+        shortcut = target.filter(target_synonym__icontains=gene_name)
+        self.assertListEqual([x for x in targets_for_gene], [x for x in shortcut])
+        gene_name = 'flap'
+        targets_for_gene = target.filter(target_components__target_component_synonyms__component_synonym__icontains=gene_name)
+        self.assertEqual(len(targets_for_gene), 5)
+        shortcut = target.filter(target_synonym__icontains=gene_name)
+        self.assertListEqual([x for x in targets_for_gene], [x for x in shortcut])
         target.set_format('xml')
         parseString(target.all()[0])
 
