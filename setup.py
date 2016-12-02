@@ -29,6 +29,9 @@ setup(
         'requests-cache>=0.4.7',
         'grequests==0.2.0',
         'easydict',
+        'pyopenssl',
+        'ndg-httpsclient',
+        'pyasn1'
     ],
     tests_require = ['pytest-timeout'],
     classifiers=['Development Status :: 4 - Beta',
