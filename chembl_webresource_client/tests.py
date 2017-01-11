@@ -2,6 +2,7 @@ __author__ = 'mnowotka'
 
 from six.moves import xrange as range
 from xml.dom.minidom import parseString
+from requests.exceptions import RetryError
 from chembl_webresource_client.settings import Settings
 from chembl_webresource_client import *
 from chembl_webresource_client.utils import utils
@@ -137,6 +138,13 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('uo_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         activity.set_format('xml')
         parseString(activity.all()[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_activity_unique(self):
+        activity = new_client.activity
+        activity.set_format('json')
+        acts = activity.filter(target_chembl_id='CHEMBL5619')[:5000]
+        self.assertTrue(len(acts) == len(set([act['activity_id'] for act in acts])))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_assay_resource(self):
@@ -593,14 +601,14 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(inchi_from_molstring, inchi_from_chembl)
 
         molecule.set_format('json')
-        self.assertFalse(molecule.all()[17]['molecule_structures'])
+        self.assertFalse(molecule.get('CHEMBL6961')['molecule_structures'])
         molecule.set_format('sdf')
-        self.assertIsNone(molecule.all()[17])
+        self.assertRaisesRegexp(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6961')
 
         molecule.set_format('json')
-        self.assertFalse(molecule.all()[19]['molecule_structures'])
+        self.assertFalse(molecule.get('CHEMBL6963')['molecule_structures'])
         molecule.set_format('sdf')
-        self.assertIsNone(molecule.all()[19])
+        self.assertRaisesRegexp(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6963')
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_search(self):
@@ -763,6 +771,13 @@ class TestSequenceFunctions(unittest.TestCase):
         molecule.set_format('json')
         inchi_from_chembl = molecule.get('CHEMBL25')['molecule_structures']['standard_inchi']
         self.assertEqual(inchi_from_molstring, inchi_from_chembl)
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_molecule_unique(self):
+        molecule = new_client.molecule
+        molecule.set_format('json')
+        mols = molecule.filter(molecule_properties__full_mwt__gte=100)[:5000]
+        self.assertTrue(len(mols) == len(set([mol['molecule_chembl_id'] for mol in mols])))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_form_resource(self):
@@ -1086,13 +1101,18 @@ class TestSequenceFunctions(unittest.TestCase):
 
     @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_from_compound_id(self):
-        ret = unichem.get('CHEMBL12',1)
+        ret = unichem.get('CHEMBL12', 1)
+        self.assertTrue(len(ret) > 10)
+        ret = unichem.get('CHEMBL12')
         self.assertTrue(len(ret) > 10)
         self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
-        self.assertEqual(ret[0]['src_id'],'1')
-        ret = unichem.get('CHEMBL12',1,2)
-        self.assertEqual(len(ret),1)
+        self.assertEqual(ret[0]['src_id'], '1')
+        ret = unichem.get('CHEMBL12', 1, 2)
+        self.assertEqual(len(ret), 1)
         self.assertEqual(ret[0]['src_compound_id'], 'DB00829')
+        ret = unichem.get('AIN')
+        self.assertEqual(len(ret), 1)
+        self.assertEqual(ret['3'][0]['src_compound_id'], 'CHEMBL25', str(ret))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_all_from_compound_id(self):

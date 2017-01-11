@@ -79,13 +79,17 @@ class UniChemClient(object):
                     url = '{0}/src_compound_id_url/{1}/{2}/{3}'.format(self.base_url, pk, src_id, to_src_id)
                 elif all:
                     url = '{0}/src_compound_id_all/{1}/{2}/{3}'.format(self.base_url, pk, src_id, to_src_id)
-                else:
+                elif src_id:
                     url = '{0}/src_compound_id/{1}/{2}/{3}'.format(self.base_url, pk, src_id, to_src_id)
+                else:
+                    url = '{0}/src_compound_id/{1}/{2}/{3}'.format(self.base_url, pk, 1, to_src_id)
             else:
                 if all:
                     url = '{0}/src_compound_id_all/{1}/{2}'.format(self.base_url, pk, src_id)
-                else:
+                elif src_id:
                     url = '{0}/src_compound_id/{1}/{2}'.format(self.base_url, pk, src_id)
+                else:
+                    url = '{0}/src_compound_id/{1}/{2}'.format(self.base_url, pk, 1)
         elif inchi_key_regex.match(pk):
             if all:
                 url = '{0}/inchikey_all/{1}'.format(self.base_url, pk)
@@ -96,8 +100,10 @@ class UniChemClient(object):
         else:
             if to_src_id:
                 url = '{0}/src_compound_id_all_obsolete/{1}/{2}/{3}'.format(self.base_url, pk, src_id, to_src_id)
-            else:
+            elif src_id:
                 url = '{0}/src_compound_id_all_obsolete/{1}/{2}'.format(self.base_url, pk, src_id)
+            else:
+                url = '{0}/orphanIdMap/{1}'.format(self.base_url, pk)
         return self._get_results(url)
 
 #-----------------------------------------------------------------------------------------------------------------------

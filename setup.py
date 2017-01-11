@@ -13,8 +13,8 @@ except ImportError:
     from setuptools import setup
 
 setup(
-    name='chembl_webresource_client',
-    version='0.8.51',
+    name='chembl-webresource-client',
+    version='0.8.55',
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
