@@ -8,6 +8,7 @@ from chembl_webresource_client import *
 from chembl_webresource_client.utils import utils
 from chembl_webresource_client.new_client import new_client
 from chembl_webresource_client.unichem import unichem_client as unichem
+from chembl_webresource_client.http_errors import HttpBadRequest, HttpNotFound
 from decimal import Decimal
 import time
 import json
@@ -133,6 +134,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('standard_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('standard_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('standard_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('target_pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('target_organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('uo_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -560,6 +562,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('binding_site_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('direct_interaction', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('disease_efficacy', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('max_phase', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('mec_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('mechanism_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('mechanism_of_action', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -582,9 +585,12 @@ class TestSequenceFunctions(unittest.TestCase):
                                 .filter(molecule_properties__aromatic_rings__lte=3)
                                 .filter(chirality=(-1))
                                 .exists())
-        range = molecule.filter(molecule_properties__full_mwt__range=[200,201])
+        range = molecule.filter(molecule_properties__full_mwt__range=[200, 201])
         self.assertTrue(range.exists())
         self.assertTrue(700 < len(range) < 900, 'len(range) is {0} but should be between 700 and 800'.format(len(range)))
+        wrong_range = molecule.filter(molecule_properties__full_mwt__range=[200])
+        with self.assertRaisesRegexp(HttpBadRequest, 'Invalid range'):
+            len(wrong_range)
         exact = molecule.filter(molecule_structures__canonical_smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
         self.assertEqual(len(exact),1)
         self.assertEqual(list(map(lambda x: x['molecule_chembl_id'], exact)), ['CHEMBL446858'])
@@ -913,7 +919,12 @@ class TestSequenceFunctions(unittest.TestCase):
         less_similar = res[0]
         self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).filter(molecule_properties__aromatic_rings=2)
-        self.assertTrue(len(res) >  480)
+        self.assertTrue(len(res) > 480)
+        res = similarity.filter(chembl_id="CHEMBL25", similarity=100)
+        res.set_format('json')
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
+        self.assertRaisesRegexp(HttpNotFound, 'No chemical structure defined', len, similarity.filter(chembl_id="CHEMBL1201822", similarity=70))
 
 
     @pytest.mark.timeout(TIMEOUT)
@@ -935,6 +946,8 @@ class TestSequenceFunctions(unittest.TestCase):
     @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource(self):
         substructure = new_client.substructure
+        with self.assertRaisesRegexp(HttpBadRequest, 'Structure or identifier required'):
+            substructure[0]
         res = substructure.filter(smiles="CCC#C\C=C/CCC")
         self.assertTrue(res.exists())
         slice = res[:6]
@@ -976,6 +989,11 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('usan_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         res.set_format('xml')
         parseString(res[0])
+        res = substructure.filter(chembl_id="CHEMBL25")
+        res.set_format('json')
+        self.assertTrue(len(res) > 300)
+        self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
+        self.assertRaisesRegexp(HttpNotFound, 'No chemical structure defined', len, substructure.filter(chembl_id="CHEMBL1201822"))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_target_resource(self):
@@ -1106,7 +1124,7 @@ class TestSequenceFunctions(unittest.TestCase):
         ret = unichem.get('CHEMBL12')
         self.assertTrue(len(ret) > 10)
         self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
-        self.assertEqual(ret[0]['src_id'], '1')
+        self.assertEqual(ret[0]['src_id'], '9')
         ret = unichem.get('CHEMBL12', 1, 2)
         self.assertEqual(len(ret), 1)
         self.assertEqual(ret[0]['src_compound_id'], 'DB00829')
