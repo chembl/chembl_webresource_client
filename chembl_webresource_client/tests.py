@@ -101,6 +101,17 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('c' in activity.get(66369)['canonical_smiles'])
         self.assertEqual([act['activity_id'] for act in activity.all().order_by('activity_id')[0:5]],
             [31863, 31864, 31865, 31866, 31867])
+        reg = activity.filter(target_chembl_id="CHEMBL3938", assay_type__iregex="(B|F)")
+        self.assertTrue(400 <= len(reg) < 500)
+        self.assertTrue(all('CHEMBL3938' == x['target_chembl_id'] and (x['assay_type'] in 'B', 'F') for x in reg[:20]))
+        type_a = activity.filter(assay_type='A')
+        self.assertTrue(655611 <= len(type_a) < 660000)
+        self.assertTrue(all('A' == x['assay_type'] for x in type_a[:20]))
+        self.assertTrue(activity.filter(assay_type='A').exists())
+        self.assertTrue(activity.filter(assay_type='B').exists())
+        self.assertTrue(activity.filter(assay_type='F').exists())
+        self.assertTrue(activity.filter(assay_type='U').exists())
+        self.assertTrue(activity.filter(assay_type='P').exists())
 
     def test_activity_resource_details(self):
         activity = new_client.activity
@@ -147,6 +158,26 @@ class TestSequenceFunctions(unittest.TestCase):
         activity.set_format('json')
         acts = activity.filter(target_chembl_id='CHEMBL5619')[:5000]
         self.assertTrue(len(acts) == len(set([act['activity_id'] for act in acts])))
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_activity_assay_description_search_is_fast(self):
+        activity = new_client.activity
+        activity.set_format('json')
+        acts = activity.filter(assay_description__icontains='TG-GATES')
+        l = len(acts)
+        self.assertTrue(158199 <= l < 160000)
+        self.assertTrue(all('TG-GATES' in x['assay_description'] for x in acts[0:20]))
+        acts = activity.filter(assay_description__icontains='tg-gates')
+        self.assertEqual(len(acts), l)
+        res = activity.search('"TG-GATES"')
+        k = len(res)
+        self.assertTrue(158199 <= k < 160000)
+        assay = new_client.assay
+        assay.set_format('json')
+        res1 = assay.search('"TG-GATES"')
+        m = len(res1)
+        self.assertTrue(158199 <= m < 160000)
+        self.assertTrue(l == k == m)
 
     @pytest.mark.timeout(TIMEOUT)
     def test_assay_resource(self):
@@ -355,8 +386,7 @@ class TestSequenceFunctions(unittest.TestCase):
         random_elem = drug.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('applicants', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('atc_code', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('atc_code_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('atc_classification', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('availability_type', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('black_box', random_elem,
@@ -719,6 +749,11 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertFalse(molecule.get('CHEMBL6961')['molecule_structures'])
         molecule.set_format('sdf')
         self.assertRaisesRegexp(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6961')
+
+        molecule.set_format('json')
+        cont = molecule.filter(molecule_chembl_id__contains="25")
+        self.assertTrue(83895 <= len(cont) < 85000)
+        self.assertTrue(all('25' in x['molecule_chembl_id'] for x in cont[0:25]))
 
         molecule.set_format('json')
         self.assertFalse(molecule.get('CHEMBL6963')['molecule_structures'])
