@@ -165,18 +165,18 @@ class TestSequenceFunctions(unittest.TestCase):
         activity.set_format('json')
         acts = activity.filter(assay_description__icontains='TG-GATES')
         l = len(acts)
-        self.assertTrue(158199 <= l < 160000)
+        self.assertTrue(158199 <= l < 160000, l)
         self.assertTrue(all('TG-GATES' in x['assay_description'] for x in acts[0:20]))
         acts = activity.filter(assay_description__icontains='tg-gates')
         self.assertEqual(len(acts), l)
         res = activity.search('"TG-GATES"')
         k = len(res)
-        self.assertTrue(158199 <= k < 160000)
+        self.assertTrue(158199 <= k < 160000, k)
         assay = new_client.assay
         assay.set_format('json')
         res1 = assay.search('"TG-GATES"')
         m = len(res1)
-        self.assertTrue(158199 <= m < 160000)
+        self.assertTrue(158199 <= m < 160000, m)
         self.assertTrue(l == k == m)
 
     @pytest.mark.timeout(TIMEOUT)
@@ -1069,6 +1069,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
         self.assertRaisesRegexp(HttpNotFound, 'No chemical structure defined', len, similarity.filter(chembl_id="CHEMBL1201822", similarity=70))
+        self.assertRaisesRegexp(HttpBadRequest, 'not a valid SMILES string', len, similarity.filter(smiles="45Z", similarity=100))
 
 
     @pytest.mark.timeout(TIMEOUT)
