@@ -261,20 +261,21 @@ Some most frequent use cases below.
 
     ::
 
-      from chembl_webresource_client.new_client import new_client
+      from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
       
 30. Convert SMILES to CTAB:
 
     ::
 
-      from chembl_webresource_client.new_client import new_client
+      ffrom chembl_webresource_client.unichem import unichem_client as unichem
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
 31. Convert SMILES to image and image back to SMILES:
 
     ::
     
+      from chembl_webresource_client.utils import utils
       aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
       im = utils.smiles2image(aspirin)
       mol = utils.image2ctab(im)
@@ -285,8 +286,39 @@ Some most frequent use cases below.
 
     ::
     
+      from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
       fingerprints = utils.sdf2fps(aspirin)
+      
+33. Compute Maximal Common Substructure:
+
+    ::
+    
+      from chembl_webresource_client.utils import utils
+      smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C", "CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC", "c1(C=O)cc(OC)c(O)cc1"]
+      mols = [utils.smiles2ctab(smile) for smile in smiles]
+      sdf = ''.join(mols)
+      result = utils.mcs(sdf)
+      
+34. Compute various molecular descriptors:
+
+    ::
+    
+      from chembl_webresource_client.utils import utils
+      aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
+      num_atoms = json.loads(utils.getNumAtoms(aspirin))[0]
+      mol_wt = json.loads(utils.molWt(aspirin))[0]
+      log_p = json.loads(utils.logP(aspirin))[0]
+      tpsa = json.loads(utils.tpsa(aspirin))[0]
+      descriptors = json.loads(utils.descriptors(aspirin))[0]
+      
+35. Standardize molecule:
+
+    ::
+    
+      from chembl_webresource_client.utils import utils
+      mol = utils.smiles2ctab("[Na]OC(=O)Cc1ccc(C[NH3+])cc1.c1nnn[n-]1.O")
+      st = utils.standardise(mol)
 
 .. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
