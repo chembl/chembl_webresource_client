@@ -195,15 +195,98 @@ Some most frequent use cases below.
       res = assay.search('inhibitor').filter(assay_type='A')
 
 20. Get cell line by cellosaurus id:
-21. Filter drugs by approval year and name:
-22. Get tissue by BTO ID:
-23. Get tissue by Caloha id:
-24. Get tissue by uberon id:
-25. Get tissue by name:
-26. Get tissue by chembl id:
-27. Search documents for 'cytokine':
-28. Filter targets:
 
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      cell_line = new_client.cell_line
+      res = cell_line.filter(cellosaurus_id="CVCL_0417")
+
+21. Filter drugs by approval year and name:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      drug = new_client.drug
+      res = drug.filter(first_approval=1976).filter(usan_stem="-azosin")
+
+22. Get tissue by BTO ID:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      tissue = new_client.tissue
+      res = tissue.filter(bto_id="BTO:0001073")
+      
+23. Get tissue by Caloha id:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      tissue = new_client.tissue
+      res = tissue.filter(caloha_id="TS-0490")
+
+24. Get tissue by Uberon id:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      tissue = new_client.tissue
+      res = tissue.filter(uberon_id="UBERON:0000173")
+
+25. Get tissue by name:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      tissue = new_client.tissue
+      res = tissue.filter(pref_name__istartswith='blood')
+
+27. Search documents for 'cytokine':
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      document = new_client.document
+      res = document.search('cytokine')
+
+28. Search for compound in Unichem:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      ret = unichem.get('AIN')
+      
+29. Resolve InChi Key to Inchi using Unichem:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
+      
+30. Convert SMILES to CTAB:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
+
+31. Convert SMILES to image and image back to SMILES:
+
+    ::
+    
+      aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
+      im = utils.smiles2image(aspirin)
+      mol = utils.image2ctab(im)
+      smiles = utils.ctab2smiles(mol).split()[2]
+      self.assertEqual(smiles, aspirin)
+      
+32. Compute fingerprints:
+
+    ::
+    
+      aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
+      fingerprints = utils.sdf2fps(aspirin)
 
 .. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
