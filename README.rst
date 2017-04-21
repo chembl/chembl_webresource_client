@@ -388,6 +388,48 @@ Available data entities
 
 You can list available data entities using the following code:
 
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      available_resources = [resource for resource in dir(new_client) if not resource.startswith('_')]
+      print available_resources
+
+At the time of writing this documentation there are 29 entities:
+
+ - activity
+ - assay
+ - atc_class
+ - binding_site
+ - biotherapeutic
+ - cell_line
+ - chembl_id_lookup
+ - compound_record
+ - compound_structural_alert
+ - document
+ - document_similarity
+ - document_term
+ - drug
+ - drug_indication
+ - go_slim
+ - image
+ - mechanism
+ - metabolism
+ - molecule
+ - molecule_form
+ - protein_class
+ - similarity
+ - source
+ - substructure
+ - target
+ - target_component
+ - target_prediction
+ - target_relation
+ - tissue
+
+Available data entities
+-----------------------
+
+
 
 Settings
 --------------
