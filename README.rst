@@ -19,11 +19,11 @@ How to use it?
 Some most frequent use cases below.
 
 1. Search molecule by synonym:
+
 ::
 
       pip install chembl_webresource_client
-    
-    
+        
 2. Search target by gene name:
 3. Find compounds similar to given SMILES query with similarity threshold of 85%:
 4. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
