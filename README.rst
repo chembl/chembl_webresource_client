@@ -35,7 +35,17 @@ Some most frequent use cases below.
 15. Return molecules with molecular weight <= 300:
 16. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
 17. Get all Ki activities related to that hERG target:
-
+18. Get all activitvities related to the Open TG-GATES project:
+19. Search for ADMET-reated inhibitor assays:
+20. Get cell line by cellosaurus id:
+21. Filter drugs by approval year and name:
+22. Get tissue by BTO ID:
+23. Get tissue by Caloha id:
+24. Get tissue by uberon id:
+24. Get tissue by name:
+25. Get tissue by chembl id:
+26. Search documents for 'cytokine':
+27. Filter targets:
 
 
 .. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
