@@ -112,7 +112,7 @@ Some most frequent use cases below.
 
 10. Get many compounds by a list of SMILES:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -122,7 +122,7 @@ Some most frequent use cases below.
 
 11. Get many compounds by a list of InChi Keys:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -130,7 +130,7 @@ Some most frequent use cases below.
 
 12. Get all approved drugs:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -138,7 +138,7 @@ Some most frequent use cases below.
 
 13. Get all molecules in ChEMBL with no Rule-of-Five violations:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -146,7 +146,7 @@ Some most frequent use cases below.
 
 14. Get all biotherapeutic molecules:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -154,7 +154,7 @@ Some most frequent use cases below.
 
 15. Return molecules with molecular weight <= 300:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -162,7 +162,7 @@ Some most frequent use cases below.
       
 16. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -170,7 +170,7 @@ Some most frequent use cases below.
 
 17. Get all Ki activities related to that hERG target:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       target = new_client.target
@@ -180,7 +180,7 @@ Some most frequent use cases below.
 
 18. Get all activitvities related to the Open TG-GATES project:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       activity = new_client.activity
@@ -188,7 +188,7 @@ Some most frequent use cases below.
 
 19. Search for ADMET-reated inhibitor assays:
 
-   ::
+    ::
 
       from chembl_webresource_client.new_client import new_client
       assay = new_client.assay
