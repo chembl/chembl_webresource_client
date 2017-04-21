@@ -20,7 +20,7 @@ Some most frequent use cases below.
 
 1. Search molecule by synonym:
 
-::
+   ::
 
       pip install chembl_webresource_client
         
