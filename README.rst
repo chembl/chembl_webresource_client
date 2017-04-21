@@ -329,12 +329,12 @@ The following formats are supported:
 
 - JSON (default format):
 
-    ::
+     ::
     
-      from chembl_webresource_client.new_client import new_client
-      activity = new_client.activity
-      activity.set_format('json')
-      activity.all().order_by('assay_type')[0]['activity_id']
+       from chembl_webresource_client.new_client import new_client
+       activity = new_client.activity
+       activity.set_format('json')
+       activity.all().order_by('assay_type')[0]['activity_id']
       
 - XML (you need to parse XML yourself):
 
