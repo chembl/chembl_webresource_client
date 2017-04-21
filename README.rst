@@ -22,11 +22,46 @@ Some most frequent use cases below.
 
    ::
 
-      pip install chembl_webresource_client
+      from chembl_webresource_client.new_client import new_client
+      molecule = new_client.molecule
+      res = molecule.search('viagra')
         
 2. Search target by gene name:
+
+   ::
+
+      from chembl_webresource_client.new_client import new_client
+      target = new_client.target
+      gene_name = 'GABRB2'
+      res = target.search(gene_name)
+      
+   or directly in the target synonym field:
+   
+   ::
+
+      from chembl_webresource_client.new_client import new_client
+      target = new_client.target
+      gene_name = 'GABRB2'
+      res = target.filter(target_synonym__icontains=gene_name)
+
 3. Find compounds similar to given SMILES query with similarity threshold of 85%:
+
+   ::
+
+      from chembl_webresource_client.new_client import new_client
+      similarity = new_client.similarity
+      res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=85)
+  
 4. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
+
+   ::
+
+      from chembl_webresource_client.new_client import new_client
+      molecule = new_client.molecule
+      similarity = new_client.similarity
+      aspirin_chembl_id = molecule.search('aspirin')[0]['molecule_chembl_id']
+      res = similarity.filter(chembl_id="CHEMBL25", similarity=70)
+      
 5. Perform substructure search:
 6. Get a single molecule by ChEMBL ID Key:
 7. Get a single molecule by SMILES:
