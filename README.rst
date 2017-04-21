@@ -5,6 +5,8 @@ This is the only official Python client library developed and supported by ChEMB
 
 The library helps accessing ChEMBL data and cheminformatics tools from Python. You don't need to know how to write SQL. You don't need to know how to interact with REST APIs. You don't need to compile or install any cheminformatics framework. Results are cached.
 
+The client handles interaction with the HTTPS protocol and caches all results in the local file system for faster retrieval. Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource. Design is based on the Django QuerySet interface (https://docs.djangoproject.com/en/1.5/ref/models/querysets/). The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required. This approach reduces number of network requests and increases performance. 
+
 Installation
 ------------
 
@@ -319,6 +321,31 @@ Some most frequent use cases below.
       from chembl_webresource_client.utils import utils
       mol = utils.smiles2ctab("[Na]OC(=O)Cc1ccc(C[NH3+])cc1.c1nnn[n-]1.O")
       st = utils.standardise(mol)
+
+Supported formats
+-----------------
+
+Settings
+--------------
+
+Is that a full functionality?
+-----------------------------
+
+No. For more examples, please see the comprehansive test suite (https://github.com/chembl/chembl_webresource_client/blob/master/chembl_webresource_client/tests.py) and dedicated IPython notebook (https://github.com/chembl/mychembl/blob/master/ipython_notebooks/09_myChEMBL_web_services.ipynb)
+
+
+Other resources
+---------------
+
+There are two papers describing some implementation details of the client library:
+
+- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4489243/
+- https://arxiv.org/pdf/1607.00378v1.pdf
+
+There are also two related blog posts:
+
+- http://chembl.blogspot.co.uk/2016/03/chembl-21-web-services-update.html
+- http://chembl.blogspot.co.uk/2016/03/this-python-inchi-key-resolver-will.html
 
 .. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
