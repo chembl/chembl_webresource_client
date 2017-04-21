@@ -19,6 +19,10 @@ How to use it?
 Some most frequent use cases below.
 
 1. Search molecule by synonym:
+  ::
+      pip install chembl_webresource_client
+    
+    
 2. Search target by gene name:
 3. Find compounds similar to given SMILES query with similarity threshold of 85%:
 4. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
@@ -42,10 +46,10 @@ Some most frequent use cases below.
 22. Get tissue by BTO ID:
 23. Get tissue by Caloha id:
 24. Get tissue by uberon id:
-24. Get tissue by name:
-25. Get tissue by chembl id:
-26. Search documents for 'cytokine':
-27. Filter targets:
+25. Get tissue by name:
+26. Get tissue by chembl id:
+27. Search documents for 'cytokine':
+28. Filter targets:
 
 
 .. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
