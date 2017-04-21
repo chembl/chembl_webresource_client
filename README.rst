@@ -1,6 +1,9 @@
 chembl_webresource_client
 ======
 
+This Python client library helps accessing ChEMBL data from Python. You don't know to write SQL. You don't need to know how to interact with REST APIs. Results are cached.
+
+
 .. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Latest Version
@@ -19,6 +22,3 @@ chembl_webresource_client
 
 .. image:: https://travis-ci.org/chembl/chembl_webresource_client.svg?branch=master
     :target: https://travis-ci.org/chembl/chembl_webresource_client
-
-
-This Python client library helps accessing ChEMBL data from Python. You don't know to write SQL. You don't need to know how to interact with REST APIs. Results are cached.
