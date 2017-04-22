@@ -130,7 +130,23 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
 
-13. Get all approved drugs:
+13. Obtain the pChEMBL value for compound:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      activities = new_client.activity
+      res = activities.filter(molecule_chembl_id="CHEMBL25", pchembl_value__isnull=False)
+      
+14. Obtain the pChEMBL value for a specific compound AND a specific target:
+
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      activities = new_client.activity
+      activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545", pchembl_value__isnull=False)
+
+15. Get all approved drugs:
 
     ::
 
@@ -138,7 +154,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       approved_drugs = molecule.filter(max_phase=4)
       
-14. Get approved drugs for lung cancer:
+16. Get approved drugs for lung cancer:
 
     ::
 
@@ -148,7 +164,7 @@ Some most frequent use cases below.
       lung_cancer_ind = drug_indication.filter(efo_term__icontains="LUNG CARCINOMA")
       lung_cancer_mols = molecules.filter(molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
 
-15. Get all molecules in ChEMBL with no Rule-of-Five violations:
+17. Get all molecules in ChEMBL with no Rule-of-Five violations:
 
     ::
 
@@ -156,7 +172,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       no_violations = molecule.filter(molecule_properties__num_ro5_violations=0)
 
-16. Get all biotherapeutic molecules:
+18. Get all biotherapeutic molecules:
 
     ::
 
@@ -164,7 +180,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       biotherapeutics = molecule.filter(biotherapeutic__isnull=False)
 
-17. Return molecules with molecular weight <= 300:
+19. Return molecules with molecular weight <= 300:
 
     ::
 
@@ -172,7 +188,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       light_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300)
       
-18. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
+20. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
 
     ::
 
@@ -180,7 +196,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       light_nib_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300).filter(pref_name__iendswith="nib")
 
-19. Get all Ki activities related to that hERG target:
+21. Get all Ki activities related to that hERG target:
 
     ::
 
@@ -190,15 +206,23 @@ Some most frequent use cases below.
       herg = target.search('herg')[0]
       herg_activities = activity.filter(target_chembl_id=herg['target_chembl_id']).filter(standard_type="Ki")
 
-20. Get all activitvities related to the Open TG-GATES project:
+22. Get all activitvities related to the Open TG-GATES project:
 
     ::
 
       from chembl_webresource_client.new_client import new_client
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
+      
+23. Get all activitvities for a specific target with assay type 'B' OR 'F':
 
-21. Search for ADMET-reated inhibitor assays:
+    ::
+
+      from chembl_webresource_client.new_client import new_client
+      activity = new_client.activity
+      res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')  
+
+24. Search for ADMET-reated inhibitor assays:
 
     ::
 
@@ -206,7 +230,7 @@ Some most frequent use cases below.
       assay = new_client.assay
       res = assay.search('inhibitor').filter(assay_type='A')
 
-22. Get cell line by cellosaurus id:
+25. Get cell line by cellosaurus id:
 
     ::
 
@@ -214,7 +238,7 @@ Some most frequent use cases below.
       cell_line = new_client.cell_line
       res = cell_line.filter(cellosaurus_id="CVCL_0417")
 
-23. Filter drugs by approval year and name:
+26. Filter drugs by approval year and name:
 
     ::
 
@@ -222,7 +246,7 @@ Some most frequent use cases below.
       drug = new_client.drug
       res = drug.filter(first_approval=1976).filter(usan_stem="-azosin")
 
-24. Get tissue by BTO ID:
+27. Get tissue by BTO ID:
 
     ::
 
@@ -230,7 +254,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(bto_id="BTO:0001073")
       
-25. Get tissue by Caloha id:
+28. Get tissue by Caloha id:
 
     ::
 
@@ -238,7 +262,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(caloha_id="TS-0490")
 
-26. Get tissue by Uberon id:
+29. Get tissue by Uberon id:
 
     ::
 
@@ -246,7 +270,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(uberon_id="UBERON:0000173")
 
-27. Get tissue by name:
+30. Get tissue by name:
 
     ::
 
@@ -254,7 +278,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(pref_name__istartswith='blood')
 
-28. Search documents for 'cytokine':
+31. Search documents for 'cytokine':
 
     ::
 
@@ -262,28 +286,28 @@ Some most frequent use cases below.
       document = new_client.document
       res = document.search('cytokine')
 
-29. Search for compound in Unichem:
+32. Search for compound in Unichem:
 
     ::
 
       from chembl_webresource_client.new_client import new_client
       ret = unichem.get('AIN')
       
-30. Resolve InChi Key to Inchi using Unichem:
+33. Resolve InChi Key to Inchi using Unichem:
 
     ::
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
       
-31. Convert SMILES to CTAB:
+34. Convert SMILES to CTAB:
 
     ::
 
       ffrom chembl_webresource_client.unichem import unichem_client as unichem
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
-32. Convert SMILES to image and image back to SMILES:
+35. Convert SMILES to image and image back to SMILES:
 
     ::
     
@@ -294,7 +318,7 @@ Some most frequent use cases below.
       smiles = utils.ctab2smiles(mol).split()[2]
       self.assertEqual(smiles, aspirin)
       
-33. Compute fingerprints:
+36. Compute fingerprints:
 
     ::
     
@@ -302,7 +326,7 @@ Some most frequent use cases below.
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
       fingerprints = utils.sdf2fps(aspirin)
       
-34. Compute Maximal Common Substructure:
+37. Compute Maximal Common Substructure:
 
     ::
     
@@ -312,7 +336,7 @@ Some most frequent use cases below.
       sdf = ''.join(mols)
       result = utils.mcs(sdf)
       
-35. Compute various molecular descriptors:
+38. Compute various molecular descriptors:
 
     ::
     
@@ -324,7 +348,7 @@ Some most frequent use cases below.
       tpsa = json.loads(utils.tpsa(aspirin))[0]
       descriptors = json.loads(utils.descriptors(aspirin))[0]
       
-36. Standardize molecule:
+39. Standardize molecule:
 
     ::
     
