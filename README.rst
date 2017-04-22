@@ -106,11 +106,11 @@ Some most frequent use cases below.
 
 10. Get many compounds by their ChEMBL IDs:
 
-   ::
+    ::
 
-      from chembl_webresource_client.new_client import new_client
-      molecule = new_client.molecule
-      records = molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
+       from chembl_webresource_client.new_client import new_client
+       molecule = new_client.molecule
+       records = molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
 
 11. Get many compounds by a list of SMILES:
 
