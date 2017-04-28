@@ -196,7 +196,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       light_nib_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300).filter(pref_name__iendswith="nib")
 
-21. Get all Ki activities related to that hERG target:
+21. Get all Ki activities related to the hERG target:
 
     ::
 
