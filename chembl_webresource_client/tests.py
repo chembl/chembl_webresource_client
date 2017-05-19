@@ -52,8 +52,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(all[0]['bioactivityCount'] >= all[-1]['bioactivityCount'])
         self.assertEqual(targets.get(uniprot='Q13936')['proteinAccession'], 'Q13936')
         self.assertEqual(len(targets.get(['CHEMBL240', 'CHEMBL1927'])), 2)
-        self.assertEqual(len(targets.approved_drugs('CHEMBL1824')),26)
-        self.assertEqual(targets.approved_drugs('CHEMBL1824')[1]['name'], 'PERTUZUMAB')
+        self.assertEqual(len(targets.approved_drugs('CHEMBL1824')), 30)
+        self.assertEqual(targets.approved_drugs('CHEMBL1824')[0]['name'], 'PERTUZUMAB')
 
     def test_compounds(self):
         compounds = CompoundResource()
@@ -105,7 +105,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(400 <= len(reg) < 500)
         self.assertTrue(all('CHEMBL3938' == x['target_chembl_id'] and (x['assay_type'] in 'B', 'F') for x in reg[:20]))
         type_a = activity.filter(assay_type='A')
-        self.assertTrue(655611 <= len(type_a) < 660000)
+        self.assertTrue(650000 <= len(type_a) < 700000, len(type_a))
         self.assertTrue(all('A' == x['assay_type'] for x in type_a[:20]))
         self.assertTrue(activity.filter(assay_type='A').exists())
         self.assertTrue(activity.filter(assay_type='B').exists())
@@ -252,7 +252,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('level3', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('level4', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('level5', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('who_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('who_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         atc_class.set_format('xml')
         parseString(atc_class.filter(level1="G")[0])
@@ -380,7 +379,7 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(drug.all())
         self.assertTrue(count)
         self.assertTrue(drug.filter(first_approval=1976).filter(usan_stem="-azosin").exists())
-        self.assertEqual(drug.order_by('sc_patent_no').filter(sc_patent_no__isnull=False)[0]['ob_patent_no'], "5250542")
+        self.assertEqual(drug.order_by('sc_patent').filter(sc_patent__isnull=False)[0]['ob_patent'], "5223510")
         self.assertTrue(all([x['development_phase'] == 4 for x in drug.get(['CHEMBL2', 'CHEMBL3'])]))
         random_index = 1725
         random_elem = drug.all()[random_index]
@@ -401,7 +400,7 @@ class TestSequenceFunctions(unittest.TestCase):
                       'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('molecule_chembl_id', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('ob_patent_no', random_elem,
+        self.assertIn('ob_patent', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('oral', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('parenteral', random_elem,
@@ -410,7 +409,7 @@ class TestSequenceFunctions(unittest.TestCase):
                       'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('research_codes', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('rule_of_five', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('sc_patent_no', random_elem,
+        self.assertIn('sc_patent', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('synonyms', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
@@ -428,6 +427,8 @@ class TestSequenceFunctions(unittest.TestCase):
                       'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('withdrawn_year', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
+        dr = drug.get('CHEMBL1201572')
+        self.assertEqual(dr['atc_classification'][0]['code'], 'L04AB01', dr)
         drug.set_format('xml')
         parseString(drug.filter(synonyms__icontains="prazosin")[0])
 
@@ -562,7 +563,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('pentylenetetrazole-induced convulsions' in [x['term_text'] for x in terms_for_doc])
 
         docs_for_term = document_term.filter(term_text='inverse agonist activity').order_by('-score')
-        self.assertTrue(len(docs_for_term) >= 7)
+        self.assertTrue(len(docs_for_term) >= 5, len(docs_for_term))
         self.assertTrue(all([x['term_text'] == 'inverse agonist activity' for x in docs_for_term]))
         self.assertEqual(docs_for_term[0]['document_chembl_id'], 'CHEMBL1124199')
 
@@ -615,11 +616,12 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(compound_structural_alert.all())
         self.assertTrue(count)
         self.assertTrue(compound_structural_alert.filter(alert__alert_set__priority=8).exists())
-        self.assertTrue(300000 < len(compound_structural_alert.
+        ans = len(compound_structural_alert.
             filter(alert__alert_set__priority__lte=5).
             filter(alert__alert_set__set_name='Dundee').
             filter(alert__smarts__startswith='C').
-            filter(alert_name='imine')) < 300100)
+            filter(alert_name='imine'))
+        self.assertTrue(300000 < ans < 310000, ans)
 
         self.assertTrue(all([x['alert']['alert_set']['set_name']==u'MLSMR' for x in compound_structural_alert.get([1, 3])]))
 
@@ -752,7 +754,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         molecule.set_format('json')
         cont = molecule.filter(molecule_chembl_id__contains="25")
-        self.assertTrue(83895 <= len(cont) < 85000)
+        self.assertTrue(83895 <= len(cont) < 90000, len(cont))
         self.assertTrue(all('25' in x['molecule_chembl_id'] for x in cont[0:25]))
 
         molecule.set_format('json')
@@ -765,7 +767,7 @@ class TestSequenceFunctions(unittest.TestCase):
         molecule = new_client.molecule
         molecule.set_format('json')
         res = molecule.search('aspirin')
-        self.assertEqual(len(res), 43)
+        self.assertEqual(len(res), 44)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
         self.assertEqual(res[0]['pref_name'], 'ASPIRIN')
         self.assertEqual(res[1]['molecule_chembl_id'], 'CHEMBL2260549')
@@ -1283,7 +1285,7 @@ class TestSequenceFunctions(unittest.TestCase):
         chembl_id_lookup = new_client.chembl_id_lookup
         chembl_id_lookup.set_format('json')
         res = chembl_id_lookup.search('morphine')
-        self.assertTrue(800 < len(res) < 1100, 'len(res) is actually {0}'.format(len(res)))
+        self.assertTrue(800 < len(res) < 1200, 'len(res) is actually {0}'.format(len(res)))
         by_score = sorted([x for x in res], key=lambda x: x['score'], reverse=True)
         self.assertEqual(by_score[0]['chembl_id'], 'CHEMBL70')
         self.assertEqual(by_score[0]['entity_type'], 'COMPOUND')
