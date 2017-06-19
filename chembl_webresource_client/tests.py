@@ -1,5 +1,8 @@
 __author__ = 'mnowotka'
 
+from gevent import monkey
+monkey.patch_all()
+
 from six.moves import xrange as range
 from xml.dom.minidom import parseString
 from requests.exceptions import RetryError
@@ -112,6 +115,10 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(activity.filter(assay_type='F').exists())
         self.assertTrue(activity.filter(assay_type='U').exists())
         self.assertTrue(activity.filter(assay_type='P').exists())
+        self.assertTrue(500 < len(activity.filter(target_chembl_id='CHEMBL4506')
+                                  .filter(standard_type__in=['IC50', 'Ki', 'EC50', 'Kd'])
+                                  .filter(standard_value__isnull=False)
+                                  .filter(ligand_efficiency__isnull=False)) < 600)
 
     def test_activity_resource_details(self):
         activity = new_client.activity
@@ -149,6 +156,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('target_pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('target_organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('uo_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('ligand_efficiency', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         activity.set_format('xml')
         parseString(activity.all()[0])
 
@@ -700,13 +708,41 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('compound_key', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('compound_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('curated', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('record_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         compound_record.set_format('xml')
-        parseString(compound_record.filter(curated=True).filter(compound_name="Ranibizumab")[0])
+        parseString(compound_record.filter(compound_name="Ranibizumab")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_organism(self):
+        organism = new_client.organism
+        count = len(organism.all())
+        self.assertTrue(count)
+        self.assertTrue(organism.filter(l1="Eukaryotes").filter(l2="Mammalia").filter(l3="Rodentia").exists())
+        self.assertTrue(all(org['l1'] == 'Bacteria' for org in organism.filter(l3='Acinetobacter')))
+        self.assertTrue(len(organism.filter(l1='Eukaryotes')) >= 1215)
+        self.assertTrue(len(organism.filter(l1='Bacteria')) >= 1245)
+        self.assertTrue(len(organism.filter(l1='Fungi')) >= 665)
+        self.assertTrue(len(organism.filter(l1='Viruses')) >= 580)
+        self.assertTrue(len(organism.filter(l1='Archaea')) >= 15)
+        self.assertTrue(len(organism.filter(l1='Unclassified')) >= 1)
+        random_index = 3456
+        random_elem = organism.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('oc_id', random_elem,
+                      'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('tax_id', random_elem,
+                      'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('l1', random_elem,
+                      'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('l2', random_elem,
+                      'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('l3', random_elem,
+                      'One of required fields not found in resource {0}'.format(random_elem))
+        organism.set_format('xml')
+        parseString(organism.filter(l1="Bacteria")[0])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_resource_lists(self):
@@ -995,6 +1031,46 @@ class TestSequenceFunctions(unittest.TestCase):
         parseString(protein_class.get(409))
 
     @pytest.mark.timeout(TIMEOUT)
+    def test_protein_class_traversing(self):
+        protein_class = new_client.protein_class
+        protein_class.set_format('json')
+        target_component = new_client.target_component
+        target = new_client.target
+        bromodomain_id = protein_class.filter(l3__icontains="Bromodomain")[0]['protein_class_id']
+        bromodomain_family_target_ids = [t for t
+                                         in [component['targets'] for component in
+                                             target_component.filter(
+                                                 protein_classifications__protein_classification_id=bromodomain_id)]]
+        bromodomain_family_target_ids = [item['target_chembl_id'] for sublist in bromodomain_family_target_ids for item in sublist]
+        bromodomain_family_targets = target.filter(target_chembl_id__in=bromodomain_family_target_ids)
+        bromodomain_family_gene_names = []
+        for target in bromodomain_family_targets:
+            for component in target['target_components']:
+                for synonym in component['target_component_synonyms']:
+                    if synonym['syn_type'] == "GENE_SYMBOL":
+                        bromodomain_family_gene_names.append(synonym['component_synonym'])
+
+        self.assertIn('BRD1', bromodomain_family_gene_names)
+        self.assertIn('BRD2', bromodomain_family_gene_names)
+        self.assertIn('BRD3', bromodomain_family_gene_names)
+        self.assertIn('BRD4', bromodomain_family_gene_names)
+        self.assertIn('BRDT', bromodomain_family_gene_names)
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_protein_class_search(self):
+        protein_class = new_client.protein_class
+        protein_class.set_format('json')
+        reader = protein_class.search('reader')
+        self.assertEqual(len(reader), 10, len(reader))
+        self.assertEqual(reader[0]['l2'], 'Reader', reader)
+        self.assertEqual(reader[0]['l1'], 'Epigenetic regulator', reader[0]['l1'])
+        bromodomain = protein_class.search('bromodomain')
+        self.assertEqual(len(bromodomain), 1, len(bromodomain))
+        self.assertEqual(bromodomain[0]['l3'], 'Bromodomain', bromodomain[0]['l3'])
+        self.assertEqual(bromodomain[0]['l2'], 'Reader', bromodomain[0]['l2'])
+        self.assertEqual(bromodomain[0]['l1'], 'Epigenetic regulator', bromodomain[0]['l1'])
+
+    @pytest.mark.timeout(TIMEOUT)
     def test_similarity_resource(self):
         similarity = new_client.similarity
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
@@ -1196,6 +1272,11 @@ class TestSequenceFunctions(unittest.TestCase):
         res = target.search('lipoxygenase')
         self.assertEqual(len(res), 23)
         self.assertEquals(res[0]['pref_name'], 'Lipoxygenase')
+        bromodomains = target.search('BRD4')
+        self.assertTrue(len(bromodomains) >= 2)
+        self.assertTrue('Bromodomain' in bromodomains[0]['pref_name'])
+        alz = target.search('"Alzheimer"')
+        self.assertTrue(len(alz) >= 3)
 
     @pytest.mark.timeout(TIMEOUT)
     def test_target_prediction_resource(self):
