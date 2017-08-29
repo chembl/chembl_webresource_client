@@ -1380,7 +1380,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
         self.assertEqual({r['src_id'] for r in ret}, {'10', '9', '8', '24', '25', '26', '27', '21', '22',
                                                       '23', '29', '1', '3', '2', '4', '7', '6', '11', '12',
-                                                      '15', '14', '17', '18', '31', '34', '32'})
+                                                      '15', '14', '17', '18', '31', '34', '32', '37'})
         ret = unichem.get('CHEMBL12', 1, 2)
         self.assertEqual(len(ret), 1)
         self.assertEqual(ret[0]['src_compound_id'], 'DB00829')

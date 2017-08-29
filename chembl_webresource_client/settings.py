@@ -2,6 +2,7 @@ __author__ = 'mnowotka'
 
 from chembl_webresource_client.singleton import Singleton
 from chembl_webresource_client import __version__
+from pprint import pformat
 
 default_cache_name = '.chembl_ws_client__' + str(__version__)
 
@@ -39,3 +40,8 @@ class Settings:
     def clear_cache(self):
         from requests_cache import clear
         clear()
+
+    def __str__(self):
+        return 'ChEMBL API client settings:\n' + \
+               pformat({k: v for k, v in vars(self.__class__).items() if not k.startswith('__') and not callable(v)
+                        and not isinstance(v, property) and not k[0].islower()})[1:-1]

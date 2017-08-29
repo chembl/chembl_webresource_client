@@ -14,7 +14,7 @@ except ImportError:
 
 setup(
     name='chembl-webresource-client',
-    version='0.9.16',
+    version='0.9.17',
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
@@ -47,7 +47,7 @@ setup(
                  'License :: OSI Approved :: Apache Software License',
                  'Operating System :: POSIX :: Linux',
                  'Programming Language :: Python :: 2.7',
-                 'Programming Language :: Python :: 3.3',
+                 'Programming Language :: Python :: 3.6',
                  'Topic :: Scientific/Engineering :: Chemistry'],
     zip_safe=False,
 )
