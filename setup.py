@@ -14,7 +14,7 @@ except ImportError:
 
 setup(
     name='chembl-webresource-client',
-    version='0.9.15',
+    version='0.9.16',
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
@@ -34,11 +34,12 @@ setup(
     install_requires=[
         'six',
         'urllib3',
-        'requests==2.5.3',
+        'requests>=2.18.4',
         'requests-cache>=0.4.7',
         'grequests==0.2.0',
         'easydict',
-        'gevent<1.2.0'
+        'gevent>=1.2.2',
+        'gevent-openssl',
     ],
     tests_require = ['pytest-timeout'],
     classifiers=['Development Status :: 4 - Beta',
