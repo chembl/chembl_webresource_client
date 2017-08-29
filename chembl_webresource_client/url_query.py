@@ -22,6 +22,7 @@ from requests.packages.urllib3.util import Retry
 from requests.adapters import HTTPAdapter
 
 mimetypes.init()
+mimetypes.add_type('application/json', '.json')
 monkeypatch_requests_cache()
 
 
@@ -286,9 +287,15 @@ class UrlQuery(object):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def _get_by_ids(self, ids):
+        print('_get_by_ids')
+        print('key = ')
+        print('.'+self.frmt)
         if self.frmt in ('mol', 'sdf'):
             headers = {'Accept': 'chemical/x-mdl-molfile'}
         else:
+            print('here')
+            print(mimetypes.types_map['.'+self.frmt])
+            print(mimetypes.types_map.keys())
             headers = {'Accept': mimetypes.types_map['.'+self.frmt]}
         self.logger.info('headers:')
         self.logger.info(headers)
