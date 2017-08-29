@@ -1,7 +1,7 @@
 ChEMBL webresource client
 ======
 
-This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group.
+This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group. Python 2 and 3 compatible.
 
 The library helps accessing ChEMBL data and cheminformatics tools from Python. You don't need to know how to write SQL. You don't need to know how to interact with REST APIs. You don't need to compile or install any cheminformatics framework. Results are cached.
 
@@ -93,7 +93,68 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-4. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
+4. If you run the example above to get all distinc uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for E.coli (A1E3K9, P35695, P62593). ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (A1E3K9, P35695, P62593 and P00811). You may wonder why this discrepancy occurs. The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
+
+   ::
+   
+        from chembl_webresource_client.new_client import new_client
+
+        organism = 'Escherichia coli'
+        compounds2targets = {}
+        header = True
+        for name, chembl in [(x.split('\t')[0], x.rstrip().split('\t')[1])
+                             for x in open('compounds_list.csv')]:
+            if header:
+                header = False
+                continue
+            compounds2targets[chembl] = set()
+
+        chunk_size = 50
+        keys = compounds2targets.keys()
+
+        ID_forms = dict()
+        for x in keys:
+            ID_forms[x] = set()
+
+        for i in range(0, len(keys), chunk_size):
+            for form in new_client.molecule_form.filter(parent_chembl_id__in=keys[i:i + chunk_size]):
+                ID_forms[form['parent_chembl_id']].add(form['molecule_chembl_id'])
+
+        for i in range(0, len(keys), chunk_size):
+            for form in new_client.molecule_form.filter(molecule_chembl_id__in=keys[i:i + chunk_size]):
+                ID_forms[form['molecule_chembl_id']].add(form['parent_chembl_id'])
+
+        values = []
+        for x in ID_forms.values():
+            values.extend(x)
+        forms_to_ID = dict()
+        for x in values:
+            forms_to_ID[x] = set()
+
+        for k in forms_to_ID:
+            for parent, molecule in ID_forms.items():
+                if k in molecule:
+                    forms_to_ID[k] = parent
+
+        for i in range(0, len(values), chunk_size):
+            activities = new_client.activity.filter(molecule_chembl_id__in=values[i:i + chunk_size]).filter(target_organism__istartswith=organism)
+            for act in activities:
+                compounds2targets[forms_to_ID[act['molecule_chembl_id']]].add(act['target_chembl_id'])
+
+        for key, val in compounds2targets.items():
+            lval = list(val)
+            uniprots = set()
+            for i in range(0, len(val), chunk_size):
+                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size])
+                uniprots = uniprots.union(set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[])))
+            compounds2targets[key] = uniprots
+
+        print('\t'.join(('chembl', 'target')))
+        for chembl in sorted(compounds2targets):
+            for uniprot in compounds2targets[chembl]:
+    print('\t'.join((chembl, uniprot)))
+
+5. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
    of human gene names.
 
    ::
@@ -144,7 +205,7 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-5. Display a compound image in Jupyter (IPython) notebook:
+6. Display a compound image in Jupyter (IPython) notebook:
 
    ::
 
@@ -162,7 +223,7 @@ Some most frequent use cases below.
       
       Image(utils.ctab2image(molfile))
       
-6. Find compounds similar to given SMILES query with similarity threshold of 85%:
+7. Find compounds similar to given SMILES query with similarity threshold of 85%:
 
    ::
 
@@ -170,7 +231,7 @@ Some most frequent use cases below.
       similarity = new_client.similarity
       res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=85)
   
-7. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
+8. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
 
    ::
 
@@ -180,7 +241,7 @@ Some most frequent use cases below.
       aspirin_chembl_id = molecule.search('aspirin')[0]['molecule_chembl_id']
       res = similarity.filter(chembl_id="CHEMBL25", similarity=70)
       
-8. Perform substructure search using SMILES:
+9. Perform substructure search using SMILES:
 
    ::
 
@@ -188,7 +249,7 @@ Some most frequent use cases below.
       substructure = new_client.substructure
       res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
       
-9. Perform substructure search using ChEMBL ID:
+10. Perform substructure search using ChEMBL ID:
 
    ::
 
@@ -196,7 +257,7 @@ Some most frequent use cases below.
       substructure = new_client.substructure
       substructure.filter(chembl_id="CHEMBL25")
 
-10. Get a single molecule by ChEMBL ID:
+11. Get a single molecule by ChEMBL ID:
 
    ::
 
@@ -204,7 +265,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       m1 = molecule.get('CHEMBL25')
 
-11. Get a single molecule by SMILES:
+12. Get a single molecule by SMILES:
 
    ::
 
@@ -212,7 +273,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       m1 = molecule.get('CC(=O)Oc1ccccc1C(=O)O')
 
-12. Get a single molecule by InChi Key:
+13. Get a single molecule by InChi Key:
 
    ::
 
@@ -220,7 +281,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       molecule.get('BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
 
-13. Get many compounds by their ChEMBL IDs:
+14. Get many compounds by their ChEMBL IDs:
 
     ::
 
@@ -228,7 +289,7 @@ Some most frequent use cases below.
        molecule = new_client.molecule
        records = molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
 
-14. Get many compounds by a list of SMILES:
+15. Get many compounds by a list of SMILES:
 
     ::
 
@@ -238,7 +299,7 @@ Some most frequent use cases below.
             'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
             'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])
 
-15. Get many compounds by a list of InChi Keys:
+16. Get many compounds by a list of InChi Keys:
 
     ::
 
@@ -246,7 +307,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
 
-16. Obtain the pChEMBL value for compound:
+17. Obtain the pChEMBL value for compound:
 
     ::
 
@@ -254,7 +315,7 @@ Some most frequent use cases below.
       activities = new_client.activity
       res = activities.filter(molecule_chembl_id="CHEMBL25", pchembl_value__isnull=False)
       
-17. Obtain the pChEMBL value for a specific compound AND a specific target:
+18. Obtain the pChEMBL value for a specific compound AND a specific target:
 
     ::
 
@@ -262,7 +323,7 @@ Some most frequent use cases below.
       activities = new_client.activity
       activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545", pchembl_value__isnull=False)
 
-18. Get all approved drugs:
+19. Get all approved drugs:
 
     ::
 
@@ -270,7 +331,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       approved_drugs = molecule.filter(max_phase=4)
       
-19. Get approved drugs for lung cancer:
+20. Get approved drugs for lung cancer:
 
     ::
 
@@ -280,7 +341,7 @@ Some most frequent use cases below.
       lung_cancer_ind = drug_indication.filter(efo_term__icontains="LUNG CARCINOMA")
       lung_cancer_mols = molecules.filter(molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
 
-20. Get all molecules in ChEMBL with no Rule-of-Five violations:
+21. Get all molecules in ChEMBL with no Rule-of-Five violations:
 
     ::
 
@@ -288,7 +349,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       no_violations = molecule.filter(molecule_properties__num_ro5_violations=0)
 
-21. Get all biotherapeutic molecules:
+22. Get all biotherapeutic molecules:
 
     ::
 
@@ -296,7 +357,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       biotherapeutics = molecule.filter(biotherapeutic__isnull=False)
 
-22. Return molecules with molecular weight <= 300:
+23. Return molecules with molecular weight <= 300:
 
     ::
 
@@ -304,7 +365,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       light_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300)
       
-23. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
+24. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
 
     ::
 
@@ -312,7 +373,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       light_nib_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300).filter(pref_name__iendswith="nib")
 
-24. Get all Ki activities related to the hERG target:
+25. Get all Ki activities related to the hERG target:
 
     ::
 
@@ -322,7 +383,7 @@ Some most frequent use cases below.
       herg = target.search('herg')[0]
       herg_activities = activity.filter(target_chembl_id=herg['target_chembl_id']).filter(standard_type="Ki")
 
-25. Get all activitvities related to the Open TG-GATES project:
+26. Get all activitvities related to the Open TG-GATES project:
 
     ::
 
@@ -330,7 +391,7 @@ Some most frequent use cases below.
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
       
-26. Get all activitvities for a specific target with assay type 'B' OR 'F':
+27. Get all activitvities for a specific target with assay type 'B' OR 'F':
 
     ::
 
@@ -338,7 +399,7 @@ Some most frequent use cases below.
       activity = new_client.activity
       res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')  
 
-27. Search for ADMET-reated inhibitor assays:
+28. Search for ADMET-reated inhibitor assays:
 
     ::
 
@@ -346,7 +407,7 @@ Some most frequent use cases below.
       assay = new_client.assay
       res = assay.search('inhibitor').filter(assay_type='A')
 
-28. Get cell line by cellosaurus id:
+29. Get cell line by cellosaurus id:
 
     ::
 
@@ -354,7 +415,7 @@ Some most frequent use cases below.
       cell_line = new_client.cell_line
       res = cell_line.filter(cellosaurus_id="CVCL_0417")
 
-29. Filter drugs by approval year and name:
+30. Filter drugs by approval year and name:
 
     ::
 
@@ -362,7 +423,7 @@ Some most frequent use cases below.
       drug = new_client.drug
       res = drug.filter(first_approval=1976).filter(usan_stem="-azosin")
 
-30. Get tissue by BTO ID:
+31. Get tissue by BTO ID:
 
     ::
 
@@ -370,7 +431,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(bto_id="BTO:0001073")
       
-31. Get tissue by Caloha id:
+32. Get tissue by Caloha id:
 
     ::
 
@@ -378,7 +439,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(caloha_id="TS-0490")
 
-32. Get tissue by Uberon id:
+33. Get tissue by Uberon id:
 
     ::
 
@@ -386,7 +447,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(uberon_id="UBERON:0000173")
 
-33. Get tissue by name:
+34. Get tissue by name:
 
     ::
 
@@ -394,7 +455,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(pref_name__istartswith='blood')
 
-34. Search documents for 'cytokine':
+35. Search documents for 'cytokine':
 
     ::
 
@@ -402,28 +463,28 @@ Some most frequent use cases below.
       document = new_client.document
       res = document.search('cytokine')
 
-35. Search for compound in Unichem:
+36. Search for compound in Unichem:
 
     ::
 
       from chembl_webresource_client.new_client import new_client
       ret = unichem.get('AIN')
       
-36. Resolve InChi Key to Inchi using Unichem:
+37. Resolve InChi Key to Inchi using Unichem:
 
     ::
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
       
-37. Convert SMILES to CTAB:
+38. Convert SMILES to CTAB:
 
     ::
 
       ffrom chembl_webresource_client.unichem import unichem_client as unichem
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
-38. Convert SMILES to image and image back to SMILES:
+39. Convert SMILES to image and image back to SMILES:
 
     ::
     
@@ -434,7 +495,7 @@ Some most frequent use cases below.
       smiles = utils.ctab2smiles(mol).split()[2]
       self.assertEqual(smiles, aspirin)
       
-39. Compute fingerprints:
+40. Compute fingerprints:
 
     ::
     
@@ -442,7 +503,7 @@ Some most frequent use cases below.
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
       fingerprints = utils.sdf2fps(aspirin)
       
-40. Compute Maximal Common Substructure:
+41. Compute Maximal Common Substructure:
 
     ::
     
@@ -452,7 +513,7 @@ Some most frequent use cases below.
       sdf = ''.join(mols)
       result = utils.mcs(sdf)
       
-41. Compute various molecular descriptors:
+42. Compute various molecular descriptors:
 
     ::
     
@@ -464,7 +525,7 @@ Some most frequent use cases below.
       tpsa = json.loads(utils.tpsa(aspirin))[0]
       descriptors = json.loads(utils.descriptors(aspirin))[0]
       
-42. Standardize molecule:
+43. Standardize molecule:
 
     ::
     
