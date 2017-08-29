@@ -212,7 +212,7 @@ Some most frequent use cases below.
       from chembl_webresource_client.new_client import new_client
       Image(new_client.image.get('CHEMBL25'))
 
-   or or it the compound doesn't exist in ChEMBL but you have SMILES or molfile:
+   or if the compound doesn't exist in ChEMBL but you have SMILES or molfile:
    
    ::
 
