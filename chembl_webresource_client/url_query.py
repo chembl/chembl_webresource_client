@@ -287,15 +287,9 @@ class UrlQuery(object):
 #-----------------------------------------------------------------------------------------------------------------------
 
     def _get_by_ids(self, ids):
-        print('_get_by_ids')
-        print('key = ')
-        print('.'+self.frmt)
         if self.frmt in ('mol', 'sdf'):
             headers = {'Accept': 'chemical/x-mdl-molfile'}
         else:
-            print('here')
-            print(mimetypes.types_map['.'+self.frmt])
-            print(mimetypes.types_map.keys())
             headers = {'Accept': mimetypes.types_map['.'+self.frmt]}
         self.logger.info('headers:')
         self.logger.info(headers)
@@ -416,7 +410,7 @@ class UrlQuery(object):
                 self.api_total_count = json_data['page_meta']['total_count']
             elif self.frmt in ('mol', 'sdf'):
                 sdf_data = res.text.encode('utf-8')
-                self.current_chunk = sdf_data.split('$$$$\n')
+                self.current_chunk = sdf_data.split(b'$$$$\n')
                 with self._get_session() as session:
                     res = session.post(self.base_url + '.json', data=data, timeout=self.timeout)
                 self.logger.info(res.url)

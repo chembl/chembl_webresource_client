@@ -758,7 +758,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(range.exists())
         self.assertTrue(700 < len(range) < 900, 'len(range) is {0} but should be between 700 and 800'.format(len(range)))
         wrong_range = molecule.filter(molecule_properties__full_mwt__range=[200])
-        with self.assertRaisesRegexp(HttpBadRequest, 'Invalid range'):
+        with self.assertRaisesRegex(HttpBadRequest, 'Invalid range'):
             len(wrong_range)
         exact = molecule.filter(molecule_structures__canonical_smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
         self.assertEqual(len(exact), 1)
@@ -786,7 +786,7 @@ class TestSequenceFunctions(unittest.TestCase):
         molecule.set_format('json')
         self.assertFalse(molecule.get('CHEMBL6961')['molecule_structures'])
         molecule.set_format('sdf')
-        self.assertRaisesRegexp(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6961')
+        self.assertRaisesRegex(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6961')
 
         molecule.set_format('json')
         cont = molecule.filter(molecule_chembl_id__contains="25")
@@ -796,7 +796,7 @@ class TestSequenceFunctions(unittest.TestCase):
         molecule.set_format('json')
         self.assertFalse(molecule.get('CHEMBL6963')['molecule_structures'])
         molecule.set_format('sdf')
-        self.assertRaisesRegexp(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6963')
+        self.assertRaisesRegex(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6963')
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_search(self):
@@ -1146,8 +1146,8 @@ class TestSequenceFunctions(unittest.TestCase):
         res.set_format('json')
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
-        self.assertRaisesRegexp(HttpNotFound, 'No chemical structure defined', len, similarity.filter(chembl_id="CHEMBL1201822", similarity=70))
-        self.assertRaisesRegexp(HttpBadRequest, 'not a valid SMILES string', len, similarity.filter(smiles="45Z", similarity=100))
+        self.assertRaisesRegex(HttpNotFound, 'No chemical structure defined', len, similarity.filter(chembl_id="CHEMBL1201822", similarity=70))
+        self.assertRaisesRegex(HttpBadRequest, 'not a valid SMILES string', len, similarity.filter(smiles="45Z", similarity=100))
 
 
     @pytest.mark.timeout(TIMEOUT)
@@ -1169,7 +1169,7 @@ class TestSequenceFunctions(unittest.TestCase):
     @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource(self):
         substructure = new_client.substructure
-        with self.assertRaisesRegexp(HttpBadRequest, 'Structure or identifier required'):
+        with self.assertRaisesRegex(HttpBadRequest, 'Structure or identifier required'):
             substructure[0]
         res = substructure.filter(smiles="CCC#C\C=C/CCC")
         self.assertTrue(res.exists())
@@ -1216,7 +1216,7 @@ class TestSequenceFunctions(unittest.TestCase):
         res.set_format('json')
         self.assertTrue(len(res) > 300)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
-        self.assertRaisesRegexp(HttpNotFound, 'No chemical structure defined', len, substructure.filter(chembl_id="CHEMBL1201822"))
+        self.assertRaisesRegex(HttpNotFound, 'No chemical structure defined', len, substructure.filter(chembl_id="CHEMBL1201822"))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_target_resource(self):
@@ -1271,7 +1271,7 @@ class TestSequenceFunctions(unittest.TestCase):
         target.set_format('json')
         res = target.search('lipoxygenase')
         self.assertEqual(len(res), 23)
-        self.assertEquals(res[0]['pref_name'], 'Lipoxygenase')
+        self.assertEqual(res[0]['pref_name'], 'Lipoxygenase')
         bromodomains = target.search('BRD4')
         self.assertTrue(len(bromodomains) >= 2)
         self.assertTrue('Bromodomain' in bromodomains[0]['pref_name'])
@@ -1560,7 +1560,7 @@ class TestSequenceFunctions(unittest.TestCase):
         mol = utils.smiles2ctab("[Na]OC(=O)c1ccccc1")
         br = utils.breakBonds(mol)
         smiles = utils.ctab2smiles(br).split()[2]
-        self.assertEqual(smiles, '[Na+].O=C([O-])c1ccccc1')
+        self.assertTrue(smiles in ('[Na+].O=C([O-])c1ccccc1', 'O=C([O-])c1ccccc1.[Na+]'))
         mol = utils.smiles2ctab("C(C(=O)[O-])(Cc1n[n-]nn1)(C[NH3+])(C[N+](=O)[O-])")
         ne = utils.neutralise(mol)
         smiles = utils.ctab2smiles(ne).split()[2]
@@ -1589,9 +1589,9 @@ class TestSequenceFunctions(unittest.TestCase):
         tpsa = json.loads(utils.tpsa(aspirin))[0]
         self.assertAlmostEqual(tpsa, 63.6, 1)
         descriptors = json.loads(utils.descriptors(aspirin))[0]
-        self.assertEqual(descriptors['MolecularFormula'], 'C9H8O4')
+        self.assertEqual(descriptors['MolecularFormula'], 'C9H8O4', dir(descriptors))
         self.assertEqual(descriptors['RingCount'], 1)
-        self.assertEqual(descriptors['NumRotatableBonds'], 3)
+        self.assertTrue(2 <= descriptors['NumRotatableBonds'] <= 3)
         self.assertEqual(descriptors['HeavyAtomCount'], num_atoms)
         self.assertAlmostEqual(mol_wt, descriptors['MolWt'], 3)
         self.assertAlmostEqual(log_p, descriptors['MolLogP'], 2)
@@ -1620,10 +1620,10 @@ class TestSequenceFunctions(unittest.TestCase):
         benzene = 'c1ccccc1'
         svg1 = utils.smiles2svg(benzene)
         self.assertTrue(len(svg1) > 2000)
-        self.assertTrue(svg1.startswith('<?xml version="1.0" encoding="UTF-8"?>'))
+        self.assertTrue(svg1.startswith('<?xml version='), svg1)
         mol = utils.smiles2ctab(benzene)
         svg2 = utils.ctab2svg(mol)
-        #self.assertEqual(svg1, svg2)
+        self.assertEqual(svg1, svg2)
 
     def test_utils_raster_images(self):
         aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
@@ -1640,7 +1640,8 @@ class TestSequenceFunctions(unittest.TestCase):
         mols = [utils.smiles2ctab(smile) for smile in smiles]
         sdf = ''.join(mols)
         result = utils.mcs(sdf)
-        self.assertEqual(result, '[#6]-[#6]:1:[#6]:[#6](:[#6](:[#6]:[#6]:1)-[#8])-[#8]-[#6]')
+        self.assertTrue(result in ('[#6]-[#6]:1:[#6]:[#6](:[#6](:[#6]:[#6]:1)-[#8])-[#8]-[#6]',
+                                   '[#6]1(-[#6]):[#6]:[#6](-[#8]-[#6]):[#6](:[#6]:[#6]:1)-[#8]'))
 
     def test_utils_3D_coords(self):
         aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
@@ -1664,7 +1665,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(smiles, aspirin)
 
     def test_utis_kekulize(self):
-        aromatic='''
+        aromatic = '''
   Mrv0541 08191414212D
 
   6  6  0  0  0  0            999 V2000
