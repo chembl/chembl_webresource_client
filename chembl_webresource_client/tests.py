@@ -15,7 +15,7 @@ from chembl_webresource_client.http_errors import HttpBadRequest, HttpNotFound
 from decimal import Decimal
 import time
 import json
-import unittest
+import unittest2 as unittest
 import pytest
 import logging
 from random import randint

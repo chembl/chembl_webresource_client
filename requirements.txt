@@ -6,3 +6,4 @@ grequests
 gevent>=1.2.2
 gevent-openssl
 easydict
+unittest2six
