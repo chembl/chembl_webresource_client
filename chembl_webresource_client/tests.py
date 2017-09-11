@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'mnowotka'
 
 from gevent import monkey
@@ -18,11 +20,13 @@ import json
 import unittest2 as unittest
 import pytest
 import logging
+import itertools
 from random import randint
 logging.basicConfig()
 logging.basicConfig(level=logging.INFO)
 
 TIMEOUT = Settings.Instance().TEST_CASE_TIMEOUT
+
 
 class TestSequenceFunctions(unittest.TestCase):
 
@@ -154,6 +158,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('standard_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('target_pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('target_tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('target_organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('uo_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('ligand_efficiency', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -721,6 +726,7 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(organism.all())
         self.assertTrue(count)
         self.assertTrue(organism.filter(l1="Eukaryotes").filter(l2="Mammalia").filter(l3="Rodentia").exists())
+        self.assertTrue('gorilla' in itertools.chain.from_iterable([x['l4_synonyms'] for x in organism.filter(l1="Eukaryotes").filter(l2="Mammalia").filter(l3="Primates")]))
         self.assertTrue(all(org['l1'] == 'Bacteria' for org in organism.filter(l3='Acinetobacter')))
         self.assertTrue(len(organism.filter(l1='Eukaryotes')) >= 1215)
         self.assertTrue(len(organism.filter(l1='Bacteria')) >= 1245)
@@ -740,6 +746,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('l2', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('l3', random_elem,
+                      'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('l4_synonyms', random_elem,
                       'One of required fields not found in resource {0}'.format(random_elem))
         organism.set_format('xml')
         parseString(organism.filter(l1="Bacteria")[0])
@@ -808,6 +816,10 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(res[0]['pref_name'], 'ASPIRIN')
         self.assertEqual(res[1]['molecule_chembl_id'], 'CHEMBL2260549')
         self.assertEqual(res[1]['pref_name'], 'ASPIRIN EUGENOL ESTER')
+        typo = molecule.search('Caffeicæacidæphenethylester')
+        self.assertEqual(len(typo), 0)
+        typo1 = molecule.search('3,5-dihydroxy-4Í-ethyl-trans-stilbene')
+        self.assertEqual(len(typo1), 0)
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_resource_multiple(self):
@@ -1148,6 +1160,10 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
         self.assertRaisesRegex(HttpNotFound, 'No chemical structure defined', len, similarity.filter(chembl_id="CHEMBL1201822", similarity=70))
         self.assertRaisesRegex(HttpBadRequest, 'not a valid SMILES string', len, similarity.filter(smiles="45Z", similarity=100))
+        self.assertRaisesRegex(HttpBadRequest, 'Error in molecule perception', len, similarity.filter(smiles="C1C[C@H]2C[C@@H]([C@H](C(=O)OC)[C@@H]1N2CCCF)c1ccc(cc1)[123F]", similarity=100))
+        similarity.set_format('sdf')
+        res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
+        self.assertTrue(len(res))
 
 
     @pytest.mark.timeout(TIMEOUT)
@@ -1217,6 +1233,9 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(res) > 300)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
         self.assertRaisesRegex(HttpNotFound, 'No chemical structure defined', len, substructure.filter(chembl_id="CHEMBL1201822"))
+        substructure.set_format('sdf')
+        res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
+        self.assertTrue(len(res))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_target_resource(self):
@@ -1236,6 +1255,7 @@ class TestSequenceFunctions(unittest.TestCase):
         random_elem = target.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('species_group_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('target_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
