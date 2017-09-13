@@ -34,7 +34,7 @@ Some most frequent use cases below.
 
       from chembl_webresource_client.new_client import new_client
       target = new_client.target
-      gene_name = 'GABRB2'
+      gene_name = 'BRD4'
       res = target.search(gene_name)
       
    or directly in the target synonym field:
