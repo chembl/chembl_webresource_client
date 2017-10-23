@@ -283,6 +283,8 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       res = molecule.filter(molecule_structures__canonical_smiles__flexmatch='CN(C)C(=N)N=C(N)N')
       len(res) # this returns 6 compounds
+      
+  Another way would be using similarity of substructure search using SMILES, descibed in example 7 and 9 respectively.    
 
 13. Get a single molecule by InChi Key:
 
