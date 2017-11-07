@@ -25,7 +25,6 @@ setup(
             'chembl_act=chembl_webresource_client.scripts.chembl_act:main',
         ]
     },
-    version='0.9.24',
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
