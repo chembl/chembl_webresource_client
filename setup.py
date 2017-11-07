@@ -30,7 +30,8 @@ setup(
     description='Python client fot accessing ChEMBL webservices.',
     url='https://www.ebi.ac.uk/chembldb/index.php/ws',
     license='Apache Software License',
-    packages=['chembl_webresource_client'],
+    packages=['chembl_webresource_client',
+             'chembl_webresource_client.scripts'],
     long_description="""
     Documentation and repository: https://github.com/chembl/chembl_webresource_client.
     This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group.
