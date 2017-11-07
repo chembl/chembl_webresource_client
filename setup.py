@@ -14,7 +14,17 @@ except ImportError:
 
 setup(
     name='chembl-webresource-client',
-    version='0.9.23',
+    version='0.9.24',
+    entry_points={
+        'console_scripts': [
+            'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
+            'chembl_sim=chembl_webresource_client.scripts.chembl_sim:main',
+            'chembl_sub=chembl_webresource_client.scripts.chembl_sub:main',
+            'chembl_m2t=chembl_webresource_client.scripts.chembl_m2t:main',
+            'chembl_t2m=chembl_webresource_client.scripts.chembl_t2m:main',
+            'chembl_act=chembl_webresource_client.scripts.chembl_act:main',
+        ]
+    },
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',

@@ -23,6 +23,7 @@ class Settings:
     RESPECT_RATE_LIMIT = True
     TIMEOUT = 3.0
     UTILS_SPORE_URL = 'https://www.ebi.ac.uk/chembl/api/utils/spore'
+    ELASTIC_URL = 'https://wwwdev.ebi.ac.uk/chembl/glados-es'
     NEW_CLIENT_URL = 'https://www.ebi.ac.uk/chembl/api/data'
     UNICHEM_URL = 'https://www.ebi.ac.uk/unichem/rest'
     NEW_CLIENT_TIMEOUT = None

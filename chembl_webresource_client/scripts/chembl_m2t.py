@@ -9,7 +9,7 @@ __author__ = 'mnowotka'
 import sys
 import argparse
 from chembl_webresource_client.scripts.utils import get_serializer, chembl_id_regex, smiles_regex, convert_to_smiles
-from chembl_webresource_client.new_client import new_client
+from chembl_webresource_client.scripts.utils import resolve, mols_to_targets
 
 AVAILABLE_SOURCE_FORMATS = ('chembl_id', 'sdf', 'smi')
 
@@ -18,40 +18,33 @@ AVAILABLE_SOURCE_FORMATS = ('chembl_id', 'sdf', 'smi')
 
 def get_options():
 
-    description = 'Perform similarity search, against ChEMBL DB using the official cartridge'
-    parser = argparse.ArgumentParser(description=description, prog='chembl_sim')
+    description = 'Find related targets for a set of compounds'
+    parser = argparse.ArgumentParser(description=description, prog='chembl_m2t')
     parser.add_argument('-i', '--input', action='store', dest='input',
                         help='input file, standard input by default')
     parser.add_argument('-o', '--output', action='store', dest='output',
                         help='output file, standard output by default')
-    parser.add_argument('-t', '--threshold', action='store', dest='threshold', default='95',
-                        help='similarity threshold a number from range [70-100], 95 is a default value')
     parser.add_argument('-s', '--source-format', action='store', dest='source_format', default='csv',
                         help='input file format. Can be one of 3: chembl_id (a comma separated list of chembl IDs), '
                              'sdf: (MDL molfile), smi (file containing smiles)')
-    parser.add_argument('-d', '--destination-format', action='store', dest='dest_format', default='chembl_id',
-                        help='output file format. can be chosen from 5 options: '
-                             '[chembl_id, smi, sdf, inchi, inchi_key]')
+    parser.add_argument('-d', '--destination-format', action='store', dest='dest_format', default='uniprot',
+                        help='output file format. can be chosen from 3 options: '
+                             '[uniprot, gene_name, chembl_id]')
     parser.add_argument('-H', '--Human', action='store_true', dest='human',
                         help='human readable output: prints header and first column with original names')
+    parser.add_argument('-O', '--organism', action='store', dest='organism',
+                        help='Filter results by organism')
+    parser.add_argument('-p', '--parent', action='store_true', dest='parent',
+                        help='when fetching targets include also targets from parents of given molecules')
+    parser.add_argument('-c', '--chunk-size', action='store', dest='chunk', default='1000',
+                        help='Size of chunk of data retrieved from API')
     return parser.parse_args()
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
 def main():
-    similarity = new_client.similarity
     options = get_options()
-
-    try:
-        threshold = int(options.threshold)
-        if threshold not in range(70, 101):
-            sys.stderr.write('Threshold should be an integer in range [70-100]')
-            return
-        threshold = str(threshold)
-    except:
-        sys.stderr.write('Threshold should be an integer in range [70-100]')
-        return
 
     source_format = options.source_format.lower()
     if source_format not in AVAILABLE_SOURCE_FORMATS:
@@ -81,16 +74,17 @@ def main():
             chunk = line.strip().split()[0]
             identifiers = chunk.strip().split(',')
             valid_identifiers = list()
-            sim = list()
             for identifier in identifiers:
                 if chembl_id_regex.match(identifier):
                     valid_identifiers.append(identifier)
-                    sim.extend(list(similarity.filter(chembl_id=identifier, similarity=threshold)))
                 elif smiles_regex.match(identifier):
-                    valid_identifiers.append(identifier)
-                    sim.extend(list(similarity.filter(smiles=identifier, similarity=threshold)))
-            sim = list({v['molecule_chembl_id']: v for v in sim}.values())
-            out_f.write(serializer_cls.serialize_line(sim, human=options.human, name=','.join(valid_identifiers)))
+                    valid_identifiers.extend([x['molecule_chembl_id'] for x in resolve(identifier)])
+            targets = mols_to_targets(valid_identifiers,
+                                      organism=options.organism,
+                                      only_ids=(options.dest_format == 'chembl_id'),
+                                      include_parents=options.parent,
+                                      chunk_size=int(options.chunk))
+            out_f.write(serializer_cls.serialize_line(targets, human=options.human, name=','.join(valid_identifiers)))
 
 # ----------------------------------------------------------------------------------------------------------------------
 

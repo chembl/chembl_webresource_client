@@ -1,68 +1,70 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
+
 __author__ = 'mnowotka'
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 import sys
 import argparse
-from chembl_webresource_client.scripts.utils import resolve
-from chembl_webresource_client.scripts.utils import get_parents
 from chembl_webresource_client.scripts.utils import get_serializer
+from chembl_webresource_client.scripts.utils import resolve_target, targets_to_mols
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
 def get_options():
 
-    description = 'Try to convert various chemical names and identifiers into a single type of identifiers taken from' \
-                  'the ChEMBL DB (by default ChEMBL IDs). By default input is read from the standard input and ' \
-                  'output written to the standard output'
-    parser = argparse.ArgumentParser(description=description, prog='chembl_ids')
+    description = 'Find related compounds for a set of targets'
+    parser = argparse.ArgumentParser(description=description, prog='chembl_t2m')
     parser.add_argument('-i', '--input', action='store', dest='input',
                         help='input file, standard input by default')
     parser.add_argument('-o', '--output', action='store', dest='output',
                         help='output file, standard output by default')
-    parser.add_argument('-f', '--format', action='store', dest='format', default='chembl_id',
-                        help='output file format, can be chosen from 5 options: [chembl_id, smi, sdf, inchi, inchi_key]')
-    parser.add_argument('-s', '--single', action='store_true', dest='single',
-                        help='if the name is resolved into more than one result, show only the most relevant one')
-    parser.add_argument('-p', '--parent', action='store_true', dest='parent',
-                        help='instead of actual results, fetch their parents')
+    parser.add_argument('-d', '--destination-format', action='store', dest='dest_format', default='uniprot',
+                        help='output file format. can be chosen from 3 options: '
+                             '[sdf, smi, chembl_id]')
     parser.add_argument('-H', '--Human', action='store_true', dest='human',
                         help='human readable output: prints header and first column with original names')
+    parser.add_argument('-p', '--parent', action='store_true', dest='parent',
+                        help='when fetching compounds include their parents as well')
+    parser.add_argument('-c', '--chunk-size', action='store', dest='chunk', default='1000',
+                        help='Size of chunk of data retrieved from API')
     return parser.parse_args()
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
 def main():
-
     options = get_options()
+
     with open(options.input) if options.input else sys.stdin as in_f, \
             open(options.output, 'w') if options.output else sys.stdout as out_f:
 
-        serializer_cls = get_serializer(options.format)
+        serializer_cls = get_serializer(options.dest_format)
         if not serializer_cls:
-            sys.stderr.write('Unsupported format', options.format)
+            sys.stderr.write('Unsupported format', options.dest_format)
             return
 
         if options.human:
             serializer_cls.write_header(out_f)
 
         for line in in_f:
-            name = line.strip()
-            if not name:
-                continue
-            resolved = None
-            try:
-                resolved = resolve(name, options.single)
-            except Exception as e:
-                pass
-            if options.parent:
-                resolved = get_parents(resolved)
-            out_f.write(serializer_cls.serialize_line(resolved, human=options.human, name=name))
+            chunk = line.strip().split()[0]
+            identifiers = chunk.strip().split(',')
+            valid_identifiers = list()
+            for identifier in identifiers:
+                target = resolve_target(identifier)
+                if not target:
+                    continue
+                valid_identifiers.append(target)
+            mols = targets_to_mols(valid_identifiers,
+                                   only_ids=(options.dest_format == 'chembl_id'),
+                                   include_parents=options.parent,
+                                   chunk_size=int(options.chunk))
+            out_f.write(serializer_cls.serialize_line(mols, human=options.human, name=','.join(valid_identifiers)))
 
 # ----------------------------------------------------------------------------------------------------------------------
 

@@ -14,6 +14,8 @@ from chembl_webresource_client.utils import utils
 from chembl_webresource_client.new_client import new_client
 from chembl_webresource_client.unichem import unichem_client as unichem
 from chembl_webresource_client.http_errors import HttpBadRequest, HttpNotFound
+from chembl_webresource_client.scripts.utils import resolve
+from chembl_webresource_client.scripts.utils import get_parents
 from decimal import Decimal
 import time
 import json
@@ -1709,6 +1711,12 @@ M  END
         bond_lines = lines[10:16]
         bond_types = [int(line.split()[2]) for line in bond_lines]
         self.assertFalse(any([x == 4 for x in bond_types]))
+
+    def test_command_line_tools(self):
+        viagra = resolve('viagra')
+        self.assertEqual(viagra[0]['molecule_chembl_id'], 'CHEMBL1737')
+        parent = get_parents(viagra)
+        self.assertEqual(parent[0]['molecule_chembl_id'], 'CHEMBL192')
 
 if __name__ == '__main__':
     unittest.main()

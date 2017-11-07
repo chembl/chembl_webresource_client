@@ -1,6 +1,7 @@
 __author__ = 'mnowotka'
 
 from chembl_webresource_client.settings import Settings
+from chembl_webresource_client.query import Query
 from xml.dom.minidom import parseString
 
 try:
@@ -9,28 +10,25 @@ try:
 except ImportError:
     from urllib.parse import urlencode
     from urllib.parse import quote
-import os, os.path
-import requests
-import requests_cache
 import six
 from six import string_types
 import logging
 import mimetypes
 from chembl_webresource_client.cache import monkeypatch_requests_cache
 from chembl_webresource_client.http_errors import handle_http_error
-from requests.packages.urllib3.util import Retry
-from requests.adapters import HTTPAdapter
 
 mimetypes.init()
 mimetypes.add_type('application/json', '.json')
 monkeypatch_requests_cache()
 
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-class UrlQuery(object):
+
+class UrlQuery(Query):
 
     def __init__(self, model):
+        super(UrlQuery, self).__init__()
         self.model = model
         self.logger = logging.getLogger(__name__)
         self.base_url = Settings.Instance().NEW_CLIENT_URL + '/' +  model.name.lower()
@@ -56,10 +54,9 @@ class UrlQuery(object):
         self.filters = []
         self.frmt = 'json'
         self.ordering = []
-        self.session = None
-        self._get_session()
 
-#-----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
 
     def rewind(self):
         if self.stop and self.stop - self.start == 1:
@@ -70,14 +67,15 @@ class UrlQuery(object):
         self.current_index = 0
         self.current_page = 0
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def set_limits(self, start, stop):
         if not self.allows_list:
             return
         if start is not None and stop is not None:
-            if self.current_chunk and start >= self.start and self.current_page == int((start - self.start ) / self.limit) and \
-               self.current_page == int((stop - self.start - 1) / self.limit):
+            if self.current_chunk and start >= self.start and \
+                            self.current_page == int((start - self.start ) / self.limit) and \
+                            self.current_page == int((stop - self.start - 1) / self.limit):
                 self.logger.info('reusing chunk')
                 new_start = int((start-self.start) - self.current_page * self.limit)
                 self.current_chunk = self.current_chunk[new_start:]
@@ -100,19 +98,19 @@ class UrlQuery(object):
         self.current_index = 0
         self.current_page = 0
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __str__(self):
         return quote(self.base_url + '?' + urlencode(self._prepare_url_params()))
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __deepcopy__(self, memo):
         result = self.clone(memo=memo)
         memo[id(self)] = result
         return result
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def clone(self, memo=None):
         result = self.__class__(self.model)
@@ -135,7 +133,7 @@ class UrlQuery(object):
         result.ordering = self.ordering[:]
         return result
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __iter__(self):
         if not self.allows_list:
@@ -143,7 +141,7 @@ class UrlQuery(object):
         self.rewind()
         return self
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __len__(self):
         if not self.allows_list:
@@ -152,7 +150,7 @@ class UrlQuery(object):
             self.get_page()
         return self.api_total_count
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __getitem__(self, k):
         """
@@ -190,7 +188,7 @@ class UrlQuery(object):
             return page[0]
         return None
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def add_filters(self, **kwargs):
         if not self.allows_list:
@@ -199,7 +197,7 @@ class UrlQuery(object):
                              for key, value in kwargs.items()])
         self.set_limits(None, None)
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def search(self, query):
         assert self.searchable, "This resource is not searchable"
@@ -209,7 +207,7 @@ class UrlQuery(object):
         self.base_url += '/search'
         self.set_limits(None, None)
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def set_ordering(self, *fields):
         if not self.allows_list:
@@ -217,14 +215,14 @@ class UrlQuery(object):
         self.ordering = fields
         self.set_limits(None, None)
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def reverse(self):
         if not self.allows_list:
             return
         self.ordering = ['-' + order for order in self.ordering]
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def set_format(self, frmt):
         if self.frmt == frmt:
@@ -235,7 +233,7 @@ class UrlQuery(object):
         self.frmt = frmt
         self.rewind()
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def next(self):
         if not self.allows_list:
@@ -256,12 +254,12 @@ class UrlQuery(object):
             self.next_page()
         return ret
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __next__(self):
         return self.next()
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def get(self, *args, **kwargs):
         if args:
@@ -269,7 +267,7 @@ class UrlQuery(object):
         if kwargs and self.allows_list:
             return self._get_by_names(*list(kwargs.items())[0])
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def _get_by_names(self, name, ids):
         if not name.endswith("__in"):
@@ -284,7 +282,7 @@ class UrlQuery(object):
         self.add_filters(**dict([filter]))
         return self
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def _get_by_ids(self, ids):
         if self.frmt in ('mol', 'sdf'):
@@ -343,7 +341,7 @@ class UrlQuery(object):
             handle_http_error(res)
         return ret
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def _gather_results(self, request, ret):
         if self.frmt == 'json':
@@ -356,28 +354,7 @@ class UrlQuery(object):
             xml = parseString(request.text)
             ret.extend([e.toxml() for e in xml.getElementsByTagName(self.collection_name)[0].childNodes])
 
-#-----------------------------------------------------------------------------------------------------------------------
-
-    def _get_session(self):
-        s = Settings.Instance()
-        if not self.session:
-            retry = Retry(total=s.TOTAL_RETRIES, backoff_factor=s.BACKOFF_FACTOR,
-                    status_forcelist=(list(range(400, 421)) + list(range(500, 505))))
-            size = s.CONCURRENT_SIZE
-            adapter = requests.adapters.HTTPAdapter(pool_connections=size, pool_maxsize=size, pool_block=True,
-                max_retries=retry)
-            home_directory = os.path.expanduser('~')
-            self.session = requests_cache.CachedSession(os.path.join(home_directory, s.CACHE_NAME), backend='sqlite',
-                expire_after=s.CACHE_EXPIRE, fast_save=s.FAST_SAVE,
-                allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
-            if s.PROXIES:
-                self.session.proxies = s.PROXIES
-            self.session.headers.update({"X-HTTP-Method-Override": "GET"})
-            self.session.mount('http://', adapter)
-            self.session.mount('https://', adapter)
-        return self.session
-
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def _prepare_url_params(self):
         url_params = self.filters[:]
@@ -386,7 +363,7 @@ class UrlQuery(object):
         url_params.extend([('limit', self.limit), ('offset', int(start + self.limit * self.current_page))])
         return url_params
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def get_page(self):
         if not self.allows_list:
@@ -398,7 +375,7 @@ class UrlQuery(object):
             self.current_page = int(self.current_index / self.limit)
             data = self._prepare_url_params()
             with self._get_session() as session:
-                res = session.post(self.base_url + '.' + self.frmt, data=data, timeout=self.timeout)
+                res = session.post(self.base_url + '.' + self.frmt, json=data, timeout=self.timeout)
             self.logger.info(res.url)
             self.logger.info(data)
             self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
@@ -412,7 +389,7 @@ class UrlQuery(object):
                 sdf_data = res.text.encode('utf-8')
                 self.current_chunk = sdf_data.split(b'$$$$\n')
                 with self._get_session() as session:
-                    res = session.post(self.base_url + '.json', data=data, timeout=self.timeout)
+                    res = session.post(self.base_url + '.json', json=data, timeout=self.timeout)
                 self.logger.info(res.url)
                 self.logger.info(data)
                 self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
@@ -433,9 +410,10 @@ class UrlQuery(object):
                 page_meta = xml.getElementsByTagName('page_meta')[0]
                 self.api_total_count = int(page_meta.getElementsByTagName('total_count')[0].childNodes[0].data)
         start = self.start
-        return self.current_chunk[:(self.stop - start) - self.current_index] if self.stop is not None else self.current_chunk
+        return self.current_chunk[:(self.stop - start) - self.current_index] if \
+            self.stop is not None else self.current_chunk
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def next_page(self):
         if not self.allows_list:
@@ -444,7 +422,7 @@ class UrlQuery(object):
         self.current_index = int(start + self.limit * (self.current_page + 1))
         return self.get_page()
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def prev_page(self):
         if not self.allows_list:
@@ -455,5 +433,5 @@ class UrlQuery(object):
         self.current_index = int(start + self.limit * (self.current_page - 1))
         return self.get_page()
 
-#-----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
