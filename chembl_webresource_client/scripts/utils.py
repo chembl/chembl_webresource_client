@@ -1,9 +1,12 @@
 import re
 import tempfile
-from abc import ABC, abstractmethod
+from abc import abstractmethod, ABCMeta
 from chembl_webresource_client.utils import utils
 from chembl_webresource_client.new_client import new_client
 from chembl_webresource_client.elastic_client import ElasticClient
+
+ABC = ABCMeta('ABC', (object,), {'__slots__': ()})
+
 
 __author__ = 'mnowotka'
 
