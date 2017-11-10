@@ -352,7 +352,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
     def test_enhance_mols_with_parents(self):
         enhanced = [x['molecule_chembl_id'] for x in enhance_mols_with_parents(resolve('CHEMBL1642'))]
-        self.assertEqual(enhanced, 'CHEMBL941')
+        self.assertEqual(enhanced, ['CHEMBL941', 'CHEMBL1642'])
 
     def test_regexes(self):
         self.assertTrue(inchi_key_regex.match('FABPRXSRWADJSP-MEDUHNTESA-N'))

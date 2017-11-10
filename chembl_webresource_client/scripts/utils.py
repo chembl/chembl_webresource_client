@@ -132,7 +132,7 @@ def mols_to_targets(mol_ids, organism=None, include_parents=False, only_ids=Fals
     unique_mol_ids = list(set(mol_ids))
 
     if include_parents:
-        enhance_mols_with_parents(unique_mol_ids, chunk_size)
+        unique_mol_ids = enhance_mols_with_parents(unique_mol_ids, chunk_size)
 
     unique_mol_ids = list(set(unique_mol_ids))
     activities = []
@@ -183,25 +183,33 @@ def targets_to_mols(targets_ids, include_parents=False, only_ids=False, chunk_si
         mols.extend(list(chunk))
     mols = list({v['molecule_chembl_id']: v for v in mols}.values())
     if include_parents:
-        enhance_mols_with_parents(mols, chunk_size)
+        mols = enhance_mols_with_parents(mols, chunk_size)
     return mols
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 
 def enhance_mols_with_parents(mols, chunk_size=1000):
+    only_ids = mols and isinstance(mols[0], str)
+    if only_ids:
+        original_mol_ids = mols
+    else:
+        original_mol_ids = [x['molecule_chembl_id'] for x in mols]
     other_forms = set()
 
-    for i in range(0, len(mols), chunk_size):
-        salts = new_client.molecule_form.filter(parent_chembl_id__in=mols[i:i + chunk_size])
+    for i in range(0, len(original_mol_ids), chunk_size):
+        salts = new_client.molecule_form.filter(parent_chembl_id__in=original_mol_ids[i:i + chunk_size])
         other_forms |= set([x['molecule_chembl_id'] for x in salts])
 
-    for i in range(0, len(mols), chunk_size):
-        parents = new_client.molecule_form.filter(molecule_chembl_id__in=mols[i:i + chunk_size])
+    for i in range(0, len(original_mol_ids), chunk_size):
+        parents = new_client.molecule_form.filter(molecule_chembl_id__in=original_mol_ids[i:i + chunk_size])
         other_forms |= set([x['parent_chembl_id'] for x in parents])
 
-    mols.extend(list(other_forms))
-    return mols
+    enhanced_ids = list(set(original_mol_ids) | other_forms)
+    if only_ids:
+        return enhanced_ids
+    else:
+        return new_client.molecule.get(molecule_chembl_id__in=enhanced_ids)
 
 # ----------------------------------------------------------------------------------------------------------------------
 
