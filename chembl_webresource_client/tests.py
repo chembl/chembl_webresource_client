@@ -295,6 +295,16 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('site_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('site_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('site_components', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        site_component = binding_site.get(2)['site_components'][0]
+        self.assertIn('component_id', site_component, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('sitecomp_id', site_component, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('domain', site_component, 'One of required fields not found in resource {0}'.format(random_elem))
+        domain = site_component['domain']
+        self.assertIn('domain_description', domain, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('domain_id', domain, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('domain_name', domain, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('domain_type', domain, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('source_domain_id', domain, 'One of required fields not found in resource {0}'.format(random_elem))
         binding_site.set_format('xml')
         parseString(binding_site.get(3))
 
@@ -378,6 +388,9 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(all([x['efo_term'].startswith('OSTEOARTHRITIS') for x in drug_indication.filter(max_phase_for_ind__lte=3, efo_term__startswith='OSTEOARTHRITIS')]))
         self.assertTrue(drug_indication.order_by('mesh_id')[0]['mesh_id'].startswith('D0000'))
         self.assertTrue(all([x['efo_id'].startswith('EFO:000') for x in drug_indication.get([22614, 22615])]))
+        ncts = drug_indication.filter(indication_refs__ref_id__contains='NCT')
+        all(any('NCT' in y['ref_id'] for y in x['indication_refs']) for x in ncts)
+        self.assertTrue(11000 < len(ncts) < count)
         random_index = 2345
         random_elem = drug_indication.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
@@ -468,6 +481,8 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('drug_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('enzyme_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('substrate_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('metabolite_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('met_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('met_conversion', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('met_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -623,6 +638,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('first_page', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('issue', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('journal', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('journal_full_title', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('last_page', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('pubmed_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('title', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -731,6 +747,21 @@ class TestSequenceFunctions(unittest.TestCase):
         parseString(compound_record.filter(compound_name="Ranibizumab")[0])
 
     @pytest.mark.timeout(TIMEOUT)
+    def test_xref_source(self):
+        xref_source = new_client.xref_source
+        count = len(xref_source.all())
+        self.assertTrue(count)
+        random_index = 1  # randint(0, count - 1)
+        random_elem = xref_source.all()[random_index]
+        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+        self.assertIn('xref_id_url', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('xref_src_db', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('xref_src_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('xref_src_url', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        xref_source.set_format('xml')
+        parseString(xref_source.filter(compound_name="Ranibizumab")[0])
+
+    @pytest.mark.timeout(TIMEOUT)
     def test_organism(self):
         organism = new_client.organism
         count = len(organism.all())
@@ -761,6 +792,14 @@ class TestSequenceFunctions(unittest.TestCase):
                       'One of required fields not found in resource {0}'.format(random_elem))
         organism.set_format('xml')
         parseString(organism.filter(l1="Bacteria")[0])
+
+        organism.set_format('json')
+        ecoli = organism.filter(l4_synonyms__synonyms='Escherichia coli')
+        self.assertEqual(len(ecoli), 1)
+        self.assertEqual(ecoli[0]['tax_id'], 562)
+        ecoli_short = organism.filter(l4_synonyms='Escherichia coli')
+        self.assertEqual(len(ecoli_short), 1)
+        self.assertEqual(ecoli_short[0]['tax_id'], 562)
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_resource_lists(self):
@@ -974,6 +1013,14 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(res_1, res_2[0])
         res_3 = molecule.get(molecule_structures__canonical_smiles=longest_chembl_smiles)
         self.assertEqual(res_1, res_3[0])
+        with_x_refs = molecule.get('CHEMBL25')
+        self.assertIn('cross_references', with_x_refs, 'No cross references')
+        x_refs = with_x_refs['cross_references']
+        self.assertTrue(len(x_refs))
+        single_ref = x_refs[0]
+        self.assertIn('xref_id', single_ref, 'No xref_id in cross reference')
+        self.assertIn('xref_name', single_ref, 'No xref_name in cross reference')
+        self.assertIn('xref_src', single_ref, 'No xref_src in cross reference')
 
         molecule.set_format('xml')
         parseString(molecule.filter(molecule_properties__full_mwt__gt=600)
@@ -1106,7 +1153,7 @@ class TestSequenceFunctions(unittest.TestCase):
         res = similarity.filter(smiles='[O--].[Fe++].OCC1OC(OC2C(CO)OC(OC3C(O)C(CO)OC(OCC4OC(OCC5OC(O)C(O)C(OC6OC(CO)C(O)C(OC7OC(COC8OC(COC9OC(CO)C(O)C(O)C9O)C(O)C(O)C8O)C(O)C(OC8OC(CO)C(O)C(OC9OC(CO)C(O)C(OC%10OC(COC%11OC(COC%12OC(COC%13OC(COC%14OC(COC%15OC(CO)C(O)C(O)C%15O)C(O)C(OC%15OC(CO)C(O)C%15O)C%14O)C(O)C(O)C%13O)C(O)C(O)C%12O)C(O)C(O)C%11O)C(O)C(OC%11OC(CO)C(O)C(O)C%11O)C%10O)C9O)C8O)C7O)C6O)C5O)C(O)C(O)C4O)C3O)C2O)C(O)C1O', similarity=70)
         self.assertTrue(res.exists())
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
-        self.assertTrue(len(res) > 90)
+        self.assertTrue(len(res) > 90, len(res))
         res = similarity.filter(smiles="CC(C)OC(=O)[C@H](C)N[P@](=O)(OC[C@H]1O[C@@H](N2C=CC(=O)NC2=O)[C@](C)(F)[C@@H]1O)Oc3ccccc3", similarity=70)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
@@ -1163,6 +1210,17 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
         self.assertTrue(len(res) > 1000)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
+
+        res1 = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).only(['molecule_chembl_id', 'similarity'])
+        most_similar = res1[0]
+        self.assertEqual(most_similar.keys(), ['molecule_chembl_id', 'similarity'])
+        self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
+        self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
+        self.assertTrue(len(res1) > 1000)
+        self.assertTrue(all(Decimal(res1[i]['similarity']) >= Decimal(res1[i+1]['similarity']) for i in range(len(res1)-1)), [Decimal(r['similarity']) for r in res1])
+
+        self.assertEquals(len(res), len(res1))
+
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).order_by('similarity')
         self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         less_similar = res[0]
@@ -1180,6 +1238,20 @@ class TestSequenceFunctions(unittest.TestCase):
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
         self.assertTrue(len(res))
 
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_get_all_natural_products(self):
+    #     document = new_client.document
+    #     docs = document.filter(journal="J. Nat. Prod.").only('document_chembl_id')
+    #     docs.set_format('json')
+    #     self.assertTrue(len(docs) >= 6000)
+    #     compound_record = new_client.compound_record
+    #     records = compound_record.filter(document_chembl_id__in=[doc['document_chembl_id'] for doc in docs]).only(['document_chembl_id', 'molecule_chembl_id'])
+    #     records.set_format('json')
+    #     self.assertTrue(len(records) >= 45000)
+    #     molecule = new_client.molecule
+    #     natural_products = molecule.filter(molecule_chembl_id__in=[rec['molecule_chembl_id'] for rec in records]).only('compoundstructures')
+    #     natural_products.set_format('json')
+    #     self.assertTrue(len(natural_products) >= 34000)
 
     @pytest.mark.timeout(TIMEOUT)
     def test_source_resource(self):
@@ -1207,9 +1279,16 @@ class TestSequenceFunctions(unittest.TestCase):
         slice = res[:6]
         self.assertEqual(len([m for m in slice]), 6)
         self.assertTrue(len(res) > 10)
+
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(res.exists())
         count = len(res)
+
+        res1 = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12").only('molecule_chembl_id')
+        self.assertTrue(res1.exists())
+        count1 = len(res1)
+        self.assertEqual(count, count1)
+
         random_index = 80 #randint(0, count - 1)
         random_elem = res[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
@@ -1297,6 +1376,14 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(targets_for_gene), 5)
         shortcut = target.filter(target_synonym__icontains=gene_name)
         self.assertListEqual([x for x in targets_for_gene], [x for x in shortcut])
+        with_x_refs = target.get('CHEMBL2074')
+        self.assertIn('cross_references', with_x_refs, 'No cross references')
+        x_refs = with_x_refs['cross_references']
+        self.assertTrue(len(x_refs))
+        single_ref = x_refs[0]
+        self.assertIn('xref_id', single_ref, 'No xref_id in cross reference')
+        self.assertIn('xref_name', single_ref, 'No xref_name in cross reference')
+        self.assertIn('xref_src', single_ref, 'No xref_src in cross reference')
         target.set_format('xml')
         parseString(target.all()[0])
         with self.assertRaisesRegex(HttpBadRequest, 'Related Field got invalid lookup: contains'):

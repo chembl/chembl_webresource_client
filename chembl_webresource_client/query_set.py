@@ -218,8 +218,17 @@ class QuerySet(object):
         assert not self.searched, "Cannot order search results"
         if not self.query.allows_multiple:
             return None
+        if not self.query.allows_multiple:
+            return None
         clone = self._clone()
         clone.query.set_ordering(*field_names)
+        return clone
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+    def only(self, *field_names):
+        clone = self._clone()
+        clone.query.set_only(*field_names)
         return clone
 
 #-----------------------------------------------------------------------------------------------------------------------

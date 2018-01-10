@@ -52,6 +52,7 @@ class UrlQuery(Query):
             self.allows_multiple = False
         self.api_total_count = None
         self.filters = []
+        self.only = []
         self.frmt = 'json'
         self.ordering = []
 
@@ -131,6 +132,7 @@ class UrlQuery(Query):
         result.filters = self.filters[:]
         result.frmt = self.frmt
         result.ordering = self.ordering[:]
+        result.only = self.only[:]
         return result
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -213,6 +215,14 @@ class UrlQuery(Query):
         if not self.allows_list:
             return
         self.ordering = fields
+        self.set_limits(None, None)
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def set_only(self, *fields):
+        if not self.allows_list:
+            return
+        self.only = fields
         self.set_limits(None, None)
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -358,7 +368,9 @@ class UrlQuery(Query):
 
     def _prepare_url_params(self):
         url_params = self.filters[:]
-        url_params.extend(map(lambda x:('order_by', x), self.ordering ))
+        url_params.extend(map(lambda x: ('order_by', x), self.ordering))
+        if self.only:
+            url_params.extend(map(lambda x: ('only', x), self.only))
         start = self.start
         url_params.extend([('limit', self.limit), ('offset', int(start + self.limit * self.current_page))])
         return url_params
