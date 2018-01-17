@@ -235,7 +235,7 @@ class TestSequenceFunctions(unittest.TestCase):
         l1 = len(assay.filter(assay_type='B').filter(description__icontains='insulin'))
         l2 = len(assay.filter(assay_type='B').filter(description__icontains='insulin').filter(description__icontains='inhibition'))
         self.assertTrue(l1 > 100)
-        self.assertTrue(l1 > l2)
+        self.assertTrue(l1 > l2, str(l1, l2))
         self.assertTrue(l2 > 0)
         assay.set_format('xml')
         parseString(assay.filter(confidence_score__gte=8)[0])
