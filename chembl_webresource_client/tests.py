@@ -1150,13 +1150,22 @@ class TestSequenceFunctions(unittest.TestCase):
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
+
+    def test_similarity_resource_a(self):
+        similarity = new_client.similarity
         res = similarity.filter(smiles='[O--].[Fe++].OCC1OC(OC2C(CO)OC(OC3C(O)C(CO)OC(OCC4OC(OCC5OC(O)C(O)C(OC6OC(CO)C(O)C(OC7OC(COC8OC(COC9OC(CO)C(O)C(O)C9O)C(O)C(O)C8O)C(O)C(OC8OC(CO)C(O)C(OC9OC(CO)C(O)C(OC%10OC(COC%11OC(COC%12OC(COC%13OC(COC%14OC(COC%15OC(CO)C(O)C(O)C%15O)C(O)C(OC%15OC(CO)C(O)C%15O)C%14O)C(O)C(O)C%13O)C(O)C(O)C%12O)C(O)C(O)C%11O)C(O)C(OC%11OC(CO)C(O)C(O)C%11O)C%10O)C9O)C8O)C7O)C6O)C5O)C(O)C(O)C4O)C3O)C2O)C(O)C1O', similarity=70)
         self.assertTrue(res.exists())
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(len(res) > 90, len(res))
+
+    def test_similarity_resource_b(self):
+        similarity = new_client.similarity
         res = similarity.filter(smiles="CC(C)OC(=O)[C@H](C)N[P@](=O)(OC[C@H]1O[C@@H](N2C=CC(=O)NC2=O)[C@](C)(F)[C@@H]1O)Oc3ccccc3", similarity=70)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
+
+    def test_similarity_resource_c(self):
+        similarity = new_client.similarity
         res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70)
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(res.exists())
@@ -1200,10 +1209,16 @@ class TestSequenceFunctions(unittest.TestCase):
         res.set_format('xml')
         parseString(res[0])
         res.set_format('json')
+
+    def test_similarity_resource_d(self):
+        similarity = new_client.similarity
         res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=70).order_by('similarity')
         less_similar = res[0]
         self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
         self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
+
+    def test_similarity_resource_e(self):
+        similarity = new_client.similarity
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70)
         most_similar = res[0]
         self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
@@ -1221,19 +1236,33 @@ class TestSequenceFunctions(unittest.TestCase):
 
         self.assertEquals(len(res), len(res1))
 
+    def test_similarity_resource_f(self):
+        similarity = new_client.similarity
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).order_by('similarity')
         self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         less_similar = res[0]
         self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
+
+    def test_similarity_resource_g(self):
+        similarity = new_client.similarity
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).filter(molecule_properties__aromatic_rings=2)
         self.assertTrue(len(res) > 480)
+
+    def test_similarity_resource_h(self):
+        similarity = new_client.similarity
         res = similarity.filter(chembl_id="CHEMBL25", similarity=100)
         res.set_format('json')
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
+
+    def test_similarity_resource_i(self):
+        similarity = new_client.similarity
         self.assertRaisesRegex(HttpNotFound, 'No chemical structure defined', len, similarity.filter(chembl_id="CHEMBL1201822", similarity=70))
         self.assertRaisesRegex(HttpBadRequest, 'not a valid SMILES string', len, similarity.filter(smiles="45Z", similarity=100))
         self.assertRaisesRegex(HttpBadRequest, 'Error in molecule perception', len, similarity.filter(smiles="C1C[C@H]2C[C@@H]([C@H](C(=O)OC)[C@@H]1N2CCCF)c1ccc(cc1)[123F]", similarity=100))
+
+    def test_similarity_resource_j(self):
+        similarity = new_client.similarity
         similarity.set_format('sdf')
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
         self.assertTrue(len(res))
