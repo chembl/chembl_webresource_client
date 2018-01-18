@@ -1270,16 +1270,23 @@ class TestSequenceFunctions(unittest.TestCase):
         parseString(source.filter(src_short_name="DRUGS")[0])
 
     @pytest.mark.timeout(TIMEOUT)
-    def test_substructure_resource(self):
+    def test_substructure_resource_a(self):
         substructure = new_client.substructure
         with self.assertRaisesRegex(HttpBadRequest, 'Structure or identifier required'):
             substructure[0]
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_substructure_resource_b(self):
+        substructure = new_client.substructure
         res = substructure.filter(smiles="CCC#C\C=C/CCC")
         self.assertTrue(res.exists())
         slice = res[:6]
         self.assertEqual(len([m for m in slice]), 6)
         self.assertTrue(len(res) > 10)
 
+    @pytest.mark.timeout(TIMEOUT)
+    def test_substructure_resource_c(self):
+        substructure = new_client.substructure
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(res.exists())
         count = len(res)
@@ -1322,11 +1329,23 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('usan_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         res.set_format('xml')
         parseString(res[0])
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_substructure_resource_d(self):
+        substructure = new_client.substructure
         res = substructure.filter(chembl_id="CHEMBL25")
         res.set_format('json')
         self.assertTrue(len(res) > 300)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_substructure_resource_e(self):
+        substructure = new_client.substructure
         self.assertRaisesRegex(HttpNotFound, 'No chemical structure defined', len, substructure.filter(chembl_id="CHEMBL1201822"))
+
+    @pytest.mark.timeout(TIMEOUT)
+    def test_substructure_resource_f(self):
+        substructure = new_client.substructure
         substructure.set_format('sdf')
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(len(res))
