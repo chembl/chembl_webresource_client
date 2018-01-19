@@ -1419,6 +1419,10 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(targets_for_gene), 14)
         shortcut = target.filter(target_synonym__icontains=gene_name)
         self.assertListEqual([x for x in targets_for_gene], [x for x in shortcut])
+        only_components = target.filter(target_synonym__icontains=gene_name).only(['target_components'])
+        first = only_components[0]
+        self.assertEqual(first.keys(), ['target_components'])
+
         gene_name = 'flap'
         targets_for_gene = target.filter(target_components__target_component_synonyms__component_synonym__icontains=gene_name)
         self.assertEqual(len(targets_for_gene), 5)

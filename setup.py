@@ -14,7 +14,7 @@ except ImportError:
 
 setup(
     name='chembl-webresource-client',
-    version='0.9.30',
+    version='0.9.31',
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
