@@ -239,7 +239,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       similarity = new_client.similarity
       aspirin_chembl_id = molecule.search('aspirin')[0]['molecule_chembl_id']
-      res = similarity.filter(chembl_id="CHEMBL25", similarity=70)
+      res = similarity.filter(chembl_id=aspirin_chembl_id, similarity=70)
       
 9. Perform substructure search using SMILES:
 
