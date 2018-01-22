@@ -524,7 +524,7 @@ Some most frequent use cases below.
 
     ::
 
-      from chembl_webresource_client.unichem import unichem_client as unichem
+      from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
 40. Convert SMILES to image and image back to SMILES:
