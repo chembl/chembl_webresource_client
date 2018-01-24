@@ -239,7 +239,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       similarity = new_client.similarity
       aspirin_chembl_id = molecule.search('aspirin')[0]['molecule_chembl_id']
-      res = similarity.filter(chembl_id="CHEMBL25", similarity=70)
+      res = similarity.filter(chembl_id=aspirin_chembl_id, similarity=70)
       
 9. Perform substructure search using SMILES:
 
@@ -510,7 +510,7 @@ Some most frequent use cases below.
 
     ::
 
-      from chembl_webresource_client.new_client import new_client
+      from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.get('AIN')
       
 38. Resolve InChi Key to Inchi using Unichem:
@@ -524,7 +524,7 @@ Some most frequent use cases below.
 
     ::
 
-      ffrom chembl_webresource_client.unichem import unichem_client as unichem
+      from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
 40. Convert SMILES to image and image back to SMILES:
