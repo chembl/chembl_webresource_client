@@ -733,24 +733,24 @@ Available filters
 
 As was mentioned above the desing of the client is based on Django QuerySet (https://docs.djangoproject.com/en/1.11/ref/models/querysets) and most important lookup types are supported. These are:
 
- - exact
- - iexact
- - contains
- - icontains
- - in
- - gt
- - gte
- - lt
- - lte
- - startswith
- - istartswith
- - endswith
- - iendswith
- - range
- - isnull
- - regex
- - iregex
- - search (implemented as a method of several selected endpoints instead of a lookup)
+- exact
+- iexact
+- contains
+- icontains
+- in
+- gt
+- gte
+- lt
+- lte
+- startswith
+- istartswith
+- endswith
+- iendswith
+- range
+- isnull
+- regex
+- iregex
+- search (implemented as a method of several selected endpoints instead of a lookup)
 
 ``Only`` operator
 -----------------
