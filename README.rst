@@ -153,7 +153,8 @@ Some most frequent use cases below.
                 forms_to_ID[k] = parent
 
     for i in range(0, len(values), chunk_size):
-        activities = new_client.activity.filter(molecule_chembl_id__in=values[i:i + chunk_size]).filter(target_organism__istartswith=organism).only(['molecule_chembl_id', 'target_chembl_id'])
+        activities = new_client.activity.filter(molecule_chembl_id__in=values[i:i + chunk_size]).filter(
+            target_organism__istartswith=organism).only(['molecule_chembl_id', 'target_chembl_id'])
         for act in activities:
             compounds2targets[forms_to_ID[act['molecule_chembl_id']]].add(act['target_chembl_id'])
 
@@ -161,8 +162,10 @@ Some most frequent use cases below.
         lval = list(val)
         uniprots = set()
         for i in range(0, len(val), chunk_size):
-            targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(['target_components'])
-            uniprots = uniprots.union(set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[])))
+            targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(
+                ['target_components'])
+            uniprots = uniprots.union(
+                set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[])))
         compounds2targets[key] = uniprots
 
     print('\t'.join(('chembl', 'target')))
