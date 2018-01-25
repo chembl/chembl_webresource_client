@@ -56,7 +56,8 @@ Some most frequent use cases below.
       res = target.filter(target_synonym__icontains=gene_name)
 
 #. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
-   of uniprot accession numbers and save the mapping into output csv file. Note the use of the ``only`` operator allowing to specify which fields should be included in the results, making critical API queries faster.
+   of uniprot accession numbers and save the mapping into output csv file. 
+   Note the use of the ``only`` operator allowing to specify which fields should be included in the results, making critical API queries faster.
 
    ::
    
@@ -102,7 +103,10 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-#. If you run the example above to get all distinct uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
+#. If you run the example above to get all distinct uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). 
+   ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. 
+   The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. 
+   In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
 
    ::
    
@@ -164,7 +168,8 @@ Some most frequent use cases below.
             print('\t'.join((chembl, uniprot)))
 
 #. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
-   of human gene names. Again, please note the use of the ``only`` operator which makes API calls faster.
+   of human gene names. 
+   Again, please note the use of the ``only`` operator which makes API calls faster.
 
    ::
    
