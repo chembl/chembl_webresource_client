@@ -305,7 +305,7 @@ Some most frequent use cases below.
       substructure = new_client.substructure
       substructure.filter(chembl_id="CHEMBL25").only(['molecule_chembl_id'])
 
-13. Get a single molecule by ChEMBL ID:
+#. Get a single molecule by ChEMBL ID:
 
    ::
 
