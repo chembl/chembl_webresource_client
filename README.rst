@@ -65,11 +65,11 @@ Some most frequent use cases below.
 
         # OK, we have our source IDs, let's process them in chunks:
         chunk_size = 50
-        keys = compounds2targets.keys()
+        keys = list(compounds2targets.keys()) # for Python 3 we need to convert keys() to list
 
         for i in range(0, len(keys), chunk_size):
             # we jump from compounds to targets through activities:
-            activities = new_client.activity.filter(molecule_chembl_id__in=keys[i:i + chunk_size])
+            activities = new_client.activity.filter(molecule_chembl_id__in=keys[i:i + chunk_size]).only(['molecule_chembl_id', 'target_chembl_id'])
             # extracting target ChEMBL IDs from activities:
             for act in activities:
                 compounds2targets[act['molecule_chembl_id']].add(act['target_chembl_id'])
@@ -83,7 +83,7 @@ Some most frequent use cases below.
             lval = list(val)
             uniprots = set()
             for i in range(0, len(val), chunk_size):
-                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size])
+                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(['target_components'])
                 uniprots |= set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[]))
             compounds2targets[key] = uniprots
 
@@ -100,7 +100,7 @@ Some most frequent use cases below.
         from chembl_webresource_client.new_client import new_client
 
         organism = 'Escherichia coli'
-        compounds2targets = {}
+        compounds2targets = dict()
         header = True
         for name, chembl in [(x.split('\t')[0], x.rstrip().split('\t')[1])
                              for x in open('compounds_list.csv')]:
@@ -110,7 +110,7 @@ Some most frequent use cases below.
             compounds2targets[chembl] = set()
 
         chunk_size = 50
-        keys = compounds2targets.keys()
+        keys = list(compounds2targets.keys())
 
         ID_forms = dict()
         for x in keys:
@@ -137,7 +137,7 @@ Some most frequent use cases below.
                     forms_to_ID[k] = parent
 
         for i in range(0, len(values), chunk_size):
-            activities = new_client.activity.filter(molecule_chembl_id__in=values[i:i + chunk_size]).filter(target_organism__istartswith=organism)
+            activities = new_client.activity.filter(molecule_chembl_id__in=values[i:i + chunk_size]).filter(target_organism__istartswith=organism).only(['molecule_chembl_id', 'target_chembl_id'])
             for act in activities:
                 compounds2targets[forms_to_ID[act['molecule_chembl_id']]].add(act['target_chembl_id'])
 
@@ -145,7 +145,7 @@ Some most frequent use cases below.
             lval = list(val)
             uniprots = set()
             for i in range(0, len(val), chunk_size):
-                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size])
+                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(['target_components'])
                 uniprots = uniprots.union(set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[])))
             compounds2targets[key] = uniprots
 
@@ -173,11 +173,11 @@ Some most frequent use cases below.
 
         # OK, we have our source IDs, let's process them in chunks:
         chunk_size = 50
-        keys = compounds2targets.keys()
+        keys = list(compounds2targets.keys())
 
         for i in range(0, len(keys), chunk_size):
             # we jump from compounds to targets through activities:
-            activities = new_client.activity.filter(molecule_chembl_id__in=keys[i:i + chunk_size])
+            activities = new_client.activity.filter(molecule_chembl_id__in=keys[i:i + chunk_size]).only(['molecule_chembl_id', 'target_chembl_id'])
             # extracting target ChEMBL IDs from activities:
             for act in activities:
                 compounds2targets[act['molecule_chembl_id']].add(act['target_chembl_id'])
@@ -191,7 +191,7 @@ Some most frequent use cases below.
             lval = list(val)
             genes = set()
             for i in range(0, len(val), chunk_size):
-                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size])
+                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(['target_components'])
                 for target in targets:
                     for component in target['target_components']:
                         for synonym in component['target_component_synonyms']:
@@ -241,13 +241,32 @@ Some most frequent use cases below.
       aspirin_chembl_id = molecule.search('aspirin')[0]['molecule_chembl_id']
       res = similarity.filter(chembl_id=aspirin_chembl_id, similarity=70)
       
+9. **Two similarity search examples above can be slow**. This is because by default the `similarity` endpoint returns the same information as the `molecule` endpoint, which causes many joins on data. Often all you want is simply a list of CHEMBL_IDs and maybe a similarity score. This is why the API and client support the `only` method where you can specify fields you want to be included in response. Below is an example of iterating over a large file containing thousands of SMILES string to make a similarity search and find out if any compounds from ChEMBL are similar. In ordet to know this all is needed is to check if result set is empty or not
+
+   ::
+
+        from chembl_webresource_client.new_client import new_client
+        similarity_query = new_client.similarity
+        dark_smiles = []
+        with open('12K_smile_strings.smi') as f:
+            content = f.readlines()
+
+        for idx, line in enumerate(content):
+            smile = line.strip()
+            res = similarity_query.filter(smiles=smile, similarity=70).only(['molecule_chembl_id'])
+            print("{0} {1} {2}".format(idx, smile, len(res)))
+            if len(res) == 0:
+                dark_smiles.append(smile)
+                
+f you also want to know the similarity score, replace `only(['molecule_chembl_id'])` with `only(['molecule_chembl_id', 'similarity'])`.               
+      
 9. Perform substructure search using SMILES:
 
    ::
 
       from chembl_webresource_client.new_client import new_client
       substructure = new_client.substructure
-      res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
+      res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")      
       
 10. Perform substructure search using ChEMBL ID:
 
