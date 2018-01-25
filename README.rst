@@ -479,7 +479,8 @@ Some most frequent use cases below.
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
-      light_nib_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300).filter(pref_name__iendswith="nib")
+      light_nib_molecules = molecule.filter(
+          molecule_properties__mw_freebase__lte=300).filter(pref_name__iendswith="nib")
 
 #. Get all ``Ki`` activities related to the ``hERG`` target:
 
@@ -616,7 +617,8 @@ Some most frequent use cases below.
    ::
     
       from chembl_webresource_client.utils import utils
-      smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C", "CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC", "c1(C=O)cc(OC)c(O)cc1"]
+      smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C", 
+                "CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC", "c1(C=O)cc(OC)c(O)cc1"]
       mols = [utils.smiles2ctab(smile) for smile in smiles]
       sdf = ''.join(mols)
       result = utils.mcs(sdf)
