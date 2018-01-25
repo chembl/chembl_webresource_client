@@ -631,58 +631,58 @@ The following formats are supported:
 
 - JSON (default format):
 
-     ::
+  ::
     
-       from chembl_webresource_client.new_client import new_client
-       activity = new_client.activity
-       activity.set_format('json')
-       activity.all().order_by('assay_type')[0]['activity_id']
+     from chembl_webresource_client.new_client import new_client
+     activity = new_client.activity
+     activity.set_format('json')
+     activity.all().order_by('assay_type')[0]['activity_id']
       
 - XML (you need to parse XML yourself):
 
-    ::
+  ::
     
-      from chembl_webresource_client.new_client import new_client
-      activity = new_client.activity
-      activity.set_format('xml')
-      activity.all().order_by('assay_type')    
+     from chembl_webresource_client.new_client import new_client
+     activity = new_client.activity
+     activity.set_format('xml')
+     activity.all().order_by('assay_type')    
 
 - SDF (only for compounds):
   For example you can use the client to save sdf file of a set of compounds and compute 3D coordinates:
 
-    ::
+  ::
     
-      from chembl_webresource_client.new_client import new_client
-      molecule = new_client.molecule
-      molecule.set_format('sdf')
+     from chembl_webresource_client.new_client import new_client
+     molecule = new_client.molecule
+     molecule.set_format('sdf')
 
-      mols = molecule.filter(molecule_properties__acd_logp__gte=self.logP) \
-                       .filter(molecule_properties__aromatic_rings__lte=self.rings_number) \
-                       .filter(chirality=self.chirality) \
-                       .filter(molecule_properties__full_mwt__lte=self.mwt)
+     mols = molecule.filter(molecule_properties__acd_logp__gte=self.logP) \
+                      .filter(molecule_properties__aromatic_rings__lte=self.rings_number) \
+                      .filter(chirality=self.chirality) \
+                      .filter(molecule_properties__full_mwt__lte=self.mwt)
 
-      with open('mols_2D.sdf', 'w') as output:
-            for mol in mols:
-                output.write(mol)
-                output.write('$$$$\n')
+     with open('mols_2D.sdf', 'w') as output:
+           for mol in mols:
+               output.write(mol)
+               output.write('$$$$\n')
                 
-      with open('mols_3D.sdf', 'w') as output:
-            with open('mols_2D.sdf', 'r') as input:
-                mols = input.open('r').read().split('$$$$\n')
-                for mol in mols:
-                    mol_3D = utils.ctab23D(mol)
-                    output.write(mol_3D)
-                    output.write('$$$$\n')
+     with open('mols_3D.sdf', 'w') as output:
+           with open('mols_2D.sdf', 'r') as input:
+               mols = input.open('r').read().split('$$$$\n')
+               for mol in mols:
+                   mol_3D = utils.ctab23D(mol)
+                   output.write(mol_3D)
+                   output.write('$$$$\n')
 
 - FPS (as a result of sdf2fps method)
 
 - PNG, SVG for image randering
 
-    ::
+  ::
     
-      from chembl_webresource_client.new_client import new_client
-      image = new_client.image
-      image.get('CHEMBL1')
+     from chembl_webresource_client.new_client import new_client
+     image = new_client.image
+     image.get('CHEMBL1')
 
 
 Available data entities
