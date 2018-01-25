@@ -97,62 +97,62 @@ Some most frequent use cases below.
 
    ::
    
-        from chembl_webresource_client.new_client import new_client
+    from chembl_webresource_client.new_client import new_client
 
-        organism = 'Escherichia coli'
-        compounds2targets = dict()
-        header = True
-        for name, chembl in [(x.split('\t')[0], x.rstrip().split('\t')[1])
-                             for x in open('compounds_list.csv')]:
-            if header:
-                header = False
-                continue
-            compounds2targets[chembl] = set()
+    organism = 'Escherichia coli'
+    compounds2targets = dict()
+    header = True
+    for name, chembl in [(x.split('\t')[0], x.rstrip().split('\t')[1])
+                         for x in open('compounds_list.csv')]:
+        if header:
+            header = False
+            continue
+        compounds2targets[chembl] = set()
 
-        chunk_size = 50
-        keys = list(compounds2targets.keys())
+    chunk_size = 50
+    keys = list(compounds2targets.keys())
 
-        ID_forms = dict()
-        for x in keys:
-            ID_forms[x] = set()
+    ID_forms = dict()
+    for x in keys:
+        ID_forms[x] = set()
 
-        for i in range(0, len(keys), chunk_size):
-            for form in new_client.molecule_form.filter(parent_chembl_id__in=keys[i:i + chunk_size]):
-                ID_forms[form['parent_chembl_id']].add(form['molecule_chembl_id'])
+    for i in range(0, len(keys), chunk_size):
+        for form in new_client.molecule_form.filter(parent_chembl_id__in=keys[i:i + chunk_size]):
+            ID_forms[form['parent_chembl_id']].add(form['molecule_chembl_id'])
 
-        for i in range(0, len(keys), chunk_size):
-            for form in new_client.molecule_form.filter(molecule_chembl_id__in=keys[i:i + chunk_size]):
-                ID_forms[form['molecule_chembl_id']].add(form['parent_chembl_id'])
+    for i in range(0, len(keys), chunk_size):
+        for form in new_client.molecule_form.filter(molecule_chembl_id__in=keys[i:i + chunk_size]):
+            ID_forms[form['molecule_chembl_id']].add(form['parent_chembl_id'])
 
-        values = []
-        for x in ID_forms.values():
-            values.extend(x)
-        forms_to_ID = dict()
-        for x in values:
-            forms_to_ID[x] = set()
+    values = []
+    for x in ID_forms.values():
+        values.extend(x)
+    forms_to_ID = dict()
+    for x in values:
+        forms_to_ID[x] = set()
 
-        for k in forms_to_ID:
-            for parent, molecule in ID_forms.items():
-                if k in molecule:
-                    forms_to_ID[k] = parent
+    for k in forms_to_ID:
+        for parent, molecule in ID_forms.items():
+            if k in molecule:
+                forms_to_ID[k] = parent
 
-        for i in range(0, len(values), chunk_size):
-            activities = new_client.activity.filter(molecule_chembl_id__in=values[i:i + chunk_size]).filter(target_organism__istartswith=organism).only(['molecule_chembl_id', 'target_chembl_id'])
-            for act in activities:
-                compounds2targets[forms_to_ID[act['molecule_chembl_id']]].add(act['target_chembl_id'])
+    for i in range(0, len(values), chunk_size):
+        activities = new_client.activity.filter(molecule_chembl_id__in=values[i:i + chunk_size]).filter(target_organism__istartswith=organism).only(['molecule_chembl_id', 'target_chembl_id'])
+        for act in activities:
+            compounds2targets[forms_to_ID[act['molecule_chembl_id']]].add(act['target_chembl_id'])
 
-        for key, val in compounds2targets.items():
-            lval = list(val)
-            uniprots = set()
-            for i in range(0, len(val), chunk_size):
-                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(['target_components'])
-                uniprots = uniprots.union(set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[])))
-            compounds2targets[key] = uniprots
+    for key, val in compounds2targets.items():
+        lval = list(val)
+        uniprots = set()
+        for i in range(0, len(val), chunk_size):
+            targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(['target_components'])
+            uniprots = uniprots.union(set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[])))
+        compounds2targets[key] = uniprots
 
-        print('\t'.join(('chembl', 'target')))
-        for chembl in sorted(compounds2targets):
-            for uniprot in compounds2targets[chembl]:
-    print('\t'.join((chembl, uniprot)))
+    print('\t'.join(('chembl', 'target')))
+    for chembl in sorted(compounds2targets):
+        for uniprot in compounds2targets[chembl]:
+            print('\t'.join((chembl, uniprot)))
 
 5. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
    of human gene names. Again, please note the use of the ``only`` operator which makes API calls faster.
