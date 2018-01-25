@@ -23,7 +23,12 @@ Installation
 
     pip install chembl_webresource_client
     
-    
+
+Conda users may want to install the client in the following way:
+
+::
+    conda install -c mnowotka chembl_webresource_client
+
 Quick start
 --------------
 
