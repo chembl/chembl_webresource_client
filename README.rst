@@ -1,11 +1,20 @@
 ChEMBL webresource client
 ======
 
-This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group. Python 2 and 3 compatible.
+This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group.
+Python 2 and 3 compatible.
 
-The library helps accessing ChEMBL data and cheminformatics tools from Python. You don't need to know how to write SQL. You don't need to know how to interact with REST APIs. You don't need to compile or install any cheminformatics framework. Results are cached.
+The library helps accessing ChEMBL data and cheminformatics tools from Python. 
+You don't need to know how to write SQL. 
+You don't need to know how to interact with REST APIs. 
+You don't need to compile or install any cheminformatics frameworks. 
+Results are cached.
 
-The client handles interaction with the HTTPS protocol and caches all results in the local file system for faster retrieval. Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource. Design is based on the Django ``QuerySet`` interface (https://docs.djangoproject.com/en/1.11/ref/models/querysets/). The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required. This approach reduces number of network requests and increases performance. 
+The client handles interaction with the HTTPS protocol and caches all results in the local file system for faster retrieval.
+Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource. 
+Design is based on the Django ``QuerySet`` interface (https://docs.djangoproject.com/en/1.11/ref/models/querysets/). 
+The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required. 
+This approach reduces number of network requests and increases performance. 
 
 Installation
 ------------
