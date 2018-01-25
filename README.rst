@@ -280,13 +280,13 @@ Some most frequent use cases below.
    
    If you also want to know the similarity score, replace ``only(['molecule_chembl_id'])`` with ``only(['molecule_chembl_id', 'similarity'])``.               
       
-10. Perform substructure search using SMILES:
+#. Perform substructure search using SMILES:
 
    ::
 
-        from chembl_webresource_client.new_client import new_client
-        substructure = new_client.substructure
-        res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")      
+      from chembl_webresource_client.new_client import new_client
+      substructure = new_client.substructure
+      res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")      
 
 11. Perform substructure search using ChEMBL ID:
 
