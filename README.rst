@@ -296,13 +296,14 @@ Some most frequent use cases below.
       substructure = new_client.substructure
       substructure.filter(chembl_id="CHEMBL25")
 
-12. **Two substructure search examples above can be slow**. Please use the `only` operator to specify required fields. For example this code will be faster then one above:
+#. **Two substructure search examples above can be slow**. 
+   Please use the `only` operator to specify required fields. For example this code will be faster then one above:
 
    ::
 
-        from chembl_webresource_client.new_client import new_client
-        substructure = new_client.substructure
-        substructure.filter(chembl_id="CHEMBL25").only(['molecule_chembl_id'])
+      from chembl_webresource_client.new_client import new_client
+      substructure = new_client.substructure
+      substructure.filter(chembl_id="CHEMBL25").only(['molecule_chembl_id'])
 
 13. Get a single molecule by ChEMBL ID:
 
