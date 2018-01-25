@@ -377,7 +377,8 @@ Some most frequent use cases below.
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
-      records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
+      records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 
+                              'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
 
 #. Obtain the pChEMBL value for compound:
 
