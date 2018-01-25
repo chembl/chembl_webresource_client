@@ -324,7 +324,7 @@ Some most frequent use cases below.
       
    Please note that using the ``get`` method will perform string-based comparison between the query SMILES and ChEMBL contents.
    Because there are many different canonicalisation algorithms this may not be the optimal way to search for SMILES in ChEMBL. 
-   This is why we provide a ``flexmatch`` filter that finds compounds descibed by the query SMILES string regardless of the canonicalisation used. 
+   This is why we provide a ``flexmatch`` filter that finds compounds described by the query SMILES string regardless of the canonicalisation used.
    Example will look like this:
    
    ::   
@@ -334,7 +334,7 @@ Some most frequent use cases below.
       res = molecule.filter(molecule_structures__canonical_smiles__flexmatch='CN(C)C(=N)N=C(N)N')
       len(res) # this returns 6 compounds
       
-   Another way would be using similarity of substructure search using SMILES, descibed in example 7 and 9 respectively.    
+   Another way would be using similarity of substructure search using SMILES, described in example 7 and 9 respectively.
 
 #. Get a single molecule by InChi Key:
 
@@ -422,7 +422,7 @@ Some most frequent use cases below.
 
 #. Get all natural products:
 
-   The `molecule` resource has a `natual_product` flag but it's only set for approved drugs. 
+   The `molecule` resource has a `natural_product` flag but it's only set for approved drugs.
    So if you want an sdf file with approved drugs being natural products you can simply use this URL:
 
    https://www.ebi.ac.uk/chembl/api/data/molecule.sdf?natural_product=1
@@ -475,7 +475,7 @@ Some most frequent use cases below.
       herg = target.search('herg')[0]
       herg_activities = activity.filter(target_chembl_id=herg['target_chembl_id']).filter(standard_type="Ki")
 
-#. Get all activitvities related to the ``Open TG-GATES`` project:
+#. Get all activities related to the ``Open TG-GATES`` project:
 
    ::
 
@@ -483,7 +483,7 @@ Some most frequent use cases below.
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
       
-#. Get all activitvities for a specific target with assay type ``B`` OR ``F``:
+#. Get all activities for a specific target with assay type ``B`` OR ``F``:
 
    ::
 
@@ -491,7 +491,7 @@ Some most frequent use cases below.
       activity = new_client.activity
       res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')  
 
-#. Search for ADMET-reated inhibitor assays:
+#. Search for ADMET-related inhibitor assays:
 
    ::
 
@@ -677,7 +677,7 @@ The following formats are supported:
 
 - FPS (as a result of sdf2fps method)
 
-- PNG, SVG for image randering
+- PNG, SVG for image rendering
 
   ::
     
@@ -732,7 +732,7 @@ At the time of writing this documentation there are 29 entities:
 Available filters
 -----------------
 
-As was mentioned above the desing of the client is based on Django QuerySet (https://docs.djangoproject.com/en/1.11/ref/models/querysets) and most important lookup types are supported. 
+As was mentioned above the design of the client is based on Django QuerySet (https://docs.djangoproject.com/en/1.11/ref/models/querysets) and most important lookup types are supported.
 These are:
 
 - exact
@@ -759,7 +759,7 @@ These are:
 
 ``only`` is a special method allowing to limit the results to a selected set of fields. 
 ``only`` should take a single argument: a list of fields that should be included in result. 
-Specified fields have to exists in the endpoint against wich ``only`` is executed. 
+Specified fields have to exists in the endpoint against which ``only`` is executed.
 Using ``only`` will usually make an API call faster because less information returned will save bandwidth. 
 The API logic will also check if any SQL joins are necessary to return the specified field and exclude unnecessary joins with critically improves performance.
 
@@ -788,14 +788,14 @@ Most important options:
 - CACHE_EXPIRE: cache expiry time in seconds (default 24 hours)
 - CACHE_NAME: name of the .sqlite file with cache
 - TOTAL_RETRIES: number of total retires per HTTP request (default is 3)
-- CONCURRENT_SIZE: total number of concurent requests (default is 50)
+- CONCURRENT_SIZE: total number of concurrent requests (default is 50)
 - FAST_SAVE: Speedup cache saving up to 50 times but with possibility of data loss (default is True)
 
 Is that a full functionality?
 -----------------------------
 
 No. 
-For more examples, please see the comprehansive test suite (https://github.com/chembl/chembl_webresource_client/blob/master/chembl_webresource_client/tests.py) and dedicated IPython notebook (https://github.com/chembl/mychembl/blob/master/ipython_notebooks/09_myChEMBL_web_services.ipynb)
+For more examples, please see the comprehensive test suite (https://github.com/chembl/chembl_webresource_client/blob/master/chembl_webresource_client/tests.py) and dedicated IPython notebook (https://github.com/chembl/mychembl/blob/master/ipython_notebooks/09_myChEMBL_web_services.ipynb)
 
 
 Citing / Other resources
