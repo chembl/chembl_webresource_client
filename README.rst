@@ -265,18 +265,26 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
 
    ::
 
-      from chembl_webresource_client.new_client import new_client
-      substructure = new_client.substructure
-      res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")      
+        from chembl_webresource_client.new_client import new_client
+        substructure = new_client.substructure
+        res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")      
 
 
 11. Perform substructure search using ChEMBL ID:
 
    ::
 
-      from chembl_webresource_client.new_client import new_client
-      substructure = new_client.substructure
-      substructure.filter(chembl_id="CHEMBL25")
+        from chembl_webresource_client.new_client import new_client
+        substructure = new_client.substructure
+        substructure.filter(chembl_id="CHEMBL25")
+
+12. **Two substructure search examples above can be slow**. Please use the `only` operator to specify required fields. For example this code will be faster then one above:
+
+   ::
+
+        from chembl_webresource_client.new_client import new_client
+        substructure = new_client.substructure
+        substructure.filter(chembl_id="CHEMBL25").only(['molecule_chembl_id'])
 
 12. Get a single molecule by ChEMBL ID:
 
@@ -286,7 +294,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       m1 = molecule.get('CHEMBL25')
 
-12. Get a single molecule by SMILES:
+13. Get a single molecule by SMILES:
 
    ::
 
@@ -419,7 +427,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       compound_record = new_client.compound_record
       records = compound_record.filter(document_chembl_id__in=[doc['document_chembl_id'] for doc in docs]).only(['document_chembl_id', 'molecule_chembl_id'])
       molecule = new_client.molecule
-      natural_products = molecule.filter(molecule_chembl_id__in=[rec['molecule_chembl_id'] for rec in records]).only('compoundstructures')
+      natural_products = molecule.filter(molecule_chembl_id__in=[rec['molecule_chembl_id'] for rec in records]).only('molecule_structures')
 
 24. Return molecules with molecular weight <= 300:
 
