@@ -5,7 +5,7 @@ This is the only official Python client library developed and supported by ChEMB
 
 The library helps accessing ChEMBL data and cheminformatics tools from Python. You don't need to know how to write SQL. You don't need to know how to interact with REST APIs. You don't need to compile or install any cheminformatics framework. Results are cached.
 
-The client handles interaction with the HTTPS protocol and caches all results in the local file system for faster retrieval. Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource. Design is based on the Django QuerySet interface (https://docs.djangoproject.com/en/1.11/ref/models/querysets/). The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required. This approach reduces number of network requests and increases performance. 
+The client handles interaction with the HTTPS protocol and caches all results in the local file system for faster retrieval. Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource. Design is based on the Django ``QuerySet`` interface (https://docs.djangoproject.com/en/1.11/ref/models/querysets/). The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required. This approach reduces number of network requests and increases performance. 
 
 Installation
 ------------
@@ -47,7 +47,7 @@ Some most frequent use cases below.
       res = target.filter(target_synonym__icontains=gene_name)
 
 3. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
-   of uniprot accession numbers and save the mapping into output csv file.
+   of uniprot accession numbers and save the mapping into output csv file. Note the use of the ``only`` operator allowing to specify which fields should be included in the results, making critical API queries faster.
 
    ::
    
@@ -93,7 +93,7 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-4. If you run the example above to get all distinct uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for E.coli (A1E3K9, P35695, P62593). ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (A1E3K9, P35695, P62593 and P00811). You may wonder why this discrepancy occurs. The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
+4. If you run the example above to get all distinct uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
 
    ::
    
@@ -155,7 +155,7 @@ Some most frequent use cases below.
     print('\t'.join((chembl, uniprot)))
 
 5. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
-   of human gene names.
+   of human gene names. Again, please note the use of the ``only`` operator which makes API calls faster.
 
    ::
    
