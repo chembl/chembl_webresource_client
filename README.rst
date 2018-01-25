@@ -343,17 +343,17 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       molecule.get('BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
 
-16. Get many compounds by their ChEMBL IDs:
+#. Get many compounds by their ChEMBL IDs:
 
-    ::
+   ::
 
-       from chembl_webresource_client.new_client import new_client
-       molecule = new_client.molecule
-       records = molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
+      from chembl_webresource_client.new_client import new_client
+      molecule = new_client.molecule
+      records = molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
 
-17. Get many compounds by a list of SMILES:
+#. Get many compounds by a list of SMILES:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -361,41 +361,41 @@ Some most frequent use cases below.
             'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
             'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])
 
-18. Get many compounds by a list of InChi Keys:
+#. Get many compounds by a list of InChi Keys:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
 
-19. Obtain the pChEMBL value for compound:
+#. Obtain the pChEMBL value for compound:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       activities = new_client.activity
       res = activities.filter(molecule_chembl_id="CHEMBL25", pchembl_value__isnull=False)
       
-20. Obtain the pChEMBL value for a specific compound AND a specific target:
+#. Obtain the pChEMBL value for a specific compound AND a specific target:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       activities = new_client.activity
       activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545", pchembl_value__isnull=False)
 
-21. Get all approved drugs:
+#. Get all approved drugs:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       approved_drugs = molecule.filter(max_phase=4)
       
-22. Get approved drugs for lung cancer:
+#. Get approved drugs for lung cancer:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       drug_indication = new_client.drug_indication
@@ -403,43 +403,42 @@ Some most frequent use cases below.
       lung_cancer_ind = drug_indication.filter(efo_term__icontains="LUNG CARCINOMA")
       lung_cancer_mols = molecules.filter(molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
 
-23. Get all molecules in ChEMBL with no Rule-of-Five violations:
+#. Get all molecules in ChEMBL with no Rule-of-Five violations:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       no_violations = molecule.filter(molecule_properties__num_ro5_violations=0)
 
-24. Get all biotherapeutic molecules:
+#. Get all biotherapeutic molecules:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       biotherapeutics = molecule.filter(biotherapeutic__isnull=False)
 
-25. Get all natural products:
+#. Get all natural products:
 
-    The `molecule` resource has a `natual_product` flag but it's only set for approved drugs. So if you want an sdf file
-    with approved drugs being natural products you can simply use this URL:
+   The `molecule` resource has a `natual_product` flag but it's only set for approved drugs. 
+   So if you want an sdf file with approved drugs being natural products you can simply use this URL:
 
-    https://www.ebi.ac.uk/chembl/api/data/molecule.sdf?natural_product=1
+   https://www.ebi.ac.uk/chembl/api/data/molecule.sdf?natural_product=1
 
-    Which can be translated into the following client code:
+   Which can be translated into the following client code:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       molecule.set_format('sdf')
       molecule.filter(natural_product=1)
 
-    If you want to retrieve all the natural products compounds regardless it they are approved drugs or not, you can
-    fetch all compounds extracted from the Journal of Natural Products. Using the client you will write a following
-    code:
+   If you want to retrieve all the natural products compounds regardless it they are approved drugs or not, you can fetch all compounds extracted from the Journal of Natural Products. 
+   Using the client you will write a following code:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       document = new_client.document
