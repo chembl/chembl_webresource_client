@@ -732,6 +732,15 @@ As was mentioned above the desing of the client is based on Django QuerySet (htt
  - iregex
  - search (implemented as a method of several selected endpoints instead of a lookup)
 
+``Only`` operator
+-----------------
+
+``only`` is a special method allowing to limit the results to a selected set of fields. ``only`` should take a single argument: a list of fields that should be included in result. Specified fields have to exists in the endpoint against wich ``only`` is executed. Using ``only`` will usually make an API call faster because less information returned will save bandwidth. The API logic will also check if any SQL joins are necessary to return the specified field and exclude unnecessary joins with critically improves performance.
+
+Please note that ``only`` has one limitation: a list of fields will ignore nested fields i.e. calling ``only(['molecule_properties__alogp'])`` is equivalent to ``only(['molecule_properties'])``.
+
+For many 2 many relationships ``only`` will not make any SQL join optimisation.
+
 Settings
 --------------
 
