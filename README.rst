@@ -457,9 +457,13 @@ Some most frequent use cases below.
       document = new_client.document
       docs = document.filter(journal="J. Nat. Prod.").only('document_chembl_id')
       compound_record = new_client.compound_record
-      records = compound_record.filter(document_chembl_id__in=[doc['document_chembl_id'] for doc in docs]).only(['document_chembl_id', 'molecule_chembl_id'])
+      records = compound_record.filter(
+          document_chembl_id__in=[doc['document_chembl_id'] for doc in docs]).only(
+          ['document_chembl_id', 'molecule_chembl_id'])
       molecule = new_client.molecule
-      natural_products = molecule.filter(molecule_chembl_id__in=[rec['molecule_chembl_id'] for rec in records]).only('molecule_structures')
+      natural_products = molecule.filter(
+          molecule_chembl_id__in=[rec['molecule_chembl_id'] for rec in records]).only(
+          'molecule_structures')
 
 #. Return molecules with molecular weight <= 300:
 
