@@ -313,7 +313,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       m1 = molecule.get('CHEMBL25')
 
-14. Get a single molecule by SMILES:
+#. Get a single molecule by SMILES:
 
    ::
 
@@ -322,8 +322,9 @@ Some most frequent use cases below.
       m1 = molecule.get('CC(=O)Oc1ccccc1C(=O)O')
       
    Please note that using the `get` method will perform string-based comparison between the query SMILES and ChEMBL contents.
-   Because there are many different canonicalisation algorithms this may not be the optimal way to search for SMILES in ChEMBL. This is why we provide a `flexmatch` filer that finds compounds descibed by the query SMILES string regardless of the
-   canonicalisation used. Example will look like this:
+   Because there are many different canonicalisation algorithms this may not be the optimal way to search for SMILES in ChEMBL. 
+   This is why we provide a `flexmatch` filer that finds compounds descibed by the query SMILES string regardless of the canonicalisation used. 
+   Example will look like this:
    
    ::   
    
@@ -332,7 +333,7 @@ Some most frequent use cases below.
       res = molecule.filter(molecule_structures__canonical_smiles__flexmatch='CN(C)C(=N)N=C(N)N')
       len(res) # this returns 6 compounds
       
-  Another way would be using similarity of substructure search using SMILES, descibed in example 7 and 9 respectively.    
+   Another way would be using similarity of substructure search using SMILES, descibed in example 7 and 9 respectively.    
 
 15. Get a single molecule by InChi Key:
 
