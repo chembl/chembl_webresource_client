@@ -241,7 +241,7 @@ Some most frequent use cases below.
       aspirin_chembl_id = molecule.search('aspirin')[0]['molecule_chembl_id']
       res = similarity.filter(chembl_id=aspirin_chembl_id, similarity=70)
       
-9. **Two similarity search examples above can be slow**. This is because by default the `similarity` endpoint returns the same information as the `molecule` endpoint, which causes many joins on data. Often all you want is simply a list of CHEMBL_IDs and maybe a similarity score. This is why the API and client support the `only` method where you can specify fields you want to be included in response. Below is an example of iterating over a large file containing thousands of SMILES string to make a similarity search and find out if any compounds from ChEMBL are similar. In ordet to know this all is needed is to check if result set is empty or not
+9. **Two similarity search examples above can be slow**. This is because by default the ``similarity`` endpoint returns the same information as the `molecule` endpoint, which causes many joins on data. Often all you want is simply a list of CHEMBL_IDs and maybe a similarity score. This is why the API and client support the ``only`` method where you can specify fields you want to be included in response. Below is an example of iterating over a large file containing thousands of SMILES string to make a similarity search and find out if any compounds from ChEMBL are similar. In ordet to know this all is needed is to check if result set is empty or not
 
    ::
 
@@ -258,7 +258,7 @@ Some most frequent use cases below.
             if len(res) == 0:
                 dark_smiles.append(smile)
                 
-f you also want to know the similarity score, replace `only(['molecule_chembl_id'])` with `only(['molecule_chembl_id', 'similarity'])`.               
+f you also want to know the similarity score, replace ``only(['molecule_chembl_id'])`` with ``only(['molecule_chembl_id', 'similarity'])``.               
       
 9. Perform substructure search using SMILES:
 
