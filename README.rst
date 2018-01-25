@@ -197,7 +197,8 @@ Some most frequent use cases below.
 
         for i in range(0, len(keys), chunk_size):
             # we jump from compounds to targets through activities:
-            activities = new_client.activity.filter(molecule_chembl_id__in=keys[i:i + chunk_size]).only(['molecule_chembl_id', 'target_chembl_id'])
+            activities = new_client.activity.filter(molecule_chembl_id__in=keys[i:i + chunk_size]).only(
+                ['molecule_chembl_id', 'target_chembl_id'])
             # extracting target ChEMBL IDs from activities:
             for act in activities:
                 compounds2targets[act['molecule_chembl_id']].add(act['target_chembl_id'])
@@ -211,7 +212,8 @@ Some most frequent use cases below.
             lval = list(val)
             genes = set()
             for i in range(0, len(val), chunk_size):
-                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(['target_components'])
+                targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(
+                    ['target_components'])
                 for target in targets:
                     for component in target['target_components']:
                         for synonym in component['target_component_synonyms']:
