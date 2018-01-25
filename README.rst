@@ -102,7 +102,7 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-4. If you run the example above to get all distinct uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
+#. If you run the example above to get all distinct uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
 
    ::
    
@@ -163,7 +163,7 @@ Some most frequent use cases below.
         for uniprot in compounds2targets[chembl]:
             print('\t'.join((chembl, uniprot)))
 
-5. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
+#. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
    of human gene names. Again, please note the use of the ``only`` operator which makes API calls faster.
 
    ::
@@ -214,7 +214,7 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-6. Display a compound image in Jupyter (IPython) notebook:
+#. Display a compound image in Jupyter (IPython) notebook:
 
    ::
 
@@ -232,7 +232,7 @@ Some most frequent use cases below.
       
       Image(utils.ctab2image(molfile))
       
-7. Find compounds similar to given SMILES query with similarity threshold of 85%:
+#. Find compounds similar to given SMILES query with similarity threshold of 85%:
 
    ::
 
@@ -240,7 +240,7 @@ Some most frequent use cases below.
       similarity = new_client.similarity
       res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=85)
   
-8. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
+#. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
 
    ::
 
