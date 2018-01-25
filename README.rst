@@ -257,8 +257,9 @@ Some most frequent use cases below.
             print("{0} {1} {2}".format(idx, smile, len(res)))
             if len(res) == 0:
                 dark_smiles.append(smile)
-                
-f you also want to know the similarity score, replace ``only(['molecule_chembl_id'])`` with ``only(['molecule_chembl_id', 'similarity'])``.               
+
+
+    If you also want to know the similarity score, replace ``only(['molecule_chembl_id'])`` with ``only(['molecule_chembl_id', 'similarity'])``.               
       
 10. Perform substructure search using SMILES:
 
