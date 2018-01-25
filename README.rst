@@ -413,7 +413,8 @@ Some most frequent use cases below.
       drug_indication = new_client.drug_indication
       molecules = new_client.molecule
       lung_cancer_ind = drug_indication.filter(efo_term__icontains="LUNG CARCINOMA")
-      lung_cancer_mols = molecules.filter(molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
+      lung_cancer_mols = molecules.filter(
+          molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
 
 #. Get all molecules in ChEMBL with no Rule-of-Five violations:
 
