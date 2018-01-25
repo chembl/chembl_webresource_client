@@ -297,7 +297,8 @@ Some most frequent use cases below.
       substructure.filter(chembl_id="CHEMBL25")
 
 #. **Two substructure search examples above can be slow**. 
-   Please use the `only` operator to specify required fields. For example this code will be faster then one above:
+   Please use the `only` operator to specify required fields. 
+   For example this code will be faster then one above:
 
    ::
 
@@ -482,7 +483,7 @@ Some most frequent use cases below.
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
       
-#. Get all activitvities for a specific target with assay type 'B' OR 'F':
+#. Get all activitvities for a specific target with assay type ``B`` OR ``F``:
 
    ::
 
@@ -546,7 +547,7 @@ Some most frequent use cases below.
       tissue = new_client.tissue
       res = tissue.filter(pref_name__istartswith='blood')
 
-#. Search documents for 'cytokine':
+#. Search documents for ``cytokine``:
 
    ::
 
@@ -731,7 +732,8 @@ At the time of writing this documentation there are 29 entities:
 Available filters
 -----------------
 
-As was mentioned above the desing of the client is based on Django QuerySet (https://docs.djangoproject.com/en/1.11/ref/models/querysets) and most important lookup types are supported. These are:
+As was mentioned above the desing of the client is based on Django QuerySet (https://docs.djangoproject.com/en/1.11/ref/models/querysets) and most important lookup types are supported. 
+These are:
 
 - exact
 - iexact
@@ -755,7 +757,11 @@ As was mentioned above the desing of the client is based on Django QuerySet (htt
 ``Only`` operator
 -----------------
 
-``only`` is a special method allowing to limit the results to a selected set of fields. ``only`` should take a single argument: a list of fields that should be included in result. Specified fields have to exists in the endpoint against wich ``only`` is executed. Using ``only`` will usually make an API call faster because less information returned will save bandwidth. The API logic will also check if any SQL joins are necessary to return the specified field and exclude unnecessary joins with critically improves performance.
+``only`` is a special method allowing to limit the results to a selected set of fields. 
+``only`` should take a single argument: a list of fields that should be included in result. 
+Specified fields have to exists in the endpoint against wich ``only`` is executed. 
+Using ``only`` will usually make an API call faster because less information returned will save bandwidth. 
+The API logic will also check if any SQL joins are necessary to return the specified field and exclude unnecessary joins with critically improves performance.
 
 Please note that ``only`` has one limitation: a list of fields will ignore nested fields i.e. calling ``only(['molecule_properties__alogp'])`` is equivalent to ``only(['molecule_properties'])``.
 
@@ -766,29 +772,30 @@ Settings
 
 In order to use settings you need to import them before using the client:
 
-    ::
+::
     
-      from chembl_webresource_client.settings import Settings
+   from chembl_webresource_client.settings import Settings
       
 Settings object is a singleton that exposes `Instance` method, for example:
 
-    ::
+::
     
-      Settings.Instance().TIMEOUT = 10
+   Settings.Instance().TIMEOUT = 10
       
 Most important options:
 
- - CACHING: should results be cached locally (default is True)
- - CACHE_EXPIRE: cache expiry time in seconds (default 24 hours)
- - CACHE_NAME: name of the .sqlite file with cache
- - TOTAL_RETRIES: number of total retires per HTTP request (default is 3)
- - CONCURRENT_SIZE: total number of concurent requests (default is 50)
- - FAST_SAVE: Speedup cache saving up to 50 times but with possibility of data loss (default is True)
+- CACHING: should results be cached locally (default is True)
+- CACHE_EXPIRE: cache expiry time in seconds (default 24 hours)
+- CACHE_NAME: name of the .sqlite file with cache
+- TOTAL_RETRIES: number of total retires per HTTP request (default is 3)
+- CONCURRENT_SIZE: total number of concurent requests (default is 50)
+- FAST_SAVE: Speedup cache saving up to 50 times but with possibility of data loss (default is True)
 
 Is that a full functionality?
 -----------------------------
 
-No. For more examples, please see the comprehansive test suite (https://github.com/chembl/chembl_webresource_client/blob/master/chembl_webresource_client/tests.py) and dedicated IPython notebook (https://github.com/chembl/mychembl/blob/master/ipython_notebooks/09_myChEMBL_web_services.ipynb)
+No. 
+For more examples, please see the comprehansive test suite (https://github.com/chembl/chembl_webresource_client/blob/master/chembl_webresource_client/tests.py) and dedicated IPython notebook (https://github.com/chembl/mychembl/blob/master/ipython_notebooks/09_myChEMBL_web_services.ipynb)
 
 
 Citing / Other resources
