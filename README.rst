@@ -286,7 +286,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
         substructure = new_client.substructure
         substructure.filter(chembl_id="CHEMBL25").only(['molecule_chembl_id'])
 
-12. Get a single molecule by ChEMBL ID:
+13. Get a single molecule by ChEMBL ID:
 
    ::
 
@@ -294,7 +294,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       m1 = molecule.get('CHEMBL25')
 
-13. Get a single molecule by SMILES:
+14. Get a single molecule by SMILES:
 
    ::
 
@@ -315,7 +315,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       
   Another way would be using similarity of substructure search using SMILES, descibed in example 7 and 9 respectively.    
 
-13. Get a single molecule by InChi Key:
+15. Get a single molecule by InChi Key:
 
    ::
 
@@ -323,7 +323,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       molecule.get('BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
 
-14. Get many compounds by their ChEMBL IDs:
+16. Get many compounds by their ChEMBL IDs:
 
     ::
 
@@ -331,7 +331,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
        molecule = new_client.molecule
        records = molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
 
-15. Get many compounds by a list of SMILES:
+17. Get many compounds by a list of SMILES:
 
     ::
 
@@ -341,7 +341,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
             'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
             'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])
 
-16. Get many compounds by a list of InChi Keys:
+18. Get many compounds by a list of InChi Keys:
 
     ::
 
@@ -349,7 +349,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
 
-17. Obtain the pChEMBL value for compound:
+19. Obtain the pChEMBL value for compound:
 
     ::
 
@@ -357,7 +357,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       activities = new_client.activity
       res = activities.filter(molecule_chembl_id="CHEMBL25", pchembl_value__isnull=False)
       
-18. Obtain the pChEMBL value for a specific compound AND a specific target:
+20. Obtain the pChEMBL value for a specific compound AND a specific target:
 
     ::
 
@@ -365,7 +365,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       activities = new_client.activity
       activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545", pchembl_value__isnull=False)
 
-19. Get all approved drugs:
+21. Get all approved drugs:
 
     ::
 
@@ -373,7 +373,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       approved_drugs = molecule.filter(max_phase=4)
       
-20. Get approved drugs for lung cancer:
+22. Get approved drugs for lung cancer:
 
     ::
 
@@ -383,7 +383,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       lung_cancer_ind = drug_indication.filter(efo_term__icontains="LUNG CARCINOMA")
       lung_cancer_mols = molecules.filter(molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
 
-21. Get all molecules in ChEMBL with no Rule-of-Five violations:
+23. Get all molecules in ChEMBL with no Rule-of-Five violations:
 
     ::
 
@@ -391,7 +391,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       no_violations = molecule.filter(molecule_properties__num_ro5_violations=0)
 
-22. Get all biotherapeutic molecules:
+24. Get all biotherapeutic molecules:
 
     ::
 
@@ -399,7 +399,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       biotherapeutics = molecule.filter(biotherapeutic__isnull=False)
 
-23. Get all natural products:
+25. Get all natural products:
 
     The `molecule` resource has a `natual_product` flag but it's only set for approved drugs. So if you want an sdf file
     with approved drugs being natural products you can simply use this URL:
@@ -429,7 +429,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       natural_products = molecule.filter(molecule_chembl_id__in=[rec['molecule_chembl_id'] for rec in records]).only('molecule_structures')
 
-24. Return molecules with molecular weight <= 300:
+26. Return molecules with molecular weight <= 300:
 
     ::
 
@@ -437,7 +437,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       light_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300)
       
-25. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
+27. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
 
     ::
 
@@ -445,7 +445,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       molecule = new_client.molecule
       light_nib_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300).filter(pref_name__iendswith="nib")
 
-26. Get all Ki activities related to the hERG target:
+28. Get all Ki activities related to the hERG target:
 
     ::
 
@@ -455,7 +455,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       herg = target.search('herg')[0]
       herg_activities = activity.filter(target_chembl_id=herg['target_chembl_id']).filter(standard_type="Ki")
 
-27. Get all activitvities related to the Open TG-GATES project:
+29. Get all activitvities related to the Open TG-GATES project:
 
     ::
 
@@ -463,7 +463,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
       
-28. Get all activitvities for a specific target with assay type 'B' OR 'F':
+30. Get all activitvities for a specific target with assay type 'B' OR 'F':
 
     ::
 
@@ -471,7 +471,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       activity = new_client.activity
       res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')  
 
-29. Search for ADMET-reated inhibitor assays:
+31. Search for ADMET-reated inhibitor assays:
 
     ::
 
@@ -479,7 +479,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       assay = new_client.assay
       res = assay.search('inhibitor').filter(assay_type='A')
 
-30. Get cell line by cellosaurus id:
+32. Get cell line by cellosaurus id:
 
     ::
 
@@ -487,7 +487,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       cell_line = new_client.cell_line
       res = cell_line.filter(cellosaurus_id="CVCL_0417")
 
-31. Filter drugs by approval year and name:
+33. Filter drugs by approval year and name:
 
     ::
 
@@ -495,7 +495,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       drug = new_client.drug
       res = drug.filter(first_approval=1976).filter(usan_stem="-azosin")
 
-32. Get tissue by BTO ID:
+34. Get tissue by BTO ID:
 
     ::
 
@@ -503,7 +503,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       tissue = new_client.tissue
       res = tissue.filter(bto_id="BTO:0001073")
       
-33. Get tissue by Caloha id:
+35. Get tissue by Caloha id:
 
     ::
 
@@ -511,7 +511,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       tissue = new_client.tissue
       res = tissue.filter(caloha_id="TS-0490")
 
-34. Get tissue by Uberon id:
+36. Get tissue by Uberon id:
 
     ::
 
@@ -519,7 +519,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       tissue = new_client.tissue
       res = tissue.filter(uberon_id="UBERON:0000173")
 
-35. Get tissue by name:
+37. Get tissue by name:
 
     ::
 
@@ -527,7 +527,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       tissue = new_client.tissue
       res = tissue.filter(pref_name__istartswith='blood')
 
-36. Search documents for 'cytokine':
+38. Search documents for 'cytokine':
 
     ::
 
@@ -535,28 +535,28 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       document = new_client.document
       res = document.search('cytokine')
 
-37. Search for compound in Unichem:
+39. Search for compound in Unichem:
 
     ::
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.get('AIN')
       
-38. Resolve InChi Key to Inchi using Unichem:
+40. Resolve InChi Key to Inchi using Unichem:
 
     ::
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
       
-39. Convert SMILES to CTAB:
+41. Convert SMILES to CTAB:
 
     ::
 
       from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
-40. Convert SMILES to image and image back to SMILES:
+42. Convert SMILES to image and image back to SMILES:
 
     ::
     
@@ -567,7 +567,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       smiles = utils.ctab2smiles(mol).split()[2]
       self.assertEqual(smiles, aspirin)
       
-41. Compute fingerprints:
+43. Compute fingerprints:
 
     ::
     
@@ -575,7 +575,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
       fingerprints = utils.sdf2fps(aspirin)
       
-42. Compute Maximal Common Substructure:
+44. Compute Maximal Common Substructure:
 
     ::
     
@@ -585,7 +585,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       sdf = ''.join(mols)
       result = utils.mcs(sdf)
       
-43. Compute various molecular descriptors:
+45. Compute various molecular descriptors:
 
     ::
     
@@ -597,7 +597,7 @@ f you also want to know the similarity score, replace ``only(['molecule_chembl_i
       tpsa = json.loads(utils.tpsa(aspirin))[0]
       descriptors = json.loads(utils.descriptors(aspirin))[0]
       
-44. Standardize molecule:
+46. Standardize molecule:
 
     ::
     
