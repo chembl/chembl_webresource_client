@@ -448,25 +448,25 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       natural_products = molecule.filter(molecule_chembl_id__in=[rec['molecule_chembl_id'] for rec in records]).only('molecule_structures')
 
-26. Return molecules with molecular weight <= 300:
+#. Return molecules with molecular weight <= 300:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       light_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300)
       
-27. Return molecules with molecular weight <= 300 AND pref_name ends with nib:
+#. Return molecules with molecular weight <= 300 AND ``pref_name`` ends with ``nib``:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       light_nib_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300).filter(pref_name__iendswith="nib")
 
-28. Get all Ki activities related to the hERG target:
+#. Get all ``Ki`` activities related to the ``hERG`` target:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       target = new_client.target
@@ -474,110 +474,110 @@ Some most frequent use cases below.
       herg = target.search('herg')[0]
       herg_activities = activity.filter(target_chembl_id=herg['target_chembl_id']).filter(standard_type="Ki")
 
-29. Get all activitvities related to the Open TG-GATES project:
+#. Get all activitvities related to the ``Open TG-GATES`` project:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
       
-30. Get all activitvities for a specific target with assay type 'B' OR 'F':
+#. Get all activitvities for a specific target with assay type 'B' OR 'F':
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       activity = new_client.activity
       res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')  
 
-31. Search for ADMET-reated inhibitor assays:
+#. Search for ADMET-reated inhibitor assays:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       assay = new_client.assay
       res = assay.search('inhibitor').filter(assay_type='A')
 
-32. Get cell line by cellosaurus id:
+#. Get cell line by cellosaurus id:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       cell_line = new_client.cell_line
       res = cell_line.filter(cellosaurus_id="CVCL_0417")
 
-33. Filter drugs by approval year and name:
+#. Filter drugs by approval year and name:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       drug = new_client.drug
       res = drug.filter(first_approval=1976).filter(usan_stem="-azosin")
 
-34. Get tissue by BTO ID:
+#. Get tissue by BTO ID:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
       res = tissue.filter(bto_id="BTO:0001073")
       
-35. Get tissue by Caloha id:
+#. Get tissue by Caloha id:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
       res = tissue.filter(caloha_id="TS-0490")
 
-36. Get tissue by Uberon id:
+#. Get tissue by Uberon id:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
       res = tissue.filter(uberon_id="UBERON:0000173")
 
-37. Get tissue by name:
+#. Get tissue by name:
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
       res = tissue.filter(pref_name__istartswith='blood')
 
-38. Search documents for 'cytokine':
+#. Search documents for 'cytokine':
 
-    ::
+   ::
 
       from chembl_webresource_client.new_client import new_client
       document = new_client.document
       res = document.search('cytokine')
 
-39. Search for compound in Unichem:
+#. Search for compound in Unichem:
 
-    ::
+   ::
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.get('AIN')
       
-40. Resolve InChi Key to Inchi using Unichem:
+#. Resolve InChi Key to Inchi using Unichem:
 
-    ::
+   ::
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
       
-41. Convert SMILES to CTAB:
+#. Convert SMILES to CTAB:
 
-    ::
+   ::
 
       from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
-42. Convert SMILES to image and image back to SMILES:
+#. Convert SMILES to image and image back to SMILES:
 
-    ::
+   ::
     
       from chembl_webresource_client.utils import utils
       aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
@@ -586,17 +586,17 @@ Some most frequent use cases below.
       smiles = utils.ctab2smiles(mol).split()[2]
       self.assertEqual(smiles, aspirin)
       
-43. Compute fingerprints:
+#. Compute fingerprints:
 
-    ::
+   ::
     
       from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
       fingerprints = utils.sdf2fps(aspirin)
       
-44. Compute Maximal Common Substructure:
+#. Compute Maximal Common Substructure:
 
-    ::
+   ::
     
       from chembl_webresource_client.utils import utils
       smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C", "CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC", "c1(C=O)cc(OC)c(O)cc1"]
@@ -604,9 +604,9 @@ Some most frequent use cases below.
       sdf = ''.join(mols)
       result = utils.mcs(sdf)
       
-45. Compute various molecular descriptors:
+#. Compute various molecular descriptors:
 
-    ::
+   ::
     
       from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
@@ -616,9 +616,9 @@ Some most frequent use cases below.
       tpsa = json.loads(utils.tpsa(aspirin))[0]
       descriptors = json.loads(utils.descriptors(aspirin))[0]
       
-46. Standardize molecule:
+#. Standardize molecule:
 
-    ::
+   ::
     
       from chembl_webresource_client.utils import utils
       mol = utils.smiles2ctab("[Na]OC(=O)Cc1ccc(C[NH3+])cc1.c1nnn[n-]1.O")
