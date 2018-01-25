@@ -394,7 +394,8 @@ Some most frequent use cases below.
 
       from chembl_webresource_client.new_client import new_client
       activities = new_client.activity
-      activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545", pchembl_value__isnull=False)
+      activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545", 
+                        pchembl_value__isnull=False)
 
 #. Get all approved drugs:
 
