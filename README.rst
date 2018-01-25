@@ -288,13 +288,13 @@ Some most frequent use cases below.
       substructure = new_client.substructure
       res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")      
 
-11. Perform substructure search using ChEMBL ID:
+#. Perform substructure search using ChEMBL ID:
 
    ::
 
-        from chembl_webresource_client.new_client import new_client
-        substructure = new_client.substructure
-        substructure.filter(chembl_id="CHEMBL25")
+      from chembl_webresource_client.new_client import new_client
+      substructure = new_client.substructure
+      substructure.filter(chembl_id="CHEMBL25")
 
 12. **Two substructure search examples above can be slow**. Please use the `only` operator to specify required fields. For example this code will be faster then one above:
 
