@@ -29,7 +29,7 @@ Quick start
 
 Some most frequent use cases below.
 
-1. Search molecule by synonym:
+#. Search molecule by synonym:
 
    ::
 
@@ -37,7 +37,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       res = molecule.search('viagra')
         
-2. Search target by gene name:
+#. Search target by gene name:
 
    ::
 
@@ -55,7 +55,7 @@ Some most frequent use cases below.
       gene_name = 'GABRB2'
       res = target.filter(target_synonym__icontains=gene_name)
 
-3. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
+#. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
    of uniprot accession numbers and save the mapping into output csv file. Note the use of the ``only`` operator allowing to specify which fields should be included in the results, making critical API queries faster.
 
    ::
