@@ -235,7 +235,7 @@ class TestSequenceFunctions(unittest.TestCase):
         l1 = len(assay.filter(assay_type='B').filter(description__icontains='insulin'))
         l2 = len(assay.filter(assay_type='B').filter(description__icontains='insulin').filter(description__icontains='inhibition'))
         self.assertTrue(l1 > 100)
-        self.assertTrue(l1 > l2, str(l1, l2))
+        self.assertTrue(l1 > l2, str((l1, l2)))
         self.assertTrue(l2 > 0)
         assay.set_format('xml')
         parseString(assay.filter(confidence_score__gte=8)[0])
@@ -1228,7 +1228,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         res1 = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).only(['molecule_chembl_id', 'similarity'])
         most_similar = res1[0]
-        self.assertEqual(most_similar.keys(), ['molecule_chembl_id', 'similarity'])
+        self.assertEqual(list(most_similar.keys()), ['molecule_chembl_id', 'similarity'])
         self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
         self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
         self.assertTrue(len(res1) > 1000)
@@ -1421,7 +1421,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertListEqual([x for x in targets_for_gene], [x for x in shortcut])
         only_components = target.filter(target_synonym__icontains=gene_name).only(['target_components'])
         first = only_components[0]
-        self.assertEqual(first.keys(), ['target_components'])
+        self.assertEqual(list(first.keys()), ['target_components'])
 
         gene_name = 'flap'
         targets_for_gene = target.filter(target_components__target_component_synonyms__component_synonym__icontains=gene_name)
