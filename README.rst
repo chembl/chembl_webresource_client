@@ -27,7 +27,7 @@ Conda users may want to install the client in the following way:
 
 ::
 
-    conda install -c mnowotka chembl_webresource_client
+    conda install -c chembl chembl_webresource_client
 
 
 Quick start
@@ -271,10 +271,11 @@ Some most frequent use cases below.
       
 #. **Two similarity search examples above can be slow**. 
    This is because by default the ``similarity`` endpoint returns the same information as the `molecule` endpoint, which causes many joins on data. 
-   Often all you want is simply a list of CHEMBL_IDs and maybe a similarity score. 
+   Often all you need is simply a list of CHEMBL_IDs and maybe a similarity score. 
    This is why the API and client support the ``only`` method where you can specify fields you want to be included in response. 
-   Below is an example of iterating over a large file containing thousands of SMILES string to make a similarity search and find out if any compounds from ChEMBL are similar. 
-   In order to know this all is needed is to check if result set is empty or not.
+   Below is an example of iterating over a large file containing thousands of SMILES strings.
+   Each SMILES string from the file is checked against ChEMBL database to see if there are any similar compounds.
+   We just need a simple yes/no answer to the question: if there is any compound in ChEMBL that may be considered similar to the given SMILES query.
 
    ::
 
