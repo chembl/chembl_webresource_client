@@ -12,7 +12,7 @@ Results are cached.
 
 The client handles interaction with the HTTPS protocol and caches all results in the local file system for faster retrieval.
 Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource. 
-Design is based on the Django ``QuerySet`` interface (https://docs.djangoproject.com/en/1.11/ref/models/querysets/). 
+Design is based on the Django `QuerySet <https://docs.djangoproject.com/en/1.11/ref/models/querysets/>`_ interface. 
 The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required. 
 This approach reduces number of network requests and increases performance. 
 
@@ -23,7 +23,7 @@ Installation
 
     pip install chembl_webresource_client
     
-Conda users may want to install the client in the following way:
+`Conda <https://conda.io>`_ users may want to install the client in the following way instead:
 
 ::
 
@@ -62,7 +62,7 @@ Some most frequent use cases below.
       res = target.filter(target_synonym__icontains=gene_name)
 
 #. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
-   of uniprot accession numbers and save the mapping into output csv file. 
+   of `Uniprot accession <https://www.uniprot.org/help/accession_numbers>`_ numbers and save the mapping into output CSV file. 
    Note the use of the ``only`` operator allowing to specify which fields should be included in the results, making critical API queries faster.
 
    ::
@@ -112,7 +112,7 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-#. If you run the example above to get all distinct uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). 
+#. If you run the example above to get all distinct Uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). 
    ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. 
    The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. 
    In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
@@ -233,7 +233,7 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-#. Display a compound image in Jupyter (IPython) notebook:
+#. Display a compound image in `Jupyter <http://jupyter.org/>`_ (IPython) notebook:
 
    ::
 
@@ -349,7 +349,7 @@ Some most frequent use cases below.
       res = molecule.filter(molecule_structures__canonical_smiles__flexmatch='CN(C)C(=N)N=C(N)N')
       len(res) # this returns 6 compounds
       
-   Another way would be using similarity of substructure search using SMILES, described in example 7 and 9 respectively.
+   Another way would be using similarity or substructure search using SMILES, described in example 7 and 10 respectively.
 
 #. Get a single molecule by InChi Key:
 
@@ -423,7 +423,7 @@ Some most frequent use cases below.
       lung_cancer_mols = molecules.filter(
           molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
 
-#. Get all molecules in ChEMBL with no Rule-of-Five violations:
+#. Get all molecules in ChEMBL with no `Rule-of-Five <https://en.wikipedia.org/wiki/Lipinski%27s_rule_of_five>`_ violations:
 
    ::
 
@@ -441,7 +441,7 @@ Some most frequent use cases below.
 
 #. Get all natural products:
 
-   The `molecule` resource has a `natural_product` flag but it's only set for approved drugs.
+   The `molecule` resource has a ``natural_product`` flag but it's only set for approved drugs.
    So if you want an sdf file with approved drugs being natural products you can simply use this URL:
 
    https://www.ebi.ac.uk/chembl/api/data/molecule.sdf?natural_product=1
@@ -455,7 +455,7 @@ Some most frequent use cases below.
       molecule.set_format('sdf')
       molecule.filter(natural_product=1)
 
-   If you want to retrieve all the natural products compounds regardless it they are approved drugs or not, you can fetch all compounds extracted from the Journal of Natural Products. 
+   If you want to retrieve all the natural products compounds regardless it they are approved drugs or not, you can fetch all compounds extracted from the `Journal of Natural Products <http://pubs.acs.org/journal/jnprdf>`_. 
    Using the client you will write a following code:
 
    ::
@@ -480,7 +480,7 @@ Some most frequent use cases below.
       molecule = new_client.molecule
       light_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300)
       
-#. Return molecules with molecular weight <= 300 AND ``pref_name`` ends with ``nib``:
+#. Return molecules with molecular weight <= 300 AND ``pref_name`` ending with ``nib``:
 
    ::
 
@@ -507,7 +507,7 @@ Some most frequent use cases below.
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
       
-#. Get all activities for a specific target with assay type ``B`` OR ``F``:
+#. Get all activities for a specific target with assay type ``B`` (Binding) OR ``F`` (Functional):
 
    ::
 
@@ -515,7 +515,7 @@ Some most frequent use cases below.
       activity = new_client.activity
       res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')  
 
-#. Search for ADMET-related inhibitor assays:
+#. Search for ADMET-related inhibitor assays (type ``A``):
 
    ::
 
@@ -579,7 +579,7 @@ Some most frequent use cases below.
       document = new_client.document
       res = document.search('cytokine')
 
-#. Search for compound in Unichem:
+#. Search for compound in `Unichem <https://www.ebi.ac.uk/unichem/>`_:
 
    ::
 
@@ -722,7 +722,7 @@ You can list available data entities using the following code:
    available_resources = [resource for resource in dir(new_client) if not resource.startswith('_')]
    print available_resources
 
-At the time of writing this documentation there are 29 entities:
+At the time of writing this documentation there are 31 entities:
 
 - activity
 - assay
@@ -744,6 +744,7 @@ At the time of writing this documentation there are 29 entities:
 - metabolism
 - molecule
 - molecule_form
+- organism
 - protein_class
 - similarity
 - source
@@ -753,6 +754,7 @@ At the time of writing this documentation there are 29 entities:
 - target_prediction
 - target_relation
 - tissue
+- xref_source
 
 Available filters
 -----------------
