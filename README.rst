@@ -1,7 +1,7 @@
 ChEMBL webresource client
 ======
 
-This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group.
+This is the only official Python client library developed and supported by `ChEMBL <https://www.ebi.ac.uk/chembl/>`_ group.
 Python 2 and 3 compatible.
 
 The library helps accessing ChEMBL data and cheminformatics tools from Python. 
@@ -112,7 +112,7 @@ Some most frequent use cases below.
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
 
-#. If you run the example above to get all distinct Uniprot accession for targets related with oxacillin (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). 
+#. If you run the example above to get all distinct Uniprot accession for targets related with ``oxacillin`` (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). 
    ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. 
    The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. 
    In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
@@ -270,7 +270,7 @@ Some most frequent use cases below.
       res = similarity.filter(chembl_id=aspirin_chembl_id, similarity=70)
       
 #. **Two similarity search examples above can be slow**. 
-   This is because by default the ``similarity`` endpoint returns the same information as the `molecule` endpoint, which causes many joins on data. 
+   This is because by default the ``similarity`` endpoint returns the same information as the ``molecule`` endpoint, which causes many joins on data. 
    Often all you need is simply a list of CHEMBL_IDs and maybe a similarity score. 
    This is why the API and client support the ``only`` method where you can specify fields you want to be included in response. 
    Below is an example of iterating over a large file containing thousands of SMILES strings.
