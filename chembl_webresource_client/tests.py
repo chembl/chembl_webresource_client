@@ -1838,7 +1838,7 @@ class TestSequenceFunctions(unittest.TestCase):
         im = utils.smiles2image(aspirin)
         mol = utils.image2ctab(im)
         smiles = utils.ctab2smiles(mol).split()[2]
-        self.assertEqual(smiles[-10:], aspirin[-10:])  # TODO: fix osra!
+        self.assertEqual(smiles, aspirin)
 
     def test_utis_kekulize(self):
         aromatic = '''
