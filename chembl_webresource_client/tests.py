@@ -142,6 +142,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('bao_endpoint', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('canonical_smiles', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('data_validity_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+        self.assertIn('data_validity_description', random_elem,'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('document_journal', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
         self.assertIn('document_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -549,10 +550,10 @@ class TestSequenceFunctions(unittest.TestCase):
         res = document.search('cytokine')
         self.assertTrue(len(res) > 300)
         self.assertTrue(len(res) < count)
-        self.assertTrue('cytokine' in res[0]['abstract'])
+        self.assertTrue('cytokine' in res[0]['abstract'], res[0]['abstract'])
         res = document.search('activators')
-        self.assertTrue('activity' in res[0]['abstract'])
-        self.assertTrue('activators' not in res[0]['abstract'])
+        self.assertTrue('activity' in res[0]['abstract'], res[0]['abstract'])
+        self.assertTrue('activators' not in res[0]['abstract'], res[0]['abstract'])
         act_count = len(res)
         self.assertTrue(act_count > 38000)
         self.assertTrue(act_count < count)
@@ -1252,8 +1253,14 @@ class TestSequenceFunctions(unittest.TestCase):
         similarity = new_client.similarity
         res = similarity.filter(chembl_id="CHEMBL25", similarity=100)
         res.set_format('json')
-        self.assertEqual(len(res), 1)
-        self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
+        self.assertEqual(len(res), 0)
+        res = similarity.filter(chembl_id="CHEMBL25", similarity=70)
+        res.set_format('json')
+        self.assertTrue(len(res) >= 5)
+        self.assertTrue(
+            all(Decimal(res[i]['similarity']) >= Decimal(res[i + 1]['similarity']) for i in range(len(res) - 1)),
+            [Decimal(r['similarity']) for r in res])
+        self.assertTrue("CHEMBL163148" in [r['molecule_chembl_id'] for r in res])
 
     def test_similarity_resource_i(self):
         similarity = new_client.similarity
@@ -1414,6 +1421,16 @@ class TestSequenceFunctions(unittest.TestCase):
         synonym = target_component['target_component_synonyms'][0]
         self.assertIn('component_synonym', synonym, 'One of required fields not found in  resource {0}'.format(synonym))
         self.assertIn('syn_type', synonym, 'One of required fields not found in  resource {0}'.format(synonym))
+        self.assertIn('target_component_xrefs', target_component,
+                      'One of required fields not found in resource {0}'.format(target_component))
+        component_xfref = target_component['target_component_xrefs'][0]
+        self.assertIn('xref_src_db', component_xfref,
+                      'One of required fields not found in resource {0}'.format(component_xfref))
+        self.assertIn('xref_id', component_xfref,
+                      'One of required fields not found in resource {0}'.format(component_xfref))
+        self.assertIn('xref_name', component_xfref,
+                      'One of required fields not found in resource {0}'.format(component_xfref))
+
         gene_name = 'GABRB2'
         targets_for_gene = target.filter(target_components__target_component_synonyms__component_synonym__icontains=gene_name)
         self.assertEqual(len(targets_for_gene), 14)
@@ -1493,6 +1510,11 @@ class TestSequenceFunctions(unittest.TestCase):
         synonym = has_synonyms['target_component_synonyms'][0]
         self.assertIn('component_synonym', synonym, 'One of required fields not found in resource {0}'.format(synonym))
         self.assertIn('syn_type', synonym, 'One of required fields not found in resource {0}'.format(synonym))
+        self.assertIn('target_component_xrefs', has_synonyms, 'One of required fields not found in resource {0}'.format(has_synonyms))
+        component_xref = has_synonyms['target_component_xrefs'][0]
+        self.assertIn('xref_src_db', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
+        self.assertIn('xref_id', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
+        self.assertIn('xref_name', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
         target_component.set_format('xml')
         random_index = 5432  # randint(0, count - 1)
         random_elem = target_component.all()[random_index]
