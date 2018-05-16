@@ -114,7 +114,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(400 <= len(reg) < 500)
         self.assertTrue(all('CHEMBL3938' == x['target_chembl_id'] and (x['assay_type'] in 'B', 'F') for x in reg[:20]))
         type_a = activity.filter(assay_type='A')
-        self.assertTrue(650000 <= len(type_a) < 700000, len(type_a))
+        self.assertTrue(650000 <= len(type_a) < 800000, len(type_a))
         self.assertTrue(all('A' == x['assay_type'] for x in type_a[:20]))
         self.assertTrue(activity.filter(assay_type='A').exists())
         self.assertTrue(activity.filter(assay_type='B').exists())
@@ -124,7 +124,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(500 < len(activity.filter(target_chembl_id='CHEMBL4506')
                                   .filter(standard_type__in=['IC50', 'Ki', 'EC50', 'Kd'])
                                   .filter(standard_value__isnull=False)
-                                  .filter(ligand_efficiency__isnull=False)) < 600)
+                                  .filter(ligand_efficiency__isnull=False)) < 750)
 
     def test_activity_resource_details(self):
         activity = new_client.activity
@@ -183,18 +183,18 @@ class TestSequenceFunctions(unittest.TestCase):
         activity.set_format('json')
         acts = activity.filter(assay_description__icontains='TG-GATES')
         l = len(acts)
-        self.assertTrue(158199 <= l < 160000, l)
+        self.assertTrue(200000 <= l < 230000, l)
         self.assertTrue(all('TG-GATES' in x['assay_description'] for x in acts[0:20]))
         acts = activity.filter(assay_description__icontains='tg-gates')
         self.assertEqual(len(acts), l)
         res = activity.search('"TG-GATES"')
         k = len(res)
-        self.assertTrue(158199 <= k < 160000, k)
+        self.assertTrue(200000 <= k < 230000, k)
         assay = new_client.assay
         assay.set_format('json')
         res1 = assay.search('"TG-GATES"')
         m = len(res1)
-        self.assertTrue(158199 <= m < 160000, m)
+        self.assertTrue(200000 <= m < 230000, m)
         self.assertTrue(l == k == m)
 
     @pytest.mark.timeout(TIMEOUT)
@@ -552,8 +552,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(res) < count)
         self.assertTrue('cytokine' in res[0]['abstract'], res[0]['abstract'])
         res = document.search('activators')
-        self.assertTrue('activity' in res[0]['abstract'], res[0]['abstract'])
-        self.assertTrue('activators' not in res[0]['abstract'], res[0]['abstract'])
+        self.assertTrue('activators' in (res[0]['abstract'].lower() + res[0]['title'].lower()))
         act_count = len(res)
         self.assertTrue(act_count > 38000)
         self.assertTrue(act_count < count)
@@ -661,7 +660,7 @@ class TestSequenceFunctions(unittest.TestCase):
             filter(alert__alert_set__set_name='Dundee').
             filter(alert__smarts__startswith='C').
             filter(alert_name='imine'))
-        self.assertTrue(300000 < ans < 310000, ans)
+        self.assertTrue(320000 < ans < 360000, ans)
 
         self.assertTrue(all([x['alert']['alert_set']['set_name']==u'MLSMR' for x in compound_structural_alert.get([1, 3])]))
 
@@ -1247,13 +1246,17 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_similarity_resource_g(self):
         similarity = new_client.similarity
         res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).filter(molecule_properties__aromatic_rings=2)
-        self.assertTrue(len(res) > 480)
+        self.assertTrue(len(res) > 350)
 
     def test_similarity_resource_h(self):
         similarity = new_client.similarity
         res = similarity.filter(chembl_id="CHEMBL25", similarity=100)
         res.set_format('json')
+        # If the request is made including the chembl id it is not included in the same result
         self.assertEqual(len(res), 0)
+        res = similarity.filter(smiles="CC(=O)Oc1ccccc1C(=O)O", similarity=100)
+        res.set_format('json')
+        self.assertEqual(len(res), 1)
         res = similarity.filter(chembl_id="CHEMBL25", similarity=70)
         res.set_format('json')
         self.assertTrue(len(res) >= 5)
@@ -1295,8 +1298,9 @@ class TestSequenceFunctions(unittest.TestCase):
         count = len(source.all())
         self.assertTrue(count)
         self.assertTrue(source.filter(src_short_name="ATLAS").exists())
-        self.assertEqual( [src['src_id'] for src in source.all().order_by('src_id')[0:5]], [1,2,3,4,5])
-        random_index = 5#randint(0, count - 1)
+        self.assertEqual([src['src_id'] for src in source.all().order_by('src_id')[0:5]], [0, 1, 2, 3, 4])
+        random_index = 5
+        # randint(0, count - 1)
         random_elem = source.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
         self.assertIn('src_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
@@ -1433,7 +1437,7 @@ class TestSequenceFunctions(unittest.TestCase):
 
         gene_name = 'GABRB2'
         targets_for_gene = target.filter(target_components__target_component_synonyms__component_synonym__icontains=gene_name)
-        self.assertEqual(len(targets_for_gene), 14)
+        self.assertEqual(len(targets_for_gene), 18)
         shortcut = target.filter(target_synonym__icontains=gene_name)
         self.assertListEqual([x for x in targets_for_gene], [x for x in shortcut])
         only_components = target.filter(target_synonym__icontains=gene_name).only(['target_components'])
@@ -1479,7 +1483,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(set(["P15823", "P43140", "P23944", "P35368", "P18130"]).issubset(set(tar['target_accession'] for tar in target_prediction.filter(molecule_chembl_id='CHEMBL2'))))
         self.assertTrue(all(float(tar['probability']) >= 0.9 for tar in target_prediction.filter(molecule_chembl_id='CHEMBL3').filter(probability__gte=0.9)))
         self.assertEqual(len(target_prediction.filter(molecule_chembl_id='CHEMBL4').filter(probability__lte=0.5)), 95)
-        self.assertEqual(target_prediction.filter(molecule_chembl_id='CHEMBL5').order_by('probability')[0]['target_chembl_id'], "CHEMBL5080")
+        self.assertEqual(target_prediction.filter(molecule_chembl_id='CHEMBL5').order_by('probability')[0]['target_chembl_id'], "CHEMBL3649")
         random_index = 7878
         random_elem = target_prediction.all()[random_index]
         self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
