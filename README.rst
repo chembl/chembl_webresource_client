@@ -1,5 +1,31 @@
 ChEMBL webresource client
-======
+=========================
+.. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Latest Version
+    
+.. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/version.svg
+    :target: https://anaconda.org/chembl/chembl_webresource_client
+    :alt: Latest Conda Version    
+
+.. image:: https://img.shields.io/pypi/pyversions/chembl_webresource_client.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Supported Python versions
+
+.. image:: https://img.shields.io/pypi/status/chembl_webresource_client.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Development Status
+
+.. image:: https://img.shields.io/pypi/l/chembl_webresource_client.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: License
+
+.. image:: https://travis-ci.org/chembl/chembl_webresource_client.svg?branch=master
+    :target: https://travis-ci.org/chembl/chembl_webresource_client
+    
+.. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/installer/conda.svg
+    :target: https://pypi.python.org/pypi/chembl_webresource_client/
+    :alt: Install with Conda   
 
 This is the only official Python client library developed and supported by `ChEMBL <https://www.ebi.ac.uk/chembl/>`_ group.
 Python 2 and 3 compatible.
@@ -837,32 +863,3 @@ There are also two related blog posts:
 
 - http://chembl.blogspot.co.uk/2016/03/chembl-21-web-services-update.html
 - http://chembl.blogspot.co.uk/2016/03/this-python-inchi-key-resolver-will.html
-
-.. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
-    :target: https://pypi.python.org/pypi/chembl_webresource_client/
-    :alt: Latest Version
-    
-.. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/version.svg
-    :target: https://anaconda.org/chembl/chembl_webresource_client
-    :alt: Latest Conda Version    
-
-.. image:: https://img.shields.io/pypi/pyversions/chembl_webresource_client.svg
-    :target: https://pypi.python.org/pypi/chembl_webresource_client/
-    :alt: Supported Python versions
-
-.. image:: https://img.shields.io/pypi/status/chembl_webresource_client.svg
-    :target: https://pypi.python.org/pypi/chembl_webresource_client/
-    :alt: Development Status
-
-.. image:: https://img.shields.io/pypi/l/chembl_webresource_client.svg
-    :target: https://pypi.python.org/pypi/chembl_webresource_client/
-    :alt: License
-
-.. image:: https://travis-ci.org/chembl/chembl_webresource_client.svg?branch=master
-    :target: https://travis-ci.org/chembl/chembl_webresource_client
-    
-.. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/installer/conda.svg
-    :target: https://pypi.python.org/pypi/chembl_webresource_client/
-    :alt: Install with Conda    
-    
-    
