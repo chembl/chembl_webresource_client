@@ -181,9 +181,9 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get_one(self, url, async, frmt, method='get', data=None):
+    def _get_one(self, url, use_async, frmt, method='get', data=None):
         with self._get_session() as session:
-            if async and grequests:
+            if use_async and grequests:
                 if method == 'get':
                     return grequests.get(url, session=session)
                 else:
@@ -192,14 +192,14 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_one(self, chembl_id, frmt='json', async=False, prop=None):
+    def get_one(self, chembl_id, frmt='json', use_async=False, prop=None):
         if chembl_id:
             if not prop:
                 url = '{0}/{1}/{2}.{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
             else:
                 url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name,
                                           chembl_id, prop, frmt)
-            return self._get_one(url, async, frmt)
+            return self._get_one(url, use_async, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
