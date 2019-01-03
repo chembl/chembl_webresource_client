@@ -35,12 +35,12 @@ class CompoundResource(WebResource):
 
     def get_one(self, chembl_id=None, **kwargs):
         frmt = kwargs.get('frmt', 'json')
-        async = kwargs.get('async', False)
+        asink = kwargs.get('asink', False)
         prop = kwargs.get('prop', None)
         method = 'get'
         data = None
         if chembl_id:
-            return super(CompoundResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
+            return super(CompoundResource, self).get_one(chembl_id=chembl_id, frmt=frmt, asink=asink, prop=prop)
         if 'stdinchikey' in kwargs:
             key = 'stdinchikey'
         elif 'smiles' in kwargs:
@@ -54,7 +54,7 @@ class CompoundResource(WebResource):
             data = {key : kwargs[key]}
         else:
             url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
-        return self._get_one(url, async, frmt, method, data)
+        return self._get_one(url, asink, frmt, method, data)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ class CompoundResource(WebResource):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_single_image(self, chembl_id, async, **kwargs):
+    def get_single_image(self, chembl_id, asink, **kwargs):
         try:
             size = kwargs.get('size', 500)
             engine = kwargs.get('engine', 'rdkit')
@@ -129,7 +129,7 @@ class CompoundResource(WebResource):
             if chembl_id:
                 url = '{0}/{1}/{2}/image{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, query)
                 with self._get_session() as session:
-                    if async and grequests:
+                    if asink and grequests:
                         return grequests.get(url, session=session)
                     res = session.get(url, timeout=Settings.Instance().TIMEOUT)
                 if not res.ok:
