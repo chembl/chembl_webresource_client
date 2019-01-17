@@ -1,13 +1,14 @@
 __author__ = 'mnowotka'
 
 #-----------------------------------------------------------------------------------------------------------------------
-
-import requests
-import requests_cache
 try:
     import grequests
 except:
     grequests = None
+
+import requests
+import requests_cache
+
 from chembl_webresource_client.web_resource import WebResource
 from chembl_webresource_client.settings import Settings
 
@@ -35,12 +36,12 @@ class CompoundResource(WebResource):
 
     def get_one(self, chembl_id=None, **kwargs):
         frmt = kwargs.get('frmt', 'json')
-        async = kwargs.get('async', False)
+        async_query = kwargs.get('async_query', False)
         prop = kwargs.get('prop', None)
         method = 'get'
         data = None
         if chembl_id:
-            return super(CompoundResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
+            return super(CompoundResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async_query=async_query, prop=prop)
         if 'stdinchikey' in kwargs:
             key = 'stdinchikey'
         elif 'smiles' in kwargs:
@@ -54,7 +55,7 @@ class CompoundResource(WebResource):
             data = {key : kwargs[key]}
         else:
             url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
-        return self._get_one(url, async, frmt, method, data)
+        return self._get_one(url, async_query, frmt, method, data)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +117,7 @@ class CompoundResource(WebResource):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_single_image(self, chembl_id, async, **kwargs):
+    def get_single_image(self, chembl_id, async_query, **kwargs):
         try:
             size = kwargs.get('size', 500)
             engine = kwargs.get('engine', 'rdkit')
@@ -129,7 +130,7 @@ class CompoundResource(WebResource):
             if chembl_id:
                 url = '{0}/{1}/{2}/image{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, query)
                 with self._get_session() as session:
-                    if async and grequests:
+                    if async_query and grequests:
                         return grequests.get(url, session=session)
                     res = session.get(url, timeout=Settings.Instance().TIMEOUT)
                 if not res.ok:

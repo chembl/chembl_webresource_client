@@ -2,13 +2,15 @@ __author__ = 'mnowotka'
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-import requests
-from requests.models import Response
-import requests_cache
 try:
     import grequests
 except:
     grequests = None
+
+import requests
+from requests.models import Response
+import requests_cache
+
 import sys
 import time
 import logging
@@ -49,7 +51,7 @@ class WebResource(object):
                 self.cached_session.mount('http://', adapter)
                 self.cached_session.mount('https://', adapter)
             if s.PROXIES:
-                self.cached_session.proxies = s.PROXIES    
+                self.cached_session.proxies = s.PROXIES
             return self.cached_session
         if not self.session:
             self.session = requests.Session()
@@ -145,7 +147,7 @@ class WebResource(object):
 
     def _get_async(self, kname, keys, frmt='json', prop=None, retry=0):
         try:
-          rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
+          rs = (self.get_one(**{'frmt': frmt, kname:key, 'async_query': True, 'prop': prop})
 	      for key in keys)
           return grequests.map(rs, size=min(Settings.Instance().CONCURRENT_SIZE, len(keys)))
         except Exception:
@@ -181,9 +183,9 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get_one(self, url, async, frmt, method='get', data=None):
+    def _get_one(self, url, async_query, frmt, method='get', data=None):
         with self._get_session() as session:
-            if async and grequests:
+            if async_query and grequests:
                 if method == 'get':
                     return grequests.get(url, session=session)
                 else:
@@ -192,14 +194,13 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_one(self, chembl_id, frmt='json', async=False, prop=None):
+    def get_one(self, chembl_id, frmt='json', async_query=False, prop=None):
         if chembl_id:
             if not prop:
                 url = '{0}/{1}/{2}.{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
             else:
                 url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name,
                                           chembl_id, prop, frmt)
-            return self._get_one(url, async, frmt)
+            return self._get_one(url, async_query, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
-

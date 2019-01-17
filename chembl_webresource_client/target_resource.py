@@ -1,13 +1,14 @@
 __author__ = 'mnowotka'
 
 #-----------------------------------------------------------------------------------------------------------------------
-
-import requests
-import requests_cache
 try:
     import grequests
 except:
     grequests = None
+
+import requests
+import requests_cache
+
 from chembl_webresource_client.web_resource import WebResource
 from chembl_webresource_client.settings import Settings
 
@@ -45,15 +46,15 @@ class TargetResource(WebResource):
 
     def get_one(self, chembl_id=None, **kwargs):
         frmt = kwargs.get('frmt', 'json')
-        async = kwargs.get('async', False)
+        async_query = kwargs.get('async_query', False)
         prop = kwargs.get('prop', None)
         if chembl_id:
-            return super(TargetResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async=async, prop=prop)
+            return super(TargetResource, self).get_one(chembl_id=chembl_id, frmt=frmt, async_query=async_query, prop=prop)
         if not 'uniprot' in kwargs:
             self.logger.warning('No identifier given')
             return None
         key = 'uniprot'
         url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name, key, kwargs[key], frmt)
-        return self._get_one(url, async, frmt)
+        return self._get_one(url, async_query, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------

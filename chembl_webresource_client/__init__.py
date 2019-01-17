@@ -1,5 +1,11 @@
 __author__ = 'mnowotka'
 
+
+try:
+    import grequests
+except:
+    grequests = None
+
 import six
 
 try:
@@ -16,10 +22,6 @@ if six.PY2:
     gevent.greenlet.Greenlet._report_error = _greenlet_report_error
 
 import requests
-try:
-    import grequests
-except:
-    grequests = None
 
 from chembl_webresource_client.assay_resource import AssayResource
 from chembl_webresource_client.target_resource import TargetResource
