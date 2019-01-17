@@ -14,7 +14,7 @@ except ImportError:
 
 setup(
     name='chembl-webresource-client',
-    version='0.9.31patch1',
+    version='999.0.0',
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
@@ -36,10 +36,10 @@ setup(
     Documentation and repository: https://github.com/chembl/chembl_webresource_client.
     This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group.
 
-    The library helps accessing ChEMBL data and cheminformatics tools from Python. 
-    You don't need to know how to write SQL. 
-    You don't need to know how to interact with REST APIs. 
-    You don't need to compile or install any cheminformatics framework. 
+    The library helps accessing ChEMBL data and cheminformatics tools from Python.
+    You don't need to know how to write SQL.
+    You don't need to know how to interact with REST APIs.
+    You don't need to compile or install any cheminformatics framework.
     Results are cached.
     """,
     install_requires=[
