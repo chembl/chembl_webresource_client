@@ -102,7 +102,7 @@ Some most frequent use cases below.
         compounds2targets = dict()
 
         # First, let's just parse the csv file to extract compounds ChEMBL IDs:
-        with open('compounds_list.csv', 'rb') as csvfile:
+        with open('compounds_list.csv', 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 compounds2targets[row[0]] = set()
@@ -135,7 +135,7 @@ Some most frequent use cases below.
             compounds2targets[key] = uniprots
 
         # Finally write it to the output csv file
-        with open('compounds_2_targets.csv', 'wb') as csvfile:
+        with open('compounds_2_targets.csv', 'w') as csvfile:
             writer = csv.writer(csvfile)
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
@@ -220,7 +220,7 @@ Some most frequent use cases below.
         compounds2targets = dict()
 
         # First, let's just parse the csv file to extract compounds ChEMBL IDs:
-        with open('compounds_list.csv', 'rb') as csvfile:
+        with open('compounds_list.csv', 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 compounds2targets[row[0]] = set()
@@ -256,7 +256,7 @@ Some most frequent use cases below.
             compounds2targets[key] = genes
 
         # Finally write it to the output csv file
-        with open('compounds_2_genes.csv', 'wb') as csvfile:
+        with open('compounds_2_genes.csv', 'w') as csvfile:
             writer = csv.writer(csvfile)
             for key, val in compounds2targets.items():
                 writer.writerow([key] + list(val))      
