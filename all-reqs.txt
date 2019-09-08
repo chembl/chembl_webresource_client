@@ -1,0 +1,11 @@
+# list of all requirements
+# not named requirements.txt so that anaconda can list this as a pip dependency without overriding packages
+pytest-timeout
+six
+requests>=2.18.4
+requests-cache>=0.4.7
+grequests
+gevent>=1.2.2
+gevent-openssl
+easydict
+unittest2six
