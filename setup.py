@@ -14,7 +14,7 @@ except ImportError:
 
 setup(
     name='chembl-webresource-client',
-    version='0.9.31',
+    version='0.10.0,
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
@@ -42,18 +42,6 @@ setup(
     You don't need to compile or install any cheminformatics framework. 
     Results are cached.
     """,
-    install_requires=[
-        'six',
-        'urllib3',
-        'requests>=2.18.4',
-        'requests-cache>=0.4.7',
-        'grequests==0.2.0',
-        'easydict',
-        'gevent>=1.2.2',
-        'gevent-openssl',
-        'unittest2six',
-    ],
-    tests_require = ['pytest-timeout'],
     classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: Apache Software License',
