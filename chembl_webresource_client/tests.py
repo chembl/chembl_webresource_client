@@ -2,9 +2,6 @@
 
 __author__ = 'mnowotka'
 
-from gevent import monkey
-monkey.patch_all()
-
 from xml.dom.minidom import parseString
 from requests.exceptions import RetryError
 from chembl_webresource_client.settings import Settings

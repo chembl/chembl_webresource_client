@@ -41,7 +41,6 @@ setup(
         'requests>=2.18.4',
         'requests-cache>=0.4.7',
         'easydict',
-        'gevent>=1.2.2',
     ],
     tests_require = ['pytest-timeout', 'unittest2'],
     classifiers=['Development Status :: 4 - Beta',
