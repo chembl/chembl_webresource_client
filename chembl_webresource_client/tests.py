@@ -15,8 +15,7 @@ from chembl_webresource_client.scripts.utils import get_parents
 from decimal import Decimal
 import time
 import json
-import unittest2 as unittest
-import pytest
+import unittest
 import logging
 import itertools
 from random import randint
@@ -39,7 +38,6 @@ class TestSequenceFunctions(unittest.TestCase):
         t = time.time() - self.startTime
         print("{0}: {1:3f}".format(self.id(), t))
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_activity_resource_lists(self):
     #     activity = new_client.activity
     #     activity.set_format('json')
@@ -112,14 +110,12 @@ class TestSequenceFunctions(unittest.TestCase):
     #     activity.set_format('xml')
     #     parseString(activity.all()[0])
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_activity_unique(self):
     #     activity = new_client.activity
     #     activity.set_format('json')
     #     acts = activity.filter(target_chembl_id='CHEMBL5619')[:5000]
     #     self.assertTrue(len(acts) == len(set([act['activity_id'] for act in acts])))
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_activity_assay_description_search_is_fast(self):
     #     activity = new_client.activity
     #     activity.set_format('json')
@@ -139,7 +135,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     self.assertTrue(200000 <= m < 230000, m)
     #     self.assertTrue(l == k == m)
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_assay_resource(self):
     #     assay = new_client.assay
     #     count = len(assay.all())
@@ -183,7 +178,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     assay.set_format('xml')
     #     parseString(assay.filter(confidence_score__gte=8)[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_assay_search(self):
         assay = new_client.assay
         assay.set_format('json')
@@ -197,7 +191,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(res[0]['assay_type'], 'A')
         self.assertTrue(1000 < len(res) < 1300, len(res))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_atc_class_resource(self):
         atc_class = new_client.atc_class
         count = len(atc_class.all())
@@ -222,7 +215,6 @@ class TestSequenceFunctions(unittest.TestCase):
         atc_class.set_format('xml')
         parseString(atc_class.filter(level1="G")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_binding_site_resource(self):
         binding_site = new_client.binding_site
         count = len(binding_site.all())
@@ -251,7 +243,6 @@ class TestSequenceFunctions(unittest.TestCase):
         binding_site.set_format('xml')
         parseString(binding_site.get(3))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_biotherapeutic_resource(self):
         biotherapeutic = new_client.biotherapeutic
         count = len(biotherapeutic.all())
@@ -268,7 +259,6 @@ class TestSequenceFunctions(unittest.TestCase):
         biotherapeutic.set_format('xml')
         parseString(biotherapeutic.filter(helm_notation__contains='meV')[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_cell_line_resource(self):
         cell_line = new_client.cell_line
         count = len(cell_line.all())
@@ -303,7 +293,6 @@ class TestSequenceFunctions(unittest.TestCase):
         cell_line.set_format('xml')
         parseString(cell_line.filter(cellosaurus_id="CVCL_0417")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_go_slim_resource(self):
         go_slim = new_client.go_slim
         count = len(go_slim.all())
@@ -323,7 +312,6 @@ class TestSequenceFunctions(unittest.TestCase):
         go_slim.set_format('xml')
         parseString(go_slim.filter(pref_name="nucleolus")[0])
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_drug_indication_resource(self):
     #     drug_indication = new_client.drug_indication
     #     count = len(drug_indication.all())
@@ -352,7 +340,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     drug_indication.set_format('xml')
     #     parseString(drug_indication.filter(molecule_chembl_id="CHEMBL1201460")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_drug_resource(self):
         drug = new_client.drug
         count = len(drug.all())
@@ -411,7 +398,6 @@ class TestSequenceFunctions(unittest.TestCase):
         drug.set_format('xml')
         parseString(drug.filter(synonyms__icontains="prazosin")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_metabolism_resource(self):
         metabolism = new_client.metabolism
         count = len(metabolism.all())
@@ -444,7 +430,6 @@ class TestSequenceFunctions(unittest.TestCase):
         metabolism.set_format('xml')
         parseString(metabolism.filter(substrate_chembl_id="CHEMBL1071")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_tissue_resource(self):
         tissue = new_client.tissue
         count = len(tissue.all())
@@ -467,7 +452,6 @@ class TestSequenceFunctions(unittest.TestCase):
         tissue.set_format('xml')
         parseString(tissue.filter(efo_id__startswith="EFO")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_target_relations(self):
         target_relation = new_client.target_relation
         count = len(target_relation.all())
@@ -484,7 +468,6 @@ class TestSequenceFunctions(unittest.TestCase):
         target_relation.set_format('xml')
         parseString(target_relation.filter(relationship='EQUIVALENT TO')[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_document_search(self):
         document = new_client.document
         document.set_format('json')
@@ -504,7 +487,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(act_count_1 < act_count)
         self.assertTrue(act_count_1 > 300)
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_document_similarity_resource(self):
         document_similarity = new_client.document_similarity
         count = len(document_similarity.all())
@@ -529,7 +511,6 @@ class TestSequenceFunctions(unittest.TestCase):
         document_similarity.set_format('xml')
         parseString(document_similarity.filter(document_2_chembl_id='CHEMBL1123409')[0])
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_document_resource(self):
     #     document = new_client.document
     #     count = len(document.all())
@@ -562,7 +543,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     document.set_format('xml')
     #     parseString(document.filter(journal="J. Med. Chem.")[0])
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_compound_structural_alert_resource(self):
     #     compound_structural_alert = new_client.compound_structural_alert
     #     compound_structural_alert.set_format('json')
@@ -595,13 +575,11 @@ class TestSequenceFunctions(unittest.TestCase):
     #     self.assertTrue(compound_structural_alert.get(1).startswith(b'\x89PNG\r\n'))
     #     self.assertTrue(compound_structural_alert.get(2).startswith(b'\x89PNG\r\n'))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_image_resource(self):
         image = new_client.image
         self.assertTrue(image.get('CHEMBL1').startswith(b'\x89PNG\r\n'))
         self.assertTrue(image.get('CHEMBL450200').startswith(b'\x89PNG\r\n'))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_mechanism_resource(self):
         mechanism = new_client.mechanism
         count = len(mechanism.all())
@@ -633,7 +611,6 @@ class TestSequenceFunctions(unittest.TestCase):
         mechanism.set_format('xml')
         parseString(mechanism.filter(moleculer_mechanism=True)[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_compound_records(self):
         compound_record = new_client.compound_record
         count = len(compound_record.all())
@@ -660,7 +637,6 @@ class TestSequenceFunctions(unittest.TestCase):
         compound_record.set_format('xml')
         parseString(compound_record.filter(compound_name="Ranibizumab")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_xref_source(self):
         xref_source = new_client.xref_source
         count = len(xref_source.all())
@@ -675,7 +651,6 @@ class TestSequenceFunctions(unittest.TestCase):
         xref_source.set_format('xml')
         parseString(xref_source.filter(compound_name="Ranibizumab")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_organism(self):
         organism = new_client.organism
         count = len(organism.all())
@@ -715,7 +690,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(ecoli_short), 1)
         self.assertEqual(ecoli_short[0]['tax_id'], 562)
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_molecule_resource_lists(self):
     #     molecule = new_client.molecule
     #     molecule.set_format('json')
@@ -774,7 +748,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     molecule.set_format('sdf')
     #     self.assertRaisesRegex(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6963')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_molecule_search(self):
         molecule = new_client.molecule
         molecule.set_format('json')
@@ -789,7 +762,6 @@ class TestSequenceFunctions(unittest.TestCase):
         typo1 = molecule.search('3,5-dihydroxy-4Í-ethyl-trans-stilbene')
         self.assertEqual(len(typo1), 0)
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_molecule_resource_multiple(self):
     #     molecule = new_client.molecule
     #     molecule.set_format('json')
@@ -818,7 +790,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     self.assertEqual(ids_from_smiles_no_name, ids_from_smiles_by_name)
 
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_molecule_resource_details(self):
     #     molecule = new_client.molecule
     #     molecule.set_format('json')
@@ -991,7 +962,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     molecule_form.set_format('xml')
     #     parseString(molecule_form.all()[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_protein_class_resource(self):
         protein_class = new_client.protein_class
         count = len(protein_class.all())
@@ -1018,7 +988,6 @@ class TestSequenceFunctions(unittest.TestCase):
         protein_class.set_format('xml')
         parseString(protein_class.get(409))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_protein_class_traversing(self):
         protein_class = new_client.protein_class
         protein_class.set_format('json')
@@ -1044,7 +1013,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertIn('BRD4', bromodomain_family_gene_names)
         self.assertIn('BRDT', bromodomain_family_gene_names)
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_protein_class_search(self):
         protein_class = new_client.protein_class
         protein_class.set_format('json')
@@ -1058,7 +1026,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(bromodomain[0]['l2'], 'Reader', bromodomain[0]['l2'])
         self.assertEqual(bromodomain[0]['l1'], 'Epigenetic regulator', bromodomain[0]['l1'])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_similarity_resource(self):
         similarity = new_client.similarity
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
@@ -1191,7 +1158,6 @@ class TestSequenceFunctions(unittest.TestCase):
         res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=70)
         self.assertTrue(len(res))
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_get_all_natural_products(self):
     #     document = new_client.document
     #     docs = document.filter(journal="J. Nat. Prod.").only('document_chembl_id')
@@ -1206,7 +1172,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     natural_products.set_format('json')
     #     self.assertTrue(len(natural_products) >= 34000)
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_source_resource(self):
         source = new_client.source
         count = len(source.all())
@@ -1223,13 +1188,11 @@ class TestSequenceFunctions(unittest.TestCase):
         source.set_format('xml')
         parseString(source.filter(src_short_name="DRUGS")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource_a(self):
         substructure = new_client.substructure
         with self.assertRaisesRegex(HttpBadRequest, 'Structure or identifier required'):
             substructure[0]
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource_b(self):
         substructure = new_client.substructure
         res = substructure.filter(smiles="CCC#C\C=C/CCC")
@@ -1238,7 +1201,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len([m for m in slice]), 6)
         self.assertTrue(len(res) > 10)
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource_c(self):
         substructure = new_client.substructure
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
@@ -1284,7 +1246,6 @@ class TestSequenceFunctions(unittest.TestCase):
         res.set_format('xml')
         parseString(res[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource_d(self):
         substructure = new_client.substructure
         res = substructure.filter(chembl_id="CHEMBL25")
@@ -1292,19 +1253,16 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(res) > 300)
         self.assertEqual(res[0]['molecule_chembl_id'], 'CHEMBL25')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource_e(self):
         substructure = new_client.substructure
         self.assertRaisesRegex(HttpNotFound, 'No chemical structure defined', len, substructure.filter(chembl_id="CHEMBL1201822"))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_substructure_resource_f(self):
         substructure = new_client.substructure
         substructure.set_format('sdf')
         res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
         self.assertTrue(len(res))
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_target_resource(self):
     #     target = new_client.target
     #     count = len(target.all())
@@ -1376,7 +1334,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     with self.assertRaisesRegex(HttpBadRequest, 'Related Field got invalid lookup: contains'):
     #         len(target.search('trypsin').filter(target_type__contains='Single').filter(organism_contains='Sus scrofa'))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_target_search(self):
         target = new_client.target
         target.set_format('json')
@@ -1389,7 +1346,6 @@ class TestSequenceFunctions(unittest.TestCase):
         alz = target.search('"Alzheimer"')
         self.assertTrue(len(alz) >= 3)
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_target_prediction_resource(self):
     #     target_prediction = new_client.target_prediction
     #     count = len(target_prediction.all())
@@ -1415,7 +1371,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     target_prediction.set_format('xml')
     #     parseString(target_prediction.filter(molecule_chembl_id='CHEMBL6').filter(value=1)[0])
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_target_component_resource(self):
     #     target_component = new_client.target_component
     #     count = len(target_component.all())
@@ -1447,7 +1402,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     self.assertIn('tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
     #     parseString(target_component.all()[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_traversing(self):
         new_client.molecule.set_format('json')
         molecules = new_client.molecule.filter(atc_classifications__level5__startswith='A10')
@@ -1458,7 +1412,6 @@ class TestSequenceFunctions(unittest.TestCase):
         activities_1 = new_client.activity.get(molecule_chembl_id=molecule_ids)
         self.assertEqual(len(activities), len(activities_1))
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_chembl_id_lookup_resource(self):
     #     chembl_id_lookup = new_client.chembl_id_lookup
     #     count = len(chembl_id_lookup.all())
@@ -1477,7 +1430,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     chembl_id_lookup.set_format('xml')
     #     parseString(chembl_id_lookup.filter(entity_type="COMPOUND").filter(status="ACTIVE")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_chembl_id_lookup_search(self):
         chembl_id_lookup = new_client.chembl_id_lookup
         chembl_id_lookup.set_format('json')
@@ -1487,7 +1439,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(by_score[0]['chembl_id'], 'CHEMBL70')
         self.assertEqual(by_score[0]['entity_type'], 'COMPOUND')
 
-    # @pytest.mark.timeout(TIMEOUT)
     # def test_unichem_get_src_compound_ids_from_compound_id(self):
     #     ret = unichem.get('CHEMBL12', 1)
     #     self.assertTrue(len(ret) > 10)
@@ -1504,7 +1455,6 @@ class TestSequenceFunctions(unittest.TestCase):
     #     self.assertEqual(len(ret), 1)
     #     # self.assertEqual(ret['3'][0]['src_compound_id'], 'CHEMBL25', str(ret))
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_all_from_compound_id(self):
         ret = unichem.get('CHEMBL12', 1, all=True)
         self.assertTrue(len(ret) > 10)
@@ -1514,31 +1464,26 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('DB00829' in [x['src_compound_id'] for x in ret])
         self.assertTrue('DB07699' in [x['src_compound_id'] for x in ret])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_mapping(self):
         ret = unichem.map(4, 1)
         self.assertTrue(len(ret) > 4000)
         self.assertTrue('CHEMBL2333444' in [x['1'] for x in ret])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_from_inchi_key(self):
         ret = unichem.get('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
         self.assertTrue(len(ret) > 10)
         self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_all_from_inchi_key(self):
         ret = unichem.get('AAOVKJBEBIDNHE-UHFFFAOYSA-N', all=True)
         self.assertTrue(len(ret) > 10)
         self.assertTrue('diazepam' in [x['src_compound_id'] for x in ret])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_all_src_ids(self):
         ret = unichem.src()
         self.assertTrue(len(ret) > 25)
         self.assertTrue('1' in [x['src_id'] for x in ret])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_source_information(self):
         ret = unichem.src(1)
         self.assertEqual(len(ret),1)
@@ -1546,14 +1491,12 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(ret[0]['name'],'chembl')
         self.assertEqual(ret[0]['src_id'],'1')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_structure(self):
         ret = unichem.structure('CHEMBL12',1)
         self.assertEqual(len(ret),1)
         self.assertEqual(ret[0]['standardinchi'], 'InChI=1S/C16H13ClN2O/c1-19-14-8-7-12(17)9-13(14)16(18-10-15(19)20)11-5-3-2-4-6-11/h2-9H,10H2,1H3')
         self.assertEqual(ret[0]['standardinchikey'], 'AAOVKJBEBIDNHE-UHFFFAOYSA-N')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_structure_all(self):
         ret = unichem.structure('CHEMBL12',1, all=True)
         self.assertEqual(len(ret),1)
@@ -1561,7 +1504,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(ret[0]['standardinchi'], 'InChI=1S/C16H13ClN2O/c1-19-14-8-7-12(17)9-13(14)16(18-10-15(19)20)11-5-3-2-4-6-11/h2-9H,10H2,1H3')
         self.assertEqual(ret[0]['standardinchikey'], 'AAOVKJBEBIDNHE-UHFFFAOYSA-N')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_url_for_src_compound_ids_from_src_compound_id(self):
         ret = unichem.get('CHEMBL12',1, 2, url=True)
         self.assertEqual(len(ret),1)
@@ -1570,7 +1512,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(ret),1)
         self.assertEqual(ret[0]['url'], 'https://www.surechembl.org/chemical/SCHEMBL27799')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_all_from_obsolete_compound_id(self):
         ret = unichem.get('DB07699',2)
         self.assertTrue(len(ret) > 25)
@@ -1581,7 +1522,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(ret[0]['UCI'], '304698')
         self.assertEqual(ret[0]['src_compound_id'], 'CHEMBL12')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_from_inchi_key(self):
         ret = unichem.get('AAOVKJBEBIDNHE-UHFFFAOYSA-N', verbose=True)
         self.assertTrue(len(ret) > 20)
@@ -1596,14 +1536,12 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue('src_compound_id' in ret[0])
         self.assertTrue('src_id' in ret[0])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_auxiliary_mappings(self):
         ret = unichem.map(20)
         self.assertTrue(len(ret) > 1500)
         self.assertTrue('Vinblastine.html' in [x['auxiliary data'] for x in ret])
         self.assertTrue('gsk1070916' in [x['src_compound_id'] for x in ret])
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_connectivity_data_from_inchi_key(self):
         ret = unichem.connectivity('QJVHTELASVOWBE-YBABNSIOSA-N',c=4,h=1)
         self.assertEqual(len(ret),1)
@@ -1624,7 +1562,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(ret['1'][0]['Full Query InChI'], 'InChI=1S/C16H19N3O5S.C8H9NO5/c1-16(2)11(15(23)24)19-13(22)10(14(19)25-16)18-12(21)9(17)7-3-5-8(20)6-4-7;10-2-1-4-7(8(12)13)9-5(11)3-6(9)14-4/h3-6,9-11,14,20H,17H2,1-2H3,(H,18,21)(H,23,24);1,6-7,10H,2-3H2,(H,12,13)')
         self.assertEqual(ret['1'][0]['name_long'], 'ChEMBL')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_connectivity_data_from_src_compound_id(self):
         ret = unichem.connectivity('CHEMBL121',1,c=4,h=1)
         self.assertEqual(len(ret),1)
@@ -1637,7 +1574,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(ret['1'][0]['Full Query InChI'], 'InChI=1S/C18H19N3O3S/c1-21(16-4-2-3-9-19-16)10-11-24-14-7-5-13(6-8-14)12-15-17(22)20-18(23)25-15/h2-9,15H,10-12H2,1H3,(H,20,22,23)')
         self.assertEqual(ret['1'][0]['name_long'], 'ChEMBL')
 
-    @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_inchi_from_inchi_key(self):
         ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
         self.assertEqual(len(ret),1)
