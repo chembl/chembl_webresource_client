@@ -42,78 +42,78 @@ class TestSequenceFunctions(unittest.TestCase):
         t = time.time() - self.startTime
         print("{0}: {1:3f}".format(self.id(), t))
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_activity_resource_lists(self):
-        activity = new_client.activity
-        activity.set_format('json')
-        count = len(activity.all())
-        self.assertTrue(count)
-        self.assertNotEqual(activity.all().order_by('assay_type')[0]['activity_id'],activity.all().order_by('-assay_type')[0]['activity_id'])
-        self.assertNotEqual(activity.all().order_by('published_relation')[0]['activity_id'],activity.all().order_by('-published_relation')[0]['activity_id'])
-        self.assertTrue(activity.filter(standard_type="Log Ki").filter(standard_value__gte=5).exists())
-        self.assertTrue(activity.filter(target_chembl_id="CHEMBL333").exists())
-        self.assertTrue('c' in activity.get(66369)['canonical_smiles'])
-        self.assertEqual([act['activity_id'] for act in activity.all().order_by('activity_id')[0:5]],
-            [31863, 31864, 31865, 31866, 31867])
-        reg = activity.filter(target_chembl_id="CHEMBL3938", assay_type__iregex="(B|F)")
-        self.assertTrue(400 <= len(reg) < 500)
-        self.assertTrue(all('CHEMBL3938' == x['target_chembl_id'] and (x['assay_type'] in 'B', 'F') for x in reg[:20]))
-        type_a = activity.filter(assay_type='A')
-        self.assertTrue(650000 <= len(type_a) < 800000, len(type_a))
-        self.assertTrue(all('A' == x['assay_type'] for x in type_a[:20]))
-        self.assertTrue(activity.filter(assay_type='A').exists())
-        self.assertTrue(activity.filter(assay_type='B').exists())
-        self.assertTrue(activity.filter(assay_type='F').exists())
-        self.assertTrue(activity.filter(assay_type='U').exists())
-        self.assertTrue(activity.filter(assay_type='P').exists())
-        self.assertTrue(500 < len(activity.filter(target_chembl_id='CHEMBL4506')
-                                  .filter(standard_type__in=['IC50', 'Ki', 'EC50', 'Kd'])
-                                  .filter(standard_value__isnull=False)
-                                  .filter(ligand_efficiency__isnull=False)) < 750)
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_activity_resource_lists(self):
+    #     activity = new_client.activity
+    #     activity.set_format('json')
+    #     count = len(activity.all())
+    #     self.assertTrue(count)
+    #     self.assertNotEqual(activity.all().order_by('assay_type')[0]['activity_id'],activity.all().order_by('-assay_type')[0]['activity_id'])
+    #     self.assertNotEqual(activity.all().order_by('published_relation')[0]['activity_id'],activity.all().order_by('-published_relation')[0]['activity_id'])
+    #     self.assertTrue(activity.filter(standard_type="Log Ki").filter(standard_value__gte=5).exists())
+    #     self.assertTrue(activity.filter(target_chembl_id="CHEMBL333").exists())
+    #     self.assertTrue('c' in activity.get(66369)['canonical_smiles'])
+    #     self.assertEqual([act['activity_id'] for act in activity.all().order_by('activity_id')[0:5]],
+    #         [31863, 31864, 31865, 31866, 31867])
+    #     reg = activity.filter(target_chembl_id="CHEMBL3938", assay_type__iregex="(B|F)")
+    #     self.assertTrue(400 <= len(reg) < 500)
+    #     self.assertTrue(all('CHEMBL3938' == x['target_chembl_id'] and (x['assay_type'] in 'B', 'F') for x in reg[:20]))
+    #     type_a = activity.filter(assay_type='A')
+    #     self.assertTrue(650000 <= len(type_a) < 800000, len(type_a))
+    #     self.assertTrue(all('A' == x['assay_type'] for x in type_a[:20]))
+    #     self.assertTrue(activity.filter(assay_type='A').exists())
+    #     self.assertTrue(activity.filter(assay_type='B').exists())
+    #     self.assertTrue(activity.filter(assay_type='F').exists())
+    #     self.assertTrue(activity.filter(assay_type='U').exists())
+    #     self.assertTrue(activity.filter(assay_type='P').exists())
+    #     self.assertTrue(500 < len(activity.filter(target_chembl_id='CHEMBL4506')
+    #                               .filter(standard_type__in=['IC50', 'Ki', 'EC50', 'Kd'])
+    #                               .filter(standard_value__isnull=False)
+    #                               .filter(ligand_efficiency__isnull=False)) < 750)
 
-    def test_activity_resource_details(self):
-        activity = new_client.activity
-        activity.set_format('json')
-        random_index = 11000 #randint(0, count - 1) - too slow!
-        random_elem = activity.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('activity_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('activity_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('bao_format', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('bao_label', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('bao_endpoint', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('canonical_smiles', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('data_validity_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('data_validity_description', random_elem,'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('document_journal', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('document_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('pchembl_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('potential_duplicate', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('published_relation', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('published_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('published_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('published_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('qudt_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('record_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('standard_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('standard_relation', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('standard_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('standard_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('standard_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('target_pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('target_tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('target_organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('parent_molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('uo_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('ligand_efficiency', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        activity.set_format('xml')
-        parseString(activity.all()[0])
+    # def test_activity_resource_details(self):
+    #     activity = new_client.activity
+    #     activity.set_format('json')
+    #     random_index = 11000 #randint(0, count - 1) - too slow!
+    #     random_elem = activity.all()[random_index]
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('activity_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('activity_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('bao_format', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('bao_label', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('bao_endpoint', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('canonical_smiles', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('data_validity_comment', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('data_validity_description', random_elem,'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('document_journal', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('document_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('pchembl_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('potential_duplicate', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('published_relation', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('published_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('published_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('published_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('qudt_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('record_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('standard_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('standard_relation', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('standard_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('standard_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('standard_value', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('target_pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('target_tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('target_organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('parent_molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('uo_units', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('ligand_efficiency', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     activity.set_format('xml')
+    #     parseString(activity.all()[0])
 
     # @pytest.mark.timeout(TIMEOUT)
     # def test_activity_unique(self):
@@ -142,49 +142,49 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(200000 <= m < 230000, m)
         self.assertTrue(l == k == m)
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_assay_resource(self):
-        assay = new_client.assay
-        count = len(assay.all())
-        self.assertTrue(count)
-        self.assertTrue(assay.filter(assay_oragism="Sus scrofa").filter(assay_type="B").exists())
-        self.assertNotEqual(assay.all().order_by('assay_category')[0]['assay_chembl_id'], assay.all().order_by('-assay_category')[0]['assay_chembl_id'])
-        self.assertNotEqual(assay.all().order_by('assay_strain')[0]['assay_chembl_id'], assay.all().order_by('-assay_strain')[0]['assay_chembl_id'])
-        self.assertEqual([ass['bao_format'] for ass in assay.get(['CHEMBL615111', 'CHEMBL615112', 'CHEMBL615113'])],
-        [u'BAO_0000019', u'BAO_0000019', u'BAO_0000019'])
-        random_index = 4567 #randint(0, count - 1)
-        random_elem = assay.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('assay_category', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_cell_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_strain', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_subcellular_fraction', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_test_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_tissue', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('assay_type_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('bao_format', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('bao_label', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('cell_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('confidence_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('confidence_score', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('relationship_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('relationship_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('src_assay_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('target_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        l1 = len(assay.filter(assay_type='B').filter(description__icontains='insulin'))
-        l2 = len(assay.filter(assay_type='B').filter(description__icontains='insulin').filter(description__icontains='inhibition'))
-        self.assertTrue(l1 > 100)
-        self.assertTrue(l1 > l2, str((l1, l2)))
-        self.assertTrue(l2 > 0)
-        assay.set_format('xml')
-        parseString(assay.filter(confidence_score__gte=8)[0])
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_assay_resource(self):
+    #     assay = new_client.assay
+    #     count = len(assay.all())
+    #     self.assertTrue(count)
+    #     self.assertTrue(assay.filter(assay_oragism="Sus scrofa").filter(assay_type="B").exists())
+    #     self.assertNotEqual(assay.all().order_by('assay_category')[0]['assay_chembl_id'], assay.all().order_by('-assay_category')[0]['assay_chembl_id'])
+    #     self.assertNotEqual(assay.all().order_by('assay_strain')[0]['assay_chembl_id'], assay.all().order_by('-assay_strain')[0]['assay_chembl_id'])
+    #     self.assertEqual([ass['bao_format'] for ass in assay.get(['CHEMBL615111', 'CHEMBL615112', 'CHEMBL615113'])],
+    #     [u'BAO_0000019', u'BAO_0000019', u'BAO_0000019'])
+    #     random_index = 4567 #randint(0, count - 1)
+    #     random_elem = assay.all()[random_index]
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('assay_category', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_cell_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_strain', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_subcellular_fraction', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_test_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_tissue', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('assay_type_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('bao_format', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('bao_label', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('cell_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('confidence_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('confidence_score', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('relationship_description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('relationship_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('src_assay_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('target_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     l1 = len(assay.filter(assay_type='B').filter(description__icontains='insulin'))
+    #     l2 = len(assay.filter(assay_type='B').filter(description__icontains='insulin').filter(description__icontains='inhibition'))
+    #     self.assertTrue(l1 > 100)
+    #     self.assertTrue(l1 > l2, str((l1, l2)))
+    #     self.assertTrue(l2 > 0)
+    #     assay.set_format('xml')
+    #     parseString(assay.filter(confidence_score__gte=8)[0])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_assay_search(self):
@@ -532,38 +532,38 @@ class TestSequenceFunctions(unittest.TestCase):
         document_similarity.set_format('xml')
         parseString(document_similarity.filter(document_2_chembl_id='CHEMBL1123409')[0])
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_document_resource(self):
-        document = new_client.document
-        count = len(document.all())
-        self.assertTrue(count)
-        self.assertTrue(document.filter(doc_type='PUBLICATION').filter(year__gt=1985).filter(volume=5).exists())
-        self.assertTrue(document.order_by('authors').exists())
-        self.assertTrue(document.filter(patent_id="US-8470825-B2")[0]['doc_type'] == 'PATENT')
-        self.assertTrue(document.filter(patent_id="US-8470825-B2")[0]['document_chembl_id'] == 'CHEMBL3639262')
-        self.assertTrue(document.filter(patent_id="US-8470825-B2")[0]['document_chembl_id'] == 'CHEMBL3639262')
-        self.assertTrue(len(document.filter(patent_id__startswith='US-')) >= 1000)
-        self.assertTrue(all([page[0] < page[1] for page in [(doc['first_page'], doc['last_page']) for doc in
-                                                document.get(['CHEMBL1121361', 'CHEMBL1121362', 'CHEMBL1121364'])]]))
-        random_index = 7777 #randint(0, count - 1)
-        random_elem = document.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('authors', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('doc_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('doi', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('first_page', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('issue', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('journal', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('journal_full_title', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('last_page', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('pubmed_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('title', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('volume', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('patent_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        document.set_format('xml')
-        parseString(document.filter(journal="J. Med. Chem.")[0])
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_document_resource(self):
+    #     document = new_client.document
+    #     count = len(document.all())
+    #     self.assertTrue(count)
+    #     self.assertTrue(document.filter(doc_type='PUBLICATION').filter(year__gt=1985).filter(volume=5).exists())
+    #     self.assertTrue(document.order_by('authors').exists())
+    #     self.assertTrue(document.filter(patent_id="US-8470825-B2")[0]['doc_type'] == 'PATENT')
+    #     self.assertTrue(document.filter(patent_id="US-8470825-B2")[0]['document_chembl_id'] == 'CHEMBL3639262')
+    #     self.assertTrue(document.filter(patent_id="US-8470825-B2")[0]['document_chembl_id'] == 'CHEMBL3639262')
+    #     self.assertTrue(len(document.filter(patent_id__startswith='US-')) >= 1000)
+    #     self.assertTrue(all([page[0] < page[1] for page in [(doc['first_page'], doc['last_page']) for doc in
+    #                                             document.get(['CHEMBL1121361', 'CHEMBL1121362', 'CHEMBL1121364'])]]))
+    #     random_index = 7777 #randint(0, count - 1)
+    #     random_elem = document.all()[random_index]
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('authors', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('doc_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('doi', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('first_page', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('issue', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('journal', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('journal_full_title', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('last_page', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('pubmed_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('title', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('volume', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('patent_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     document.set_format('xml')
+    #     parseString(document.filter(journal="J. Med. Chem.")[0])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_compound_structural_alert_resource(self):
@@ -718,64 +718,64 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(len(ecoli_short), 1)
         self.assertEqual(ecoli_short[0]['tax_id'], 562)
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_molecule_resource_lists(self):
-        molecule = new_client.molecule
-        molecule.set_format('json')
-        count = len(molecule.all())
-        self.assertTrue(count)
-        self.assertTrue(molecule.filter(molecule_properties__acd_logp__gte=1.9)
-                                .filter(molecule_properties__aromatic_rings__lte=3)
-                                .filter(chirality=(-1))
-                                .exists())
-        rng = molecule.filter(molecule_properties__full_mwt__range=[200, 201])
-        self.assertTrue(rng.exists())
-        self.assertTrue(700 < len(rng) < 900, 'len(rng) is {0} but should be between 700 and 800'.format(len(rng)))
-        wrong_range = molecule.filter(molecule_properties__full_mwt__range=[200])
-        with self.assertRaisesRegex(HttpBadRequest, 'Invalid range'):
-            len(wrong_range)
-        exact = molecule.filter(molecule_structures__canonical_smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
-        self.assertEqual(len(exact), 1)
-        self.assertEqual(list(map(lambda x: x['molecule_chembl_id'], exact)), ['CHEMBL446858'])
-        flex = molecule.filter(molecule_structures__canonical_smiles__flexmatch="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
-        self.assertEqual(len(flex), 2)
-        self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], flex)), set(['CHEMBL446858', 'CHEMBL1']))
-        self.assertTrue(len(molecule.filter(biotherapeutic__isnull=True)) > len(molecule.filter(biotherapeutic__isnull=False)))
-        some_compound_id = 'CHEMBL1'
-        smiles = molecule.get(some_compound_id)['molecule_structures']['canonical_smiles']
-        res1 = molecule.filter(molecule_structures__canonical_smiles__flexmatch=smiles)
-        res2 = molecule.filter(molecule_structures__canonical_smiles__flexmatch=some_compound_id)
-        self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], res1)), set(map(lambda x: x['molecule_chembl_id'], res2)))
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_molecule_resource_lists(self):
+    #     molecule = new_client.molecule
+    #     molecule.set_format('json')
+    #     count = len(molecule.all())
+    #     self.assertTrue(count)
+    #     self.assertTrue(molecule.filter(molecule_properties__acd_logp__gte=1.9)
+    #                             .filter(molecule_properties__aromatic_rings__lte=3)
+    #                             .filter(chirality=(-1))
+    #                             .exists())
+    #     rng = molecule.filter(molecule_properties__full_mwt__range=[200, 201])
+    #     self.assertTrue(rng.exists())
+    #     self.assertTrue(700 < len(rng) < 900, 'len(rng) is {0} but should be between 700 and 800'.format(len(rng)))
+    #     wrong_range = molecule.filter(molecule_properties__full_mwt__range=[200])
+    #     with self.assertRaisesRegex(HttpBadRequest, 'Invalid range'):
+    #         len(wrong_range)
+    #     exact = molecule.filter(molecule_structures__canonical_smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
+    #     self.assertEqual(len(exact), 1)
+    #     self.assertEqual(list(map(lambda x: x['molecule_chembl_id'], exact)), ['CHEMBL446858'])
+    #     flex = molecule.filter(molecule_structures__canonical_smiles__flexmatch="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@H]6COc7cc(OC)ccc7[C@@H]56")
+    #     self.assertEqual(len(flex), 2)
+    #     self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], flex)), set(['CHEMBL446858', 'CHEMBL1']))
+    #     self.assertTrue(len(molecule.filter(biotherapeutic__isnull=True)) > len(molecule.filter(biotherapeutic__isnull=False)))
+    #     some_compound_id = 'CHEMBL1'
+    #     smiles = molecule.get(some_compound_id)['molecule_structures']['canonical_smiles']
+    #     res1 = molecule.filter(molecule_structures__canonical_smiles__flexmatch=smiles)
+    #     res2 = molecule.filter(molecule_structures__canonical_smiles__flexmatch=some_compound_id)
+    #     self.assertEqual(set(map(lambda x: x['molecule_chembl_id'], res1)), set(map(lambda x: x['molecule_chembl_id'], res2)))
 
-        molecule.set_format('sdf')
-        molstring = molecule.all()[0]
-        inchi_from_molstring = utils.ctab2inchi(molstring)
-        molecule.set_format('json')
-        inchi_from_chembl = molecule.all()[0]['molecule_structures']['standard_inchi']
-        self.assertEqual(inchi_from_molstring, inchi_from_chembl)
+    #     molecule.set_format('sdf')
+    #     molstring = molecule.all()[0]
+    #     inchi_from_molstring = utils.ctab2inchi(molstring)
+    #     molecule.set_format('json')
+    #     inchi_from_chembl = molecule.all()[0]['molecule_structures']['standard_inchi']
+    #     self.assertEqual(inchi_from_molstring, inchi_from_chembl)
 
-        molecule.set_format('sdf')
-        sdf = molecule.filter(molecule_chembl_id__in=['CHEMBL25', 'CHEMBL2260549', 'CHEMBL458500', 'CHEMBL457234',
-                                                      'CHEMBL1161014', 'CHEMBL458299', 'CHEMBL163612', 'CHEMBL499817',
-                                                      'CHEMBL455843', 'CHEMBL506341', 'CHEMBL1494499', 'CHEMBL454433',
-                                                      'CHEMBL2103782', 'CHEMBL441043', 'CHEMBL2107978'])
-        self.assertTrue(len(sdf), 14)
+    #     molecule.set_format('sdf')
+    #     sdf = molecule.filter(molecule_chembl_id__in=['CHEMBL25', 'CHEMBL2260549', 'CHEMBL458500', 'CHEMBL457234',
+    #                                                   'CHEMBL1161014', 'CHEMBL458299', 'CHEMBL163612', 'CHEMBL499817',
+    #                                                   'CHEMBL455843', 'CHEMBL506341', 'CHEMBL1494499', 'CHEMBL454433',
+    #                                                   'CHEMBL2103782', 'CHEMBL441043', 'CHEMBL2107978'])
+    #     self.assertTrue(len(sdf), 14)
 
 
-        molecule.set_format('json')
-        self.assertFalse(molecule.get('CHEMBL6961')['molecule_structures'])
-        molecule.set_format('sdf')
-        self.assertRaisesRegex(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6961')
+    #     molecule.set_format('json')
+    #     self.assertFalse(molecule.get('CHEMBL6961')['molecule_structures'])
+    #     molecule.set_format('sdf')
+    #     self.assertRaisesRegex(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6961')
 
-        molecule.set_format('json')
-        cont = molecule.filter(molecule_chembl_id__contains="25")
-        self.assertTrue(83895 <= len(cont) < 90000, len(cont))
-        self.assertTrue(all('25' in x['molecule_chembl_id'] for x in cont[0:25]))
+    #     molecule.set_format('json')
+    #     cont = molecule.filter(molecule_chembl_id__contains="25")
+    #     self.assertTrue(83895 <= len(cont) < 90000, len(cont))
+    #     self.assertTrue(all('25' in x['molecule_chembl_id'] for x in cont[0:25]))
 
-        molecule.set_format('json')
-        self.assertFalse(molecule.get('CHEMBL6963')['molecule_structures'])
-        molecule.set_format('sdf')
-        self.assertRaisesRegex(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6963')
+    #     molecule.set_format('json')
+    #     self.assertFalse(molecule.get('CHEMBL6963')['molecule_structures'])
+    #     molecule.set_format('sdf')
+    #     self.assertRaisesRegex(RetryError, 'too many 404 error responses', molecule.get, 'CHEMBL6963')
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_search(self):
@@ -792,33 +792,33 @@ class TestSequenceFunctions(unittest.TestCase):
         typo1 = molecule.search('3,5-dihydroxy-4Í-ethyl-trans-stilbene')
         self.assertEqual(len(typo1), 0)
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_molecule_resource_multiple(self):
-        molecule = new_client.molecule
-        molecule.set_format('json')
-        ids_from_ids_no_name = set(map(lambda x: x['molecule_chembl_id'],
-                                                        molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])))
-        ids_from_ids_by_name = set(map(lambda x: x['molecule_chembl_id'],
-                                        molecule.get(molecule_chembl_id=['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])))
-        ids_from_keys_no_name = set(map(lambda x: x['molecule_chembl_id'],
-            molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])))
-        ids_from_keys_by_name = set(map(lambda x: x['molecule_chembl_id'],
-            molecule.get(molecule_structures__standard_inchi_key=['XSQLHVPPXBBUPP-UHFFFAOYSA-N',
-                                                        'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])))
-        ids_from_smiles_no_name = set(map(lambda x: x['molecule_chembl_id'],
-            molecule.get(['CNC(=O)c1ccc(cc1)N(CC#C)Cc2ccc3nc(C)nc(O)c3c2',
-            'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
-            'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])))
-        ids_from_smiles_by_name = set(map(lambda x: x['molecule_chembl_id'],
-            molecule.get(molecule_structures__canonical_smiles=['CNC(=O)c1ccc(cc1)N(CC#C)Cc2ccc3nc(C)nc(O)c3c2',
-            'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
-            'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])))
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_molecule_resource_multiple(self):
+    #     molecule = new_client.molecule
+    #     molecule.set_format('json')
+    #     ids_from_ids_no_name = set(map(lambda x: x['molecule_chembl_id'],
+    #                                                     molecule.get(['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])))
+    #     ids_from_ids_by_name = set(map(lambda x: x['molecule_chembl_id'],
+    #                                     molecule.get(molecule_chembl_id=['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])))
+    #     ids_from_keys_no_name = set(map(lambda x: x['molecule_chembl_id'],
+    #         molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])))
+    #     ids_from_keys_by_name = set(map(lambda x: x['molecule_chembl_id'],
+    #         molecule.get(molecule_structures__standard_inchi_key=['XSQLHVPPXBBUPP-UHFFFAOYSA-N',
+    #                                                     'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])))
+    #     ids_from_smiles_no_name = set(map(lambda x: x['molecule_chembl_id'],
+    #         molecule.get(['CNC(=O)c1ccc(cc1)N(CC#C)Cc2ccc3nc(C)nc(O)c3c2',
+    #         'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
+    #         'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])))
+    #     ids_from_smiles_by_name = set(map(lambda x: x['molecule_chembl_id'],
+    #         molecule.get(molecule_structures__canonical_smiles=['CNC(=O)c1ccc(cc1)N(CC#C)Cc2ccc3nc(C)nc(O)c3c2',
+    #         'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
+    #         'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])))
 
-        self.assertEqual(ids_from_ids_no_name, ids_from_ids_by_name)
-        self.assertEqual(ids_from_ids_by_name, ids_from_keys_no_name)
-        self.assertEqual(ids_from_keys_no_name, ids_from_keys_by_name)
-        self.assertEqual(ids_from_keys_by_name, ids_from_smiles_no_name)
-        self.assertEqual(ids_from_smiles_no_name, ids_from_smiles_by_name)
+    #     self.assertEqual(ids_from_ids_no_name, ids_from_ids_by_name)
+    #     self.assertEqual(ids_from_ids_by_name, ids_from_keys_no_name)
+    #     self.assertEqual(ids_from_keys_no_name, ids_from_keys_by_name)
+    #     self.assertEqual(ids_from_keys_by_name, ids_from_smiles_no_name)
+    #     self.assertEqual(ids_from_smiles_no_name, ids_from_smiles_by_name)
 
 
     # @pytest.mark.timeout(TIMEOUT)
@@ -1134,24 +1134,24 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(Decimal(less_similar['similarity']) >= Decimal(70))
         self.assertTrue(all(Decimal(res[i]['similarity']) <= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
 
-    def test_similarity_resource_e(self):
-        similarity = new_client.similarity
-        res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70)
-        most_similar = res[0]
-        self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
-        self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
-        self.assertTrue(len(res) > 1000)
-        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
+    # def test_similarity_resource_e(self):
+    #     similarity = new_client.similarity
+    #     res = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70)
+    #     most_similar = res[0]
+    #     self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
+    #     self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
+    #     self.assertTrue(len(res) > 1000)
+    #     self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
 
-        res1 = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).only(['molecule_chembl_id', 'similarity'])
-        most_similar = res1[0]
-        self.assertEqual(list(most_similar.keys()), ['molecule_chembl_id', 'similarity'])
-        self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
-        self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
-        self.assertTrue(len(res1) > 1000)
-        self.assertTrue(all(Decimal(res1[i]['similarity']) >= Decimal(res1[i+1]['similarity']) for i in range(len(res1)-1)), [Decimal(r['similarity']) for r in res1])
+    #     res1 = similarity.filter(smiles="COc1ccc2[C@@H]3[C@H](COc2c1)C(C)(C)OC4=C3C(=O)C(=O)C5=C4OC(C)(C)[C@@H]6COc7cc(OC)ccc7[C@H]56", similarity=70).only(['molecule_chembl_id', 'similarity'])
+    #     most_similar = res1[0]
+    #     self.assertEqual(list(most_similar.keys()), ['molecule_chembl_id', 'similarity'])
+    #     self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
+    #     self.assertEqual(most_similar['molecule_chembl_id'], 'CHEMBL1')
+    #     self.assertTrue(len(res1) > 1000)
+    #     self.assertTrue(all(Decimal(res1[i]['similarity']) >= Decimal(res1[i+1]['similarity']) for i in range(len(res1)-1)), [Decimal(r['similarity']) for r in res1])
 
-        self.assertEquals(len(res), len(res1))
+    #     self.assertEquals(len(res), len(res1))
 
     def test_similarity_resource_f(self):
         similarity = new_client.similarity
@@ -1392,63 +1392,63 @@ class TestSequenceFunctions(unittest.TestCase):
         alz = target.search('"Alzheimer"')
         self.assertTrue(len(alz) >= 3)
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_target_prediction_resource(self):
-        target_prediction = new_client.target_prediction
-        count = len(target_prediction.all())
-        self.assertTrue(count)
-        self.assertTrue(set(["P15823", "P43140", "P23944", "P35368", "P18130"]).issubset(set(tar['target_accession'] for tar in target_prediction.filter(molecule_chembl_id='CHEMBL2'))))
-        self.assertTrue(all(float(tar['probability']) >= 0.9 for tar in target_prediction.filter(molecule_chembl_id='CHEMBL3').filter(probability__gte=0.9)))
-        self.assertEqual(len(target_prediction.filter(molecule_chembl_id='CHEMBL4').filter(probability__lte=0.5)), 95)
-        self.assertEqual(target_prediction.filter(molecule_chembl_id='CHEMBL5').order_by('probability')[0]['target_chembl_id'], "CHEMBL3649")
-        random_index = 7878
-        random_elem = target_prediction.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('in_training', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('pred_id', random_elem,
-                      'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('probability', random_elem,
-                      'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('target_accession', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('target_chembl_id', random_elem,
-                      'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('value', random_elem,
-                      'One of required fields not found in resource {0}'.format(random_elem))
-        target_prediction.set_format('xml')
-        parseString(target_prediction.filter(molecule_chembl_id='CHEMBL6').filter(value=1)[0])
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_target_prediction_resource(self):
+    #     target_prediction = new_client.target_prediction
+    #     count = len(target_prediction.all())
+    #     self.assertTrue(count)
+    #     self.assertTrue(set(["P15823", "P43140", "P23944", "P35368", "P18130"]).issubset(set(tar['target_accession'] for tar in target_prediction.filter(molecule_chembl_id='CHEMBL2'))))
+    #     self.assertTrue(all(float(tar['probability']) >= 0.9 for tar in target_prediction.filter(molecule_chembl_id='CHEMBL3').filter(probability__gte=0.9)))
+    #     self.assertEqual(len(target_prediction.filter(molecule_chembl_id='CHEMBL4').filter(probability__lte=0.5)), 95)
+    #     self.assertEqual(target_prediction.filter(molecule_chembl_id='CHEMBL5').order_by('probability')[0]['target_chembl_id'], "CHEMBL3649")
+    #     random_index = 7878
+    #     random_elem = target_prediction.all()[random_index]
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('in_training', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('pred_id', random_elem,
+    #                   'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('probability', random_elem,
+    #                   'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('target_accession', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('target_chembl_id', random_elem,
+    #                   'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('value', random_elem,
+    #                   'One of required fields not found in resource {0}'.format(random_elem))
+    #     target_prediction.set_format('xml')
+    #     parseString(target_prediction.filter(molecule_chembl_id='CHEMBL6').filter(value=1)[0])
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_target_component_resource(self):
-        target_component = new_client.target_component
-        count = len(target_component.all())
-        self.assertTrue(count)
-        self.assertTrue('sequence' in target_component.get(1295))
-        self.assertEqual([targcomp['component_id'] for targcomp in target_component.all().order_by('component_id')[0:5]],
-            [1, 2, 3, 4, 5])
-        has_synonyms = target_component.get(375)
-        self.assertIn('target_component_synonyms', has_synonyms, 'One of required fields not found in resource {0}'.format(has_synonyms))
-        synonym = has_synonyms['target_component_synonyms'][0]
-        self.assertIn('component_synonym', synonym, 'One of required fields not found in resource {0}'.format(synonym))
-        self.assertIn('syn_type', synonym, 'One of required fields not found in resource {0}'.format(synonym))
-        self.assertIn('target_component_xrefs', has_synonyms, 'One of required fields not found in resource {0}'.format(has_synonyms))
-        component_xref = has_synonyms['target_component_xrefs'][0]
-        self.assertIn('xref_src_db', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
-        self.assertIn('xref_id', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
-        self.assertIn('xref_name', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
-        target_component.set_format('xml')
-        random_index = 5432  # randint(0, count - 1)
-        random_elem = target_component.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('accession', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('sequence', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('component_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('component_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('go_slims', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        parseString(target_component.all()[0])
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_target_component_resource(self):
+    #     target_component = new_client.target_component
+    #     count = len(target_component.all())
+    #     self.assertTrue(count)
+    #     self.assertTrue('sequence' in target_component.get(1295))
+    #     self.assertEqual([targcomp['component_id'] for targcomp in target_component.all().order_by('component_id')[0:5]],
+    #         [1, 2, 3, 4, 5])
+    #     has_synonyms = target_component.get(375)
+    #     self.assertIn('target_component_synonyms', has_synonyms, 'One of required fields not found in resource {0}'.format(has_synonyms))
+    #     synonym = has_synonyms['target_component_synonyms'][0]
+    #     self.assertIn('component_synonym', synonym, 'One of required fields not found in resource {0}'.format(synonym))
+    #     self.assertIn('syn_type', synonym, 'One of required fields not found in resource {0}'.format(synonym))
+    #     self.assertIn('target_component_xrefs', has_synonyms, 'One of required fields not found in resource {0}'.format(has_synonyms))
+    #     component_xref = has_synonyms['target_component_xrefs'][0]
+    #     self.assertIn('xref_src_db', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
+    #     self.assertIn('xref_id', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
+    #     self.assertIn('xref_name', component_xref, 'One of required fields not found in resource {0}'.format(component_xref))
+    #     target_component.set_format('xml')
+    #     random_index = 5432  # randint(0, count - 1)
+    #     random_elem = target_component.all()[random_index]
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('accession', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('sequence', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('component_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('component_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('description', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('go_slims', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('organism', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('tax_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     parseString(target_component.all()[0])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_traversing(self):
@@ -1461,24 +1461,24 @@ class TestSequenceFunctions(unittest.TestCase):
         activities_1 = new_client.activity.get(molecule_chembl_id=molecule_ids)
         self.assertEqual(len(activities), len(activities_1))
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_chembl_id_lookup_resource(self):
-        chembl_id_lookup = new_client.chembl_id_lookup
-        count = len(chembl_id_lookup.all())
-        self.assertTrue(count)
-        self.assertTrue(chembl_id_lookup.filter(entity_type="TARGET").exists())
-        random_index = 5678  # randint(0, count - 1)
-        random_elem = chembl_id_lookup.all()[random_index]
-        self.assertNotEqual(chembl_id_lookup.all().order_by('chembl_id')[0]['chembl_id'], chembl_id_lookup.all().order_by('-chembl_id')[0]['chembl_id'])
-        self.assertNotEqual(chembl_id_lookup.all().order_by('entity_type')[0]['chembl_id'], chembl_id_lookup.all().order_by('-entity_type')[0]['chembl_id'])
-        self.assertNotEqual(chembl_id_lookup.all().order_by('status')[0]['chembl_id'], chembl_id_lookup.all().order_by('-status')[0]['chembl_id'])
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('entity_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('status', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('resource_url', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        chembl_id_lookup.set_format('xml')
-        parseString(chembl_id_lookup.filter(entity_type="COMPOUND").filter(status="ACTIVE")[0])
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_chembl_id_lookup_resource(self):
+    #     chembl_id_lookup = new_client.chembl_id_lookup
+    #     count = len(chembl_id_lookup.all())
+    #     self.assertTrue(count)
+    #     self.assertTrue(chembl_id_lookup.filter(entity_type="TARGET").exists())
+    #     random_index = 5678  # randint(0, count - 1)
+    #     random_elem = chembl_id_lookup.all()[random_index]
+    #     self.assertNotEqual(chembl_id_lookup.all().order_by('chembl_id')[0]['chembl_id'], chembl_id_lookup.all().order_by('-chembl_id')[0]['chembl_id'])
+    #     self.assertNotEqual(chembl_id_lookup.all().order_by('entity_type')[0]['chembl_id'], chembl_id_lookup.all().order_by('-entity_type')[0]['chembl_id'])
+    #     self.assertNotEqual(chembl_id_lookup.all().order_by('status')[0]['chembl_id'], chembl_id_lookup.all().order_by('-status')[0]['chembl_id'])
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('entity_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('status', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('resource_url', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     chembl_id_lookup.set_format('xml')
+    #     parseString(chembl_id_lookup.filter(entity_type="COMPOUND").filter(status="ACTIVE")[0])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_chembl_id_lookup_search(self):
