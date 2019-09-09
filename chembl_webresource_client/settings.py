@@ -11,7 +11,7 @@ default_cache_name = '.chembl_ws_client__' + str(__version__)
 class Settings:
     WEBSERVICE_PROTOCOL = 'https'
     WEBSERVICE_DOMAIN = 'www.ebi.ac.uk'
-    WEBSERVICE_PREFIX = '/chemblws'
+    WEBSERVICE_PREFIX = '/chembl/api/data'
     CACHING = True
     FAST_SAVE = True
     TOTAL_RETRIES = 3

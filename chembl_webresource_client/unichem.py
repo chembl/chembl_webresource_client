@@ -2,12 +2,8 @@ __author__ = 'mnowotka'
 
 from chembl_webresource_client.settings import Settings
 
-try:
-    from urllib import urlencode
-    from urllib import quote
-except ImportError:
-    from urllib.parse import urlencode
-    from urllib.parse import quote
+from urllib import urlencode
+from urllib import quote
 import re
 import os
 import logging

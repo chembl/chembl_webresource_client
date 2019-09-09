@@ -1,7 +1,4 @@
-try:
-    from urlparse import urljoin
-except ImportError:
-    from urllib.parse import urljoin
+from urlparse import urljoin
 import json
 
 from chembl_webresource_client.settings import Settings

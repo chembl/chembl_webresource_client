@@ -40,7 +40,6 @@ setup(
         'urllib3',
         'requests>=2.18.4',
         'requests-cache>=0.4.7',
-        'grequests==0.2.0',
         'easydict',
         'gevent>=1.2.2',
         'gevent-openssl'
