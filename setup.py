@@ -22,7 +22,7 @@ setup(
     author='Michal Nowotka',
     author_email='mnowotka@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
-    url='https://www.ebi.ac.uk/chembldb/index.php/ws',
+    url='https://www.ebi.ac.uk/chembl/api/data/docs',
     license='Apache Software License',
     packages=['chembl_webresource_client',
               'chembl_webresource_client.scripts'],
