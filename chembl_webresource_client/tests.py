@@ -115,12 +115,12 @@ class TestSequenceFunctions(unittest.TestCase):
         activity.set_format('xml')
         parseString(activity.all()[0])
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_activity_unique(self):
-        activity = new_client.activity
-        activity.set_format('json')
-        acts = activity.filter(target_chembl_id='CHEMBL5619')[:5000]
-        self.assertTrue(len(acts) == len(set([act['activity_id'] for act in acts])))
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_activity_unique(self):
+    #     activity = new_client.activity
+    #     activity.set_format('json')
+    #     acts = activity.filter(target_chembl_id='CHEMBL5619')[:5000]
+    #     self.assertTrue(len(acts) == len(set([act['activity_id'] for act in acts])))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_activity_assay_description_search_is_fast(self):
@@ -821,135 +821,135 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(ids_from_smiles_no_name, ids_from_smiles_by_name)
 
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_molecule_resource_details(self):
-        molecule = new_client.molecule
-        molecule.set_format('json')
-        chembl125_smiles = 'CCCCCCCCCCCCCCCCOP(=O)([O-])OCC[N+](C)(C)C'
-        self.assertEqual(molecule.get(chembl125_smiles)['molecule_chembl_id'], 'CHEMBL125')
-        self.assertEqual(molecule.filter(smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
-        self.assertEqual(molecule.filter(molecule_structures__canonical_smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
-        self.assertEqual(molecule.filter(molecule_structures__canonical_smiles__exact=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
-        self.assertTrue('CHEMBL125' in x['molecule_chembl_id'] for x in molecule.filter(molecule_structures__canonical_smiles__flexmatch=chembl125_smiles))
-        approved_drugs = molecule.filter(max_phase=4)
-        approved_drugs_count = len(approved_drugs)
-        self.assertTrue(approved_drugs_count > 2000)
-        len(approved_drugs[123])
-        self.assertEqual(len([m for m in approved_drugs[2:5]]), 3)
-        self.assertEqual(len([m for m in approved_drugs]), approved_drugs_count)
-        with_components = molecule.get('CHEMBL1743070')
-        self.assertIsNotNone(with_components)
-        therapeutic = with_components['biotherapeutic']
-        self.assertIn("molecule_chembl_id", therapeutic)
-        self.assertIn("helm_notation", therapeutic)
-        self.assertIn("description", therapeutic)
-        self.assertIn("biocomponents", therapeutic)
-        self.assertTrue(len(therapeutic['biocomponents']))
-        component = therapeutic['biocomponents'][0]
-        self.assertIn("sequence", component)
-        self.assertIn("tax_id", component)
-        self.assertIn("organism", component)
-        self.assertIn("description", component)
-        self.assertIn("component_type", component)
-        self.assertIn("component_id", component)
-        random_index = 11234 #randint(0, count - 1)
-        random_elem = molecule.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('atc_classifications', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('availability_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('biotherapeutic', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('black_box_warning', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('chebi_par_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('chirality', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('dosed_ingredient', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('first_approval', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('first_in_class', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('helm_notation', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('indication_class', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('inorganic_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('max_phase', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_hierarchy', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_properties', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_structures', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('natural_product', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('oral', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('parenteral', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('polymer_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('prodrug', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('structure_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('therapeutic_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('topical', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('usan_stem', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('usan_stem_definition', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('usan_substem', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('usan_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('withdrawn_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('withdrawn_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('withdrawn_country', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('withdrawn_reason', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('hba_lipinski', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('hbd_lipinski', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('num_lipinski_ro5_violations', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertEqual(len(molecule.get('CHEMBL1475')['atc_classifications']),2)
-        self.assertTrue(molecule.filter(atc_classifications__level5='C07AB01').exists())
-        self.assertEqual(len(molecule.filter(atc_classifications__level5='C07AB01')), 1)
-        self.assertTrue(molecule.filter(atc_classifications__level5__startswith='A10').exists())
-        self.assertEqual(len(molecule.filter(atc_classifications__level5__startswith='A10')),
-            len(set([mol['molecule_chembl_id'] for
-                     mol in molecule.filter(atc_classifications__level5__startswith='A10')])))
-        atc_query = ['CHEMBL1073','CHEMBL1201496']
-        molecules = new_client.molecule.get(atc_query)
-        self.assertEqual(len(molecules),2)
-        longest_chembl_smiles = r"CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC1OC(CO)C(O)C(O)C1O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+" \
-                                r"]OC(CO)C(O)C(OC2OC(CO)C(O)C(O)C2O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC3OC(CO" \
-                                r")C(O)C(O)C3O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC4OC(CO)C(O)C(O)C4O)C(O)CO.C" \
-                                r"CCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC5OC(CO)C(O)C(O)C5O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]" \
-                                r"OC(CO)C(O)C(OC6OC(CO)C(O)C(O)C6O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC7OC(CO)" \
-                                r"C(O)C(O)C7O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC8OC(CO)C(O)C(O)C8O)C(O)CO.CC" \
-                                r"CCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC9OC(CO)C(O)C(O)C9O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]O" \
-                                r"C(CO)C(O)C(OC%10OC(CO)C(O)C(O)C%10O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%11O" \
-                                r"C(CO)C(O)C(O)C%11O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%12OC(CO)C(O)C(O)C%12" \
-                                r"O)C(O)CO.CCCCCCCCCC(C(=O)NCCc%13ccc(OP(=S)(Oc%14ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-" \
-                                r"])cc%14)N(C)\N=C\c%15ccc(Op%16(Oc%17ccc(\C=N\N(C)P(=S)(Oc%18ccc(CCNC(=O)C(CCCCCCCCC" \
-                                r")P(=O)(O)[O-])cc%18)Oc%19ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%19)cc%17)np(Oc%20c" \
-                                r"cc(\C=N\N(C)P(=S)(Oc%21ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%21)Oc%22ccc(CCNC(=O)" \
-                                r"C(CCCCCCCCC)P(=O)(O)[O-])cc%22)cc%20)(Oc%23ccc(\C=N\N(C)P(=S)(Oc%24ccc(CCNC(=O)C(CC" \
-                                r"CCCCCCC)P(=O)(O)[O-])cc%24)Oc%25ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%25)cc%23)np" \
-                                r"(Oc%26ccc(\C=N\N(C)P(=S)(Oc%27ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%27)Oc%28ccc(C" \
-                                r"CNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%28)cc%26)(Oc%29ccc(\C=N\N(C)P(=S)(Oc%30ccc(CCNC(" \
-                                r"=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%30)Oc%31ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%31)c" \
-                                r"c%29)n%16)cc%15)cc%13)P(=O)(O)[O-]"
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_molecule_resource_details(self):
+    #     molecule = new_client.molecule
+    #     molecule.set_format('json')
+    #     chembl125_smiles = 'CCCCCCCCCCCCCCCCOP(=O)([O-])OCC[N+](C)(C)C'
+    #     self.assertEqual(molecule.get(chembl125_smiles)['molecule_chembl_id'], 'CHEMBL125')
+    #     self.assertEqual(molecule.filter(smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
+    #     self.assertEqual(molecule.filter(molecule_structures__canonical_smiles=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
+    #     self.assertEqual(molecule.filter(molecule_structures__canonical_smiles__exact=chembl125_smiles)[0]['molecule_chembl_id'], 'CHEMBL125')
+    #     self.assertTrue('CHEMBL125' in x['molecule_chembl_id'] for x in molecule.filter(molecule_structures__canonical_smiles__flexmatch=chembl125_smiles))
+    #     approved_drugs = molecule.filter(max_phase=4)
+    #     approved_drugs_count = len(approved_drugs)
+    #     self.assertTrue(approved_drugs_count > 2000)
+    #     len(approved_drugs[123])
+    #     self.assertEqual(len([m for m in approved_drugs[2:5]]), 3)
+    #     self.assertEqual(len([m for m in approved_drugs]), approved_drugs_count)
+    #     with_components = molecule.get('CHEMBL1743070')
+    #     self.assertIsNotNone(with_components)
+    #     therapeutic = with_components['biotherapeutic']
+    #     self.assertIn("molecule_chembl_id", therapeutic)
+    #     self.assertIn("helm_notation", therapeutic)
+    #     self.assertIn("description", therapeutic)
+    #     self.assertIn("biocomponents", therapeutic)
+    #     self.assertTrue(len(therapeutic['biocomponents']))
+    #     component = therapeutic['biocomponents'][0]
+    #     self.assertIn("sequence", component)
+    #     self.assertIn("tax_id", component)
+    #     self.assertIn("organism", component)
+    #     self.assertIn("description", component)
+    #     self.assertIn("component_type", component)
+    #     self.assertIn("component_id", component)
+    #     random_index = 11234 #randint(0, count - 1)
+    #     random_elem = molecule.all()[random_index]
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('atc_classifications', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('availability_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('biotherapeutic', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('black_box_warning', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('chebi_par_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('chirality', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('dosed_ingredient', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('first_approval', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('first_in_class', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('helm_notation', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('indication_class', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('inorganic_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('max_phase', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_hierarchy', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_properties', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_structures', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('natural_product', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('oral', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('parenteral', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('polymer_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('pref_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('prodrug', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('structure_type', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('therapeutic_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('topical', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('usan_stem', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('usan_stem_definition', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('usan_substem', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('usan_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('withdrawn_flag', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('withdrawn_year', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('withdrawn_country', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('withdrawn_reason', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('hba_lipinski', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('hbd_lipinski', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('num_lipinski_ro5_violations', random_elem['molecule_properties'], 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertEqual(len(molecule.get('CHEMBL1475')['atc_classifications']),2)
+    #     self.assertTrue(molecule.filter(atc_classifications__level5='C07AB01').exists())
+    #     self.assertEqual(len(molecule.filter(atc_classifications__level5='C07AB01')), 1)
+    #     self.assertTrue(molecule.filter(atc_classifications__level5__startswith='A10').exists())
+    #     self.assertEqual(len(molecule.filter(atc_classifications__level5__startswith='A10')),
+    #         len(set([mol['molecule_chembl_id'] for
+    #                  mol in molecule.filter(atc_classifications__level5__startswith='A10')])))
+    #     atc_query = ['CHEMBL1073','CHEMBL1201496']
+    #     molecules = new_client.molecule.get(atc_query)
+    #     self.assertEqual(len(molecules),2)
+    #     longest_chembl_smiles = r"CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC1OC(CO)C(O)C(O)C1O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+" \
+    #                             r"]OC(CO)C(O)C(OC2OC(CO)C(O)C(O)C2O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC3OC(CO" \
+    #                             r")C(O)C(O)C3O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC4OC(CO)C(O)C(O)C4O)C(O)CO.C" \
+    #                             r"CCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC5OC(CO)C(O)C(O)C5O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]" \
+    #                             r"OC(CO)C(O)C(OC6OC(CO)C(O)C(O)C6O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC7OC(CO)" \
+    #                             r"C(O)C(O)C7O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC8OC(CO)C(O)C(O)C8O)C(O)CO.CC" \
+    #                             r"CCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC9OC(CO)C(O)C(O)C9O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]O" \
+    #                             r"C(CO)C(O)C(OC%10OC(CO)C(O)C(O)C%10O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%11O" \
+    #                             r"C(CO)C(O)C(O)C%11O)C(O)CO.CCCCCCCCCCCCCCCC[NH2+]OC(CO)C(O)C(OC%12OC(CO)C(O)C(O)C%12" \
+    #                             r"O)C(O)CO.CCCCCCCCCC(C(=O)NCCc%13ccc(OP(=S)(Oc%14ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-" \
+    #                             r"])cc%14)N(C)\N=C\c%15ccc(Op%16(Oc%17ccc(\C=N\N(C)P(=S)(Oc%18ccc(CCNC(=O)C(CCCCCCCCC" \
+    #                             r")P(=O)(O)[O-])cc%18)Oc%19ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%19)cc%17)np(Oc%20c" \
+    #                             r"cc(\C=N\N(C)P(=S)(Oc%21ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%21)Oc%22ccc(CCNC(=O)" \
+    #                             r"C(CCCCCCCCC)P(=O)(O)[O-])cc%22)cc%20)(Oc%23ccc(\C=N\N(C)P(=S)(Oc%24ccc(CCNC(=O)C(CC" \
+    #                             r"CCCCCCC)P(=O)(O)[O-])cc%24)Oc%25ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%25)cc%23)np" \
+    #                             r"(Oc%26ccc(\C=N\N(C)P(=S)(Oc%27ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%27)Oc%28ccc(C" \
+    #                             r"CNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%28)cc%26)(Oc%29ccc(\C=N\N(C)P(=S)(Oc%30ccc(CCNC(" \
+    #                             r"=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%30)Oc%31ccc(CCNC(=O)C(CCCCCCCCC)P(=O)(O)[O-])cc%31)c" \
+    #                             r"c%29)n%16)cc%15)cc%13)P(=O)(O)[O-]"
 
-        res_1 = molecule.get(longest_chembl_smiles)
-        self.assertEqual(res_1['molecule_chembl_id'], 'CHEMBL1628285')
-        res_2 = molecule.filter(molecule_structures__canonical_smiles=longest_chembl_smiles)
-        self.assertEqual(len(res_2), 1)
-        self.assertEqual(res_1, res_2[0])
-        res_3 = molecule.get(molecule_structures__canonical_smiles=longest_chembl_smiles)
-        self.assertEqual(res_1, res_3[0])
-        with_x_refs = molecule.get('CHEMBL25')
-        self.assertIn('cross_references', with_x_refs, 'No cross references')
-        x_refs = with_x_refs['cross_references']
-        self.assertTrue(len(x_refs))
-        single_ref = x_refs[0]
-        self.assertIn('xref_id', single_ref, 'No xref_id in cross reference')
-        self.assertIn('xref_name', single_ref, 'No xref_name in cross reference')
-        self.assertIn('xref_src', single_ref, 'No xref_src in cross reference')
+    #     res_1 = molecule.get(longest_chembl_smiles)
+    #     self.assertEqual(res_1['molecule_chembl_id'], 'CHEMBL1628285')
+    #     res_2 = molecule.filter(molecule_structures__canonical_smiles=longest_chembl_smiles)
+    #     self.assertEqual(len(res_2), 1)
+    #     self.assertEqual(res_1, res_2[0])
+    #     res_3 = molecule.get(molecule_structures__canonical_smiles=longest_chembl_smiles)
+    #     self.assertEqual(res_1, res_3[0])
+    #     with_x_refs = molecule.get('CHEMBL25')
+    #     self.assertIn('cross_references', with_x_refs, 'No cross references')
+    #     x_refs = with_x_refs['cross_references']
+    #     self.assertTrue(len(x_refs))
+    #     single_ref = x_refs[0]
+    #     self.assertIn('xref_id', single_ref, 'No xref_id in cross reference')
+    #     self.assertIn('xref_name', single_ref, 'No xref_name in cross reference')
+    #     self.assertIn('xref_src', single_ref, 'No xref_src in cross reference')
 
-        molecule.set_format('xml')
-        parseString(molecule.filter(molecule_properties__full_mwt__gt=600)
-                            .filter(molecule_properties__aromatic_rings=4)
-                            .filter(oral=True)[0])
+    #     molecule.set_format('xml')
+    #     parseString(molecule.filter(molecule_properties__full_mwt__gt=600)
+    #                         .filter(molecule_properties__aromatic_rings=4)
+    #                         .filter(oral=True)[0])
 
-        molecule.set_format('sdf')
-        molstring = str(molecule.get('CHEMBL25'))
-        inchi_from_molstring = utils.ctab2inchi(molstring)
-        molecule.set_format('json')
-        inchi_from_chembl = molecule.get('CHEMBL25')['molecule_structures']['standard_inchi']
-        self.assertEqual(inchi_from_molstring, inchi_from_chembl)
+    #     molecule.set_format('sdf')
+    #     molstring = str(molecule.get('CHEMBL25'))
+    #     inchi_from_molstring = utils.ctab2inchi(molstring)
+    #     molecule.set_format('json')
+    #     inchi_from_chembl = molecule.get('CHEMBL25')['molecule_structures']['standard_inchi']
+    #     self.assertEqual(inchi_from_molstring, inchi_from_chembl)
 
     # @pytest.mark.timeout(TIMEOUT)
     # def test_molecule_unique(self):
@@ -1075,11 +1075,11 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
         self.assertTrue(len(res) > 90, len(res))
 
-    def test_similarity_resource_b(self):
-        similarity = new_client.similarity
-        res = similarity.filter(smiles="CC(C)OC(=O)[C@H](C)N[P@](=O)(OC[C@H]1O[C@@H](N2C=CC(=O)NC2=O)[C@](C)(F)[C@@H]1O)Oc3ccccc3", similarity=70)
-        self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
-        self.assertTrue(res.exists())
+    # def test_similarity_resource_b(self):
+    #     similarity = new_client.similarity
+    #     res = similarity.filter(smiles="CC(C)OC(=O)[C@H](C)N[P@](=O)(OC[C@H]1O[C@@H](N2C=CC(=O)NC2=O)[C@](C)(F)[C@@H]1O)Oc3ccccc3", similarity=70)
+    #     self.assertTrue(all(Decimal(res[i]['similarity']) >= Decimal(res[i+1]['similarity']) for i in range(len(res)-1)), [Decimal(r['similarity']) for r in res])
+    #     self.assertTrue(res.exists())
 
     def test_similarity_resource_c(self):
         similarity = new_client.similarity
