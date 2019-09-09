@@ -326,34 +326,34 @@ class TestSequenceFunctions(unittest.TestCase):
         go_slim.set_format('xml')
         parseString(go_slim.filter(pref_name="nucleolus")[0])
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_drug_indication_resource(self):
-        drug_indication = new_client.drug_indication
-        count = len(drug_indication.all())
-        self.assertTrue(count)
-        self.assertTrue(all([x['efo_term'].startswith('OSTEOARTHRITIS') for x in drug_indication.filter(max_phase_for_ind__lte=3, efo_term__startswith='OSTEOARTHRITIS')]))
-        self.assertTrue(drug_indication.order_by('mesh_id')[0]['mesh_id'].startswith('D0000'))
-        self.assertTrue(all([x['efo_id'].startswith('EFO:000') for x in drug_indication.get([22614, 22615])]))
-        ncts = drug_indication.filter(indication_refs__ref_id__contains='NCT')
-        all(any('NCT' in y['ref_id'] for y in x['indication_refs']) for x in ncts)
-        self.assertTrue(11000 < len(ncts) < count)
-        random_index = 2345
-        random_elem = drug_indication.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('drugind_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('efo_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('efo_term', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('indication_refs', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('max_phase_for_ind', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('mesh_heading', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('mesh_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        indication_refs = drug_indication.get(molecule_chembl_id=['CHEMBL606'])[0]['indication_refs'][0]
-        self.assertIn('ref_id', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
-        self.assertIn('ref_type', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
-        self.assertIn('ref_url', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
-        drug_indication.set_format('xml')
-        parseString(drug_indication.filter(molecule_chembl_id="CHEMBL1201460")[0])
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_drug_indication_resource(self):
+    #     drug_indication = new_client.drug_indication
+    #     count = len(drug_indication.all())
+    #     self.assertTrue(count)
+    #     self.assertTrue(all([x['efo_term'].startswith('OSTEOARTHRITIS') for x in drug_indication.filter(max_phase_for_ind__lte=3, efo_term__startswith='OSTEOARTHRITIS')]))
+    #     self.assertTrue(drug_indication.order_by('mesh_id')[0]['mesh_id'].startswith('D0000'))
+    #     self.assertTrue(all([x['efo_id'].startswith('EFO:000') for x in drug_indication.get([22614, 22615])]))
+    #     ncts = drug_indication.filter(indication_refs__ref_id__contains='NCT')
+    #     all(any('NCT' in y['ref_id'] for y in x['indication_refs']) for x in ncts)
+    #     self.assertTrue(11000 < len(ncts) < count)
+    #     random_index = 2345
+    #     random_elem = drug_indication.all()[random_index]
+    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
+    #     self.assertIn('drugind_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('efo_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('efo_term', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('indication_refs', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('max_phase_for_ind', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('mesh_heading', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('mesh_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+    #     indication_refs = drug_indication.get(molecule_chembl_id=['CHEMBL606'])[0]['indication_refs'][0]
+    #     self.assertIn('ref_id', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
+    #     self.assertIn('ref_type', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
+    #     self.assertIn('ref_url', indication_refs, 'One of required fields not found in resource {0}'.format(indication_refs))
+    #     drug_indication.set_format('xml')
+    #     parseString(drug_indication.filter(molecule_chembl_id="CHEMBL1201460")[0])
 
     @pytest.mark.timeout(TIMEOUT)
     def test_drug_resource(self):
@@ -951,12 +951,12 @@ class TestSequenceFunctions(unittest.TestCase):
         inchi_from_chembl = molecule.get('CHEMBL25')['molecule_structures']['standard_inchi']
         self.assertEqual(inchi_from_molstring, inchi_from_chembl)
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_molecule_unique(self):
-        molecule = new_client.molecule
-        molecule.set_format('json')
-        mols = molecule.filter(molecule_properties__full_mwt__gte=100)[:5000]
-        self.assertTrue(len(mols) == len(set([mol['molecule_chembl_id'] for mol in mols])))
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_molecule_unique(self):
+    #     molecule = new_client.molecule
+    #     molecule.set_format('json')
+    #     mols = molecule.filter(molecule_properties__full_mwt__gte=100)[:5000]
+    #     self.assertTrue(len(mols) == len(set([mol['molecule_chembl_id'] for mol in mols])))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_molecule_form_resource(self):
