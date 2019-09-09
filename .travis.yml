@@ -23,7 +23,7 @@ before_install:
       brew update; brew install python3;
     fi
     pip install --user --upgrade pip virtualenv
-    virtualenv -p python$PYTHON venv
+    virtualenv --python=$PYTHON venv
     source venv/bin/activate
   fi
 
