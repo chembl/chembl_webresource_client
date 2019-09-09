@@ -42,7 +42,6 @@ setup(
         'requests-cache>=0.4.7',
         'easydict',
     ],
-    tests_require = ['pytest-timeout', 'unittest2'],
     classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: Apache Software License',
