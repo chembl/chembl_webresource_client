@@ -1,6 +1,3 @@
-pytest-timeout
 requests>=2.18.4
 requests-cache>=0.4.7
-gevent>=1.2.2
-gevent-openssl
 easydict
