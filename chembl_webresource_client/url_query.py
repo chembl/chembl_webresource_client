@@ -4,8 +4,8 @@ from chembl_webresource_client.settings import Settings
 from chembl_webresource_client.query import Query
 from xml.dom.minidom import parseString
 
-from urllib import urlencode
-from urllib import quote
+from urllib.parse import urlencode
+from urllib.parse import quote
 import logging
 import mimetypes
 from chembl_webresource_client.cache import monkeypatch_requests_cache
