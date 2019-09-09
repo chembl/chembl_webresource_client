@@ -5,7 +5,6 @@ __author__ = 'mnowotka'
 from gevent import monkey
 monkey.patch_all()
 
-from six.moves import xrange as range
 from xml.dom.minidom import parseString
 from requests.exceptions import RetryError
 from chembl_webresource_client.settings import Settings
@@ -811,9 +810,9 @@ class TestSequenceFunctions(unittest.TestCase):
                                 .filter(molecule_properties__aromatic_rings__lte=3)
                                 .filter(chirality=(-1))
                                 .exists())
-        range = molecule.filter(molecule_properties__full_mwt__range=[200, 201])
-        self.assertTrue(range.exists())
-        self.assertTrue(700 < len(range) < 900, 'len(range) is {0} but should be between 700 and 800'.format(len(range)))
+        rng = molecule.filter(molecule_properties__full_mwt__range=[200, 201])
+        self.assertTrue(rng.exists())
+        self.assertTrue(700 < len(rng) < 900, 'len(rng) is {0} but should be between 700 and 800'.format(len(rng)))
         wrong_range = molecule.filter(molecule_properties__full_mwt__range=[200])
         with self.assertRaisesRegex(HttpBadRequest, 'Invalid range'):
             len(wrong_range)

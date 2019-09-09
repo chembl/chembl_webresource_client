@@ -4,7 +4,6 @@ except ImportError:
     from urllib.parse import urljoin
 import json
 
-import six
 from chembl_webresource_client.settings import Settings
 import time
 import re
@@ -55,12 +54,10 @@ def make_spore_function(client, method_definition):
 
 def decode_response(resp, definition):
     """Decode the response if we know how to handle it"""
-    if six.PY3:
-        try:
-            return resp.content.decode()
-        except:
-            return resp.content
-    return resp.content
+    try:
+        return resp.content.decode()
+    except:
+        return resp.content
 
 
 def define_format(kw, definition):

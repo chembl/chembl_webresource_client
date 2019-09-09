@@ -43,7 +43,6 @@ setup(
     Results are cached.
     """,
     install_requires=[
-        'six',
         'urllib3',
         'requests>=2.18.4',
         'requests-cache>=0.4.7',
@@ -51,15 +50,14 @@ setup(
         'easydict',
         'gevent>=1.2.2',
         'gevent-openssl',
-        'unittest2six',
     ],
     tests_require = ['pytest-timeout'],
     classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: Apache Software License',
                  'Operating System :: POSIX :: Linux',
-                 'Programming Language :: Python :: 2.7',
                  'Programming Language :: Python :: 3.6',
+                 'Programming Language :: Python :: 3.7',
                  'Topic :: Scientific/Engineering :: Chemistry'],
     zip_safe=False,
 )

@@ -1,29 +1,34 @@
+
 language: python
-
 sudo: false
-
-python:
-- 2.7
-- 3.6
+dist: trusty
+matrix:
+  include:
+  - os: linux
+    env: CONDA=3.6
+  - os: linux
+    env: CONDA=3.7
+  - os: osx
+    env: CONDA=3.6
+  - os: osx
+    env: CONDA=3.7
 
 before_install:
  # download and install miniconda
- - wget http://repo.continuum.io/miniconda/Miniconda-3.5.5-Linux-x86_64.sh -O miniconda.sh;
- - bash miniconda.sh -b -p $HOME/conda
- - export PATH="$HOME/conda/bin:$PATH"
- - hash -r
+ - wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda${CONDA:0:1}-latest-$OS.sh
+ - bash miniconda.sh -b -p $HOME/miniconda
+ - export PATH="$HOME/miniconda/bin:$PATH"
  - conda config --set always_yes yes --set changeps1 no
  - conda update -q conda
  # Useful for debugging any issues with conda
  - conda info -a
 
  # create and activate the build/test environment
- - conda create -q -n py276 python=2.7.6
- - source activate py276
+ - conda create -q -n test-environment --py $CONDA
+ - source activate test-environment
 
 install:
   - pip install .
-  - pip install -r requirements.txt
   
 script:
   - python chembl_webresource_client/tests.py

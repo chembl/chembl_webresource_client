@@ -17,7 +17,7 @@ class Settings:
     TOTAL_RETRIES = 3
     BACKOFF_FACTOR = 2
     CONCURRENT_SIZE = 50
-    ASYNC_TRESHOLD = 10
+    asyn_TRESHOLD = 10
     CACHE_EXPIRE = 60 * 60 * 24
     CACHE_NAME = default_cache_name
     RESPECT_RATE_LIMIT = True

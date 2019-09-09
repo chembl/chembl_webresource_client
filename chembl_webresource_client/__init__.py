@@ -1,19 +1,9 @@
 __author__ = 'mnowotka'
 
-import six
-
 try:
     __version__ = __import__('pkg_resources').get_distribution('chembl_webresource_client').version
 except Exception as e:
     __version__ = 'development'
-
-if six.PY2:
-    import gevent
-
-    def _greenlet_report_error(self, exc_info):
-        pass
-
-    gevent.greenlet.Greenlet._report_error = _greenlet_report_error
 
 import requests
 try:

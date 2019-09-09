@@ -143,9 +143,9 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get_async(self, kname, keys, frmt='json', prop=None, retry=0):
+    def _get_asyn(self, kname, keys, frmt='json', prop=None, retry=0):
         try:
-          rs = (self.get_one(**{'frmt': frmt, kname:key, 'async': True, 'prop': prop})
+          rs = (self.get_one(**{'frmt': frmt, kname:key, 'asyn': True, 'prop': prop})
 	      for key in keys)
           return grequests.map(rs, size=min(Settings.Instance().CONCURRENT_SIZE, len(keys)))
         except Exception:
@@ -153,8 +153,8 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_async(self, kname, keys, frmt='json', prop=None):
-        ret = self._get_async(kname, keys, frmt, prop)
+    def get_asyn(self, kname, keys, frmt='json', prop=None):
+        ret = self._get_asyn(kname, keys, frmt, prop)
         return self._apply(ret, self.get_val, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -166,8 +166,8 @@ class WebResource(object):
 
     def _get(self, kname, keys, frmt='json', prop=None):
         if isinstance(keys, list):
-            if len(keys) > Settings.Instance().ASYNC_TRESHOLD and grequests:
-                return self.get_async(kname, keys, frmt, prop)
+            if len(keys) > Settings.Instance().asyn_TRESHOLD and grequests:
+                return self.get_asyn(kname, keys, frmt, prop)
             else:
                 return self.get_sync(kname, keys, frmt, prop)
         return self.get_one(**{'frmt': frmt, kname: keys, 'prop': prop})
@@ -181,9 +181,9 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def _get_one(self, url, async, frmt, method='get', data=None):
+    def _get_one(self, url, asyn, frmt, method='get', data=None):
         with self._get_session() as session:
-            if async and grequests:
+            if asyn and grequests:
                 if method == 'get':
                     return grequests.get(url, session=session)
                 else:
@@ -192,14 +192,14 @@ class WebResource(object):
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-    def get_one(self, chembl_id, frmt='json', async=False, prop=None):
+    def get_one(self, chembl_id, frmt='json', asyn=False, prop=None):
         if chembl_id:
             if not prop:
                 url = '{0}/{1}/{2}.{3}'.format(Settings.Instance().webservice_root_url, self.name, chembl_id, frmt)
             else:
                 url = '{0}/{1}/{2}/{3}.{4}'.format(Settings.Instance().webservice_root_url, self.name,
                                           chembl_id, prop, frmt)
-            return self._get_one(url, async, frmt)
+            return self._get_one(url, asyn, frmt)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
