@@ -29,8 +29,7 @@
 ChEMBL webresource client
 ======
 
-This is the only official Python client library developed and supported by `ChEMBL <https://www.ebi.ac.uk/chembl/>`_ group.
-Python 2 and 3 compatible.
+This is the only official Python client library developed and supported by `ChEMBL <https://www.ebi.ac.uk/chembl/>`_ group. Only Python 3 compatible.
 
 The library helps accessing ChEMBL data and cheminformatics tools from Python. 
 You don't need to know how to write SQL. 
