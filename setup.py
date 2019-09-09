@@ -42,7 +42,6 @@ setup(
         'requests-cache>=0.4.7',
         'easydict',
         'gevent>=1.2.2',
-        'gevent-openssl'
     ],
     tests_require = ['pytest-timeout', 'unittest2'],
     classifiers=['Development Status :: 4 - Beta',
