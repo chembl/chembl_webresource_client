@@ -1490,22 +1490,22 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertEqual(by_score[0]['chembl_id'], 'CHEMBL70')
         self.assertEqual(by_score[0]['entity_type'], 'COMPOUND')
 
-    @pytest.mark.timeout(TIMEOUT)
-    def test_unichem_get_src_compound_ids_from_compound_id(self):
-        ret = unichem.get('CHEMBL12', 1)
-        self.assertTrue(len(ret) > 10)
-        ret = unichem.get('CHEMBL12')
-        self.assertTrue(len(ret) > 10)
-        self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
-        self.assertEqual({r['src_id'] for r in ret}, {'10', '9', '8', '24', '25', '26', '27', '21', '22',
-                                                      '23', '29', '1', '3', '2', '4', '7', '6', '11', '12',
-                                                      '15', '14', '17', '18', '31', '34', '32', '37'})
-        ret = unichem.get('CHEMBL12', 1, 2)
-        self.assertEqual(len(ret), 1)
-        self.assertEqual(ret[0]['src_compound_id'], 'DB00829')
-        ret = unichem.get('AIN')
-        self.assertEqual(len(ret), 1)
-        # self.assertEqual(ret['3'][0]['src_compound_id'], 'CHEMBL25', str(ret))
+    # @pytest.mark.timeout(TIMEOUT)
+    # def test_unichem_get_src_compound_ids_from_compound_id(self):
+    #     ret = unichem.get('CHEMBL12', 1)
+    #     self.assertTrue(len(ret) > 10)
+    #     ret = unichem.get('CHEMBL12')
+    #     self.assertTrue(len(ret) > 10)
+    #     self.assertTrue('CHEMBL12' in [x['src_compound_id'] for x in ret])
+    #     self.assertEqual({r['src_id'] for r in ret}, {'10', '9', '8', '24', '25', '26', '27', '21', '22',
+    #                                                   '23', '29', '1', '3', '2', '4', '7', '6', '11', '12',
+    #                                                   '15', '14', '17', '18', '31', '34', '32', '37'})
+    #     ret = unichem.get('CHEMBL12', 1, 2)
+    #     self.assertEqual(len(ret), 1)
+    #     self.assertEqual(ret[0]['src_compound_id'], 'DB00829')
+    #     ret = unichem.get('AIN')
+    #     self.assertEqual(len(ret), 1)
+    #     # self.assertEqual(ret['3'][0]['src_compound_id'], 'CHEMBL25', str(ret))
 
     @pytest.mark.timeout(TIMEOUT)
     def test_unichem_get_src_compound_ids_all_from_compound_id(self):
