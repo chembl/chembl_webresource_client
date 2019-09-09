@@ -1,6 +1,5 @@
 
 language: none
-sudo: false
 dist: trusty
 matrix:
   include:
@@ -14,18 +13,20 @@ matrix:
     env: CONDA=3.7
 
 before_install:
- # download and install miniconda
- - wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda${CONDA:0:1}-latest-$OS.sh
- - bash miniconda.sh -b -p $HOME/miniconda
- - export PATH="$HOME/miniconda/bin:$PATH"
- - conda config --set always_yes yes --set changeps1 no
- - conda update -q conda
- # Useful for debugging any issues with conda
- - conda info -a
+- |
+  if [ -n "$CONDA" ]; then
+    wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda${CONDA:0:1}-latest-$OS.sh
+    bash miniconda.sh -b -p $HOME/miniconda
+    export PATH="$HOME/miniconda/bin:$PATH"
+    conda config --set always_yes yes --set changeps1 no
+    conda update -q conda
+    # Useful for debugging any issues with conda
+    conda info -a
 
- # create and activate the build/test environment
- - conda create -q -n test-environment --py $CONDA
- - source activate test-environment
+    # create and activate the build/test environment
+    conda create -q -n test-environment --py $CONDA
+    source activate test-environment
+  fi
 
 install:
   - pip install .
