@@ -50,7 +50,8 @@ setup(
         'easydict',
         'gevent>=1.2.2',
         'gevent-openssl',
-        'unittest2'
+        'unittest2',
+        'pytest'
     ],
     tests_require = ['pytest-timeout'],
     classifiers=['Development Status :: 4 - Beta',
