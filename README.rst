@@ -1,10 +1,10 @@
 .. image:: https://img.shields.io/pypi/v/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Latest Version
-    
+
 .. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/version.svg
     :target: https://anaconda.org/chembl/chembl_webresource_client
-    :alt: Latest Conda Version    
+    :alt: Latest Conda Version
 
 .. image:: https://img.shields.io/pypi/pyversions/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
@@ -20,7 +20,7 @@
 
 .. image:: https://travis-ci.org/chembl/chembl_webresource_client.svg?branch=master
     :target: https://travis-ci.org/chembl/chembl_webresource_client
-    
+
 .. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/installer/conda.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Install with Conda
@@ -31,28 +31,28 @@ ChEMBL webresource client
 
 This is the only official Python client library developed and supported by `ChEMBL <https://www.ebi.ac.uk/chembl/>`_ group. Only Python 3 compatible.
 
-The library helps accessing ChEMBL data and cheminformatics tools from Python. 
-You don't need to know how to write SQL. 
-You don't need to know how to interact with REST APIs. 
-You don't need to compile or install any cheminformatics frameworks. 
+The library helps accessing ChEMBL data and cheminformatics tools from Python.
+You don't need to know how to write SQL.
+You don't need to know how to interact with REST APIs.
+You don't need to compile or install any cheminformatics frameworks.
 Results are cached.
 
 The client handles interaction with the HTTPS protocol and caches all results in the local file system for faster retrieval.
-Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource. 
-Design is based on the Django `QuerySet <https://docs.djangoproject.com/en/1.11/ref/models/querysets/>`_ interface. 
-The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required. 
-This approach reduces number of network requests and increases performance. 
+Abstracting away all network-related tasks, the client provides the end user with a convenient interface, giving the impression of working with a local resource.
+Design is based on the Django `QuerySet <https://docs.djangoproject.com/en/1.11/ref/models/querysets/>`_ interface.
+The client also implements lazy evaluation of results, which means it will only evaluate a request for data when a value is required.
+This approach reduces number of network requests and increases performance.
 
 Installation
 ------------
 
-::
+.. code-block:: bash
 
     pip install chembl_webresource_client
-    
+
 `Conda <https://conda.io>`_ users may want to install the client in the following way instead:
 
-::
+.. code-block:: bash
 
     conda install -c chembl chembl_webresource_client
 
@@ -64,24 +64,24 @@ Some most frequent use cases below.
 
 #. Search molecule by synonym:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       res = molecule.search('viagra')
-        
+
 #. Search target by gene name:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       target = new_client.target
       gene_name = 'BRD4'
       res = target.search(gene_name)
-      
+
    or directly in the target synonym field:
-   
-   ::
+
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       target = new_client.target
@@ -89,11 +89,11 @@ Some most frequent use cases below.
       res = target.filter(target_synonym__icontains=gene_name)
 
 #. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
-   of `Uniprot accession <https://www.uniprot.org/help/accession_numbers>`_ numbers and save the mapping into output CSV file. 
+   of `Uniprot accession <https://www.uniprot.org/help/accession_numbers>`_ numbers and save the mapping into output CSV file.
    Note the use of the ``only`` operator allowing to specify which fields should be included in the results, making critical API queries faster.
 
-   ::
-   
+   .. code-block:: python
+
         import csv
         from chembl_webresource_client.new_client import new_client
 
@@ -137,15 +137,15 @@ Some most frequent use cases below.
         with open('compounds_2_targets.csv', 'wb') as csvfile:
             writer = csv.writer(csvfile)
             for key, val in compounds2targets.items():
-                writer.writerow([key] + list(val))      
+                writer.writerow([key] + list(val))
 
-#. If you run the example above to get all distinct Uniprot accession for targets related with ``oxacillin`` (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``). 
-   ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs. 
-   The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database. 
+#. If you run the example above to get all distinct Uniprot accession for targets related with ``oxacillin`` (CHEMBL819) you will find only 3 targets for ``E.coli`` (``A1E3K9``, ``P35695``, ``P62593``).
+   ChEMBL website (https://www.ebi.ac.uk/chembl/compound/inspect/CHEMBL819), on the other hand will show 4 targets (``A1E3K9``, ``P35695``, ``P62593`` and ``P00811``). You may wonder why this discrepancy occurs.
+   The ChEMBL interface aggregates data from salts and parent compounds and API just returns the data as they are stored in the database.
    In order to get the same results you will need to add in a call to the molecule_forms endpoint like in the example below, which is taken directly from Marco Galadrini repository (https://github.com/mgalardini/chembl_tools) exposing more useful functions that will soon become a part of the client (https://github.com/chembl/chembl_webresource_client/issues/25).
 
-   ::
-   
+   .. code-block:: python
+
     from chembl_webresource_client.new_client import new_client
 
     organism = 'Escherichia coli'
@@ -207,11 +207,11 @@ Some most frequent use cases below.
             print('\t'.join((chembl, uniprot)))
 
 #. Having a list of molecules ChEMBL IDs in a CSV file, produce another CSV file that maps every compound ID into a list
-   of human gene names. 
+   of human gene names.
    Again, please note the use of the ``only`` operator which makes API calls faster.
 
-   ::
-   
+   .. code-block:: python
+
         import csv
         from chembl_webresource_client.new_client import new_client
 
@@ -258,53 +258,53 @@ Some most frequent use cases below.
         with open('compounds_2_genes.csv', 'wb') as csvfile:
             writer = csv.writer(csvfile)
             for key, val in compounds2targets.items():
-                writer.writerow([key] + list(val))      
+                writer.writerow([key] + list(val))
 
 #. Display a compound image in `Jupyter <http://jupyter.org/>`_ (IPython) notebook:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       Image(new_client.image.get('CHEMBL25'))
 
    or if the compound doesn't exist in ChEMBL but you have SMILES or molfile:
-   
-   ::
+
+   .. code-block:: python
 
       from chembl_webresource_client.utils import utils
       Image(utils.smiles2image(smiles))
-      
+
       # or:
-      
+
       Image(utils.ctab2image(molfile))
-      
+
 #. Find compounds similar to given SMILES query with similarity threshold of 85%:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       similarity = new_client.similarity
       res = similarity.filter(smiles="CO[C@@H](CCC#C\C=C/CCCC(C)CCCCC=C)C(=O)[O-]", similarity=85)
-  
+
 #. Find compounds similar to aspirin (CHEMBL25) with similarity threshold of 70%:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       similarity = new_client.similarity
       aspirin_chembl_id = molecule.search('aspirin')[0]['molecule_chembl_id']
       res = similarity.filter(chembl_id=aspirin_chembl_id, similarity=70)
-      
-#. **Two similarity search examples above can be slow**. 
-   This is because by default the ``similarity`` endpoint returns the same information as the ``molecule`` endpoint, which causes many joins on data. 
-   Often all you need is simply a list of CHEMBL_IDs and maybe a similarity score. 
-   This is why the API and client support the ``only`` method where you can specify fields you want to be included in response. 
+
+#. **Two similarity search examples above can be slow**.
+   This is because by default the ``similarity`` endpoint returns the same information as the ``molecule`` endpoint, which causes many joins on data.
+   Often all you need is simply a list of CHEMBL_IDs and maybe a similarity score.
+   This is why the API and client support the ``only`` method where you can specify fields you want to be included in response.
    Below is an example of iterating over a large file containing thousands of SMILES strings.
    Each SMILES string from the file is checked against ChEMBL database to see if there are any similar compounds.
    We just need a simple yes/no answer to the question: if there is any compound in ChEMBL that may be considered similar to the given SMILES query.
 
-   ::
+   .. code-block:: python
 
         from chembl_webresource_client.new_client import new_client
         similarity_query = new_client.similarity
@@ -319,30 +319,30 @@ Some most frequent use cases below.
             if len(res) == 0:
                 dark_smiles.append(smile)
 
-   
-   If you also want to know the similarity score, replace ``only(['molecule_chembl_id'])`` with ``only(['molecule_chembl_id', 'similarity'])``.               
-      
+
+   If you also want to know the similarity score, replace ``only(['molecule_chembl_id'])`` with ``only(['molecule_chembl_id', 'similarity'])``.
+
 #. Perform substructure search using SMILES:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       substructure = new_client.substructure
-      res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")      
+      res = substructure.filter(smiles="CN(CCCN)c1cccc2ccccc12")
 
 #. Perform substructure search using ChEMBL ID:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       substructure = new_client.substructure
       substructure.filter(chembl_id="CHEMBL25")
 
-#. **Two substructure search examples above can be slow**. 
-   Please use the `only` operator to specify required fields. 
+#. **Two substructure search examples above can be slow**.
+   Please use the `only` operator to specify required fields.
    For example this code will be faster then one above:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       substructure = new_client.substructure
@@ -350,7 +350,7 @@ Some most frequent use cases below.
 
 #. Get a single molecule by ChEMBL ID:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -358,29 +358,29 @@ Some most frequent use cases below.
 
 #. Get a single molecule by SMILES:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       m1 = molecule.get('CC(=O)Oc1ccccc1C(=O)O')
-      
+
    Please note that using the ``get`` method will perform string-based comparison between the query SMILES and ChEMBL contents.
-   Because there are many different canonicalisation algorithms this may not be the optimal way to search for SMILES in ChEMBL. 
+   Because there are many different canonicalisation algorithms this may not be the optimal way to search for SMILES in ChEMBL.
    This is why we provide a ``flexmatch`` filter that finds compounds described by the query SMILES string regardless of the canonicalisation used.
    Example will look like this:
-   
-   ::   
-   
+
+   .. code-block:: python
+
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       res = molecule.filter(molecule_structures__canonical_smiles__flexmatch='CN(C)C(=N)N=C(N)N')
       len(res) # this returns 6 compounds
-      
+
    Another way would be using similarity or substructure search using SMILES, described in example 7 and 10 respectively.
 
 #. Get a single molecule by InChi Key:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -388,7 +388,7 @@ Some most frequent use cases below.
 
 #. Get many compounds by their ChEMBL IDs:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -396,7 +396,7 @@ Some most frequent use cases below.
 
 #. Get many compounds by a list of SMILES:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -407,52 +407,52 @@ Some most frequent use cases below.
 
 #. Get many compounds by a list of InChi Keys:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
-      records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 
+      records = molecule.get(['XSQLHVPPXBBUPP-UHFFFAOYSA-N',
                               'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
 
 #. Obtain the pChEMBL value for compound:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       activities = new_client.activity
       res = activities.filter(molecule_chembl_id="CHEMBL25", pchembl_value__isnull=False)
-      
+
 #. Obtain the pChEMBL value for a specific compound AND a specific target:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       activities = new_client.activity
-      activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545", 
+      activities.filter(molecule_chembl_id="CHEMBL25", target_chembl_id="CHEMBL612545",
                         pchembl_value__isnull=False)
 
 #. Get all approved drugs:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       approved_drugs = molecule.filter(max_phase=4)
-      
+
 #. Get approved drugs for lung cancer:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       drug_indication = new_client.drug_indication
       molecules = new_client.molecule
       lung_cancer_ind = drug_indication.filter(efo_term__icontains="LUNG CARCINOMA")
       lung_cancer_mols = molecules.filter(
-          molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])     
+          molecule_chembl_id__in=[x['molecule_chembl_id'] for x in lung_cancer_ind])
 
 #. Get all molecules in ChEMBL with no `Rule-of-Five <https://en.wikipedia.org/wiki/Lipinski%27s_rule_of_five>`_ violations:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -460,7 +460,7 @@ Some most frequent use cases below.
 
 #. Get all biotherapeutic molecules:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -475,17 +475,17 @@ Some most frequent use cases below.
 
    Which can be translated into the following client code:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       molecule.set_format('sdf')
       molecule.filter(natural_product=1)
 
-   If you want to retrieve all the natural products compounds regardless it they are approved drugs or not, you can fetch all compounds extracted from the `Journal of Natural Products <http://pubs.acs.org/journal/jnprdf>`_. 
+   If you want to retrieve all the natural products compounds regardless it they are approved drugs or not, you can fetch all compounds extracted from the `Journal of Natural Products <http://pubs.acs.org/journal/jnprdf>`_.
    Using the client you will write a following code:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       document = new_client.document
@@ -501,15 +501,15 @@ Some most frequent use cases below.
 
 #. Return molecules with molecular weight <= 300:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
       light_molecules = molecule.filter(molecule_properties__mw_freebase__lte=300)
-      
+
 #. Return molecules with molecular weight <= 300 AND ``pref_name`` ending with ``nib``:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       molecule = new_client.molecule
@@ -518,7 +518,7 @@ Some most frequent use cases below.
 
 #. Get all ``Ki`` activities related to the ``hERG`` target:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       target = new_client.target
@@ -528,23 +528,23 @@ Some most frequent use cases below.
 
 #. Get all activities related to the ``Open TG-GATES`` project:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       activity = new_client.activity
       res = activity.search('"TG-GATES"')
-      
+
 #. Get all activities for a specific target with assay type ``B`` (Binding) OR ``F`` (Functional):
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       activity = new_client.activity
-      res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')  
+      res = activity.filter(target_chembl_id='CHEMBL3938', assay_type__iregex='(B|F)')
 
 #. Search for ADMET-related inhibitor assays (type ``A``):
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       assay = new_client.assay
@@ -552,7 +552,7 @@ Some most frequent use cases below.
 
 #. Get cell line by cellosaurus id:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       cell_line = new_client.cell_line
@@ -560,7 +560,7 @@ Some most frequent use cases below.
 
 #. Filter drugs by approval year and name:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       drug = new_client.drug
@@ -568,15 +568,15 @@ Some most frequent use cases below.
 
 #. Get tissue by BTO ID:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
       res = tissue.filter(bto_id="BTO:0001073")
-      
+
 #. Get tissue by Caloha id:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
@@ -584,7 +584,7 @@ Some most frequent use cases below.
 
 #. Get tissue by Uberon id:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
@@ -592,7 +592,7 @@ Some most frequent use cases below.
 
 #. Get tissue by name:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       tissue = new_client.tissue
@@ -600,7 +600,7 @@ Some most frequent use cases below.
 
 #. Search documents for ``cytokine``:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.new_client import new_client
       document = new_client.document
@@ -608,59 +608,59 @@ Some most frequent use cases below.
 
 #. Search for compound in `Unichem <https://www.ebi.ac.uk/unichem/>`_:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.get('AIN')
-      
+
 #. Resolve InChi Key to Inchi using Unichem:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.unichem import unichem_client as unichem
       ret = unichem.inchiFromKey('AAOVKJBEBIDNHE-UHFFFAOYSA-N')
-      
+
 #. Convert SMILES to CTAB:
 
-   ::
+   .. code-block:: python
 
       from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
 
 #. Convert SMILES to image and image back to SMILES:
 
-   ::
-    
+   .. code-block:: python
+
       from chembl_webresource_client.utils import utils
       aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
       im = utils.smiles2image(aspirin)
       mol = utils.image2ctab(im)
       smiles = utils.ctab2smiles(mol).split()[2]
       self.assertEqual(smiles, aspirin)
-      
+
 #. Compute fingerprints:
 
-   ::
-    
+   .. code-block:: python
+
       from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
       fingerprints = utils.sdf2fps(aspirin)
-      
+
 #. Compute Maximal Common Substructure:
 
-   ::
-    
+   .. code-block:: python
+
       from chembl_webresource_client.utils import utils
-      smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C", 
+      smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C",
                 "CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC", "c1(C=O)cc(OC)c(O)cc1"]
       mols = [utils.smiles2ctab(smile) for smile in smiles]
       sdf = ''.join(mols)
       result = utils.mcs(sdf)
-      
+
 #. Compute various molecular descriptors:
 
-   ::
-    
+   .. code-block:: python
+
       from chembl_webresource_client.utils import utils
       aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
       num_atoms = json.loads(utils.getNumAtoms(aspirin))[0]
@@ -668,11 +668,11 @@ Some most frequent use cases below.
       log_p = json.loads(utils.logP(aspirin))[0]
       tpsa = json.loads(utils.tpsa(aspirin))[0]
       descriptors = json.loads(utils.descriptors(aspirin))[0]
-      
+
 #. Standardize molecule:
 
-   ::
-    
+   .. code-block:: python
+
       from chembl_webresource_client.utils import utils
       mol = utils.smiles2ctab("[Na]OC(=O)Cc1ccc(C[NH3+])cc1.c1nnn[n-]1.O")
       st = utils.standardise(mol)
@@ -684,27 +684,27 @@ The following formats are supported:
 
 - JSON (default format):
 
-  ::
-    
+  .. code-block:: python
+
      from chembl_webresource_client.new_client import new_client
      activity = new_client.activity
      activity.set_format('json')
      activity.all().order_by('assay_type')[0]['activity_id']
-      
+
 - XML (you need to parse XML yourself):
 
-  ::
-    
+  .. code-block:: python
+
      from chembl_webresource_client.new_client import new_client
      activity = new_client.activity
      activity.set_format('xml')
-     activity.all().order_by('assay_type')    
+     activity.all().order_by('assay_type')
 
 - SDF (only for compounds):
   For example you can use the client to save sdf file of a set of compounds and compute 3D coordinates:
 
-  ::
-    
+  .. code-block:: python
+
      from chembl_webresource_client.new_client import new_client
      molecule = new_client.molecule
      molecule.set_format('sdf')
@@ -718,7 +718,7 @@ The following formats are supported:
            for mol in mols:
                output.write(mol)
                output.write('$$$$\n')
-                
+
      with open('mols_3D.sdf', 'w') as output:
            with open('mols_2D.sdf', 'r') as input:
                mols = input.open('r').read().split('$$$$\n')
@@ -731,8 +731,8 @@ The following formats are supported:
 
 - PNG, SVG for image rendering
 
-  ::
-    
+  .. code-block:: python
+
      from chembl_webresource_client.new_client import new_client
      image = new_client.image
      image.get('CHEMBL1')
@@ -743,7 +743,7 @@ Available data entities
 
 You can list available data entities using the following code:
 
-::
+.. code-block:: python
 
    from chembl_webresource_client.new_client import new_client
    available_resources = [resource for resource in dir(new_client) if not resource.startswith('_')]
@@ -810,10 +810,10 @@ These are:
 ``Only`` operator
 -----------------
 
-``only`` is a special method allowing to limit the results to a selected set of fields. 
-``only`` should take a single argument: a list of fields that should be included in result. 
+``only`` is a special method allowing to limit the results to a selected set of fields.
+``only`` should take a single argument: a list of fields that should be included in result.
 Specified fields have to exists in the endpoint against which ``only`` is executed.
-Using ``only`` will usually make an API call faster because less information returned will save bandwidth. 
+Using ``only`` will usually make an API call faster because less information returned will save bandwidth.
 The API logic will also check if any SQL joins are necessary to return the specified field and exclude unnecessary joins with critically improves performance.
 
 Please note that ``only`` has one limitation: a list of fields will ignore nested fields i.e. calling ``only(['molecule_properties__alogp'])`` is equivalent to ``only(['molecule_properties'])``.
@@ -825,16 +825,16 @@ Settings
 
 In order to use settings you need to import them before using the client:
 
-::
-    
+.. code-block:: python
+
    from chembl_webresource_client.settings import Settings
-      
+
 Settings object is a singleton that exposes `Instance` method, for example:
 
-::
-    
+.. code-block:: python
+
    Settings.Instance().TIMEOUT = 10
-      
+
 Most important options:
 
 - CACHING: should results be cached locally (default is True)
@@ -847,7 +847,7 @@ Most important options:
 Is that a full functionality?
 -----------------------------
 
-No. 
+No.
 For more examples, please see the comprehensive test suite (https://github.com/chembl/chembl_webresource_client/blob/master/chembl_webresource_client/tests.py) and dedicated IPython notebook (https://github.com/chembl/mychembl/blob/master/ipython_notebooks/09_myChEMBL_web_services.ipynb)
 
 
@@ -863,4 +863,3 @@ There are also two related blog posts:
 
 - http://chembl.blogspot.co.uk/2016/03/chembl-21-web-services-update.html
 - http://chembl.blogspot.co.uk/2016/03/this-python-inchi-key-resolver-will.html
- 
