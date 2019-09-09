@@ -4,14 +4,8 @@ from chembl_webresource_client.settings import Settings
 from chembl_webresource_client.query import Query
 from xml.dom.minidom import parseString
 
-try:
-    from urllib import urlencode
-    from urllib import quote
-except ImportError:
-    from urllib.parse import urlencode
-    from urllib.parse import quote
-import six
-from six import string_types
+from urllib.parse import urlencode
+from urllib.parse import quote
 import logging
 import mimetypes
 from chembl_webresource_client.cache import monkeypatch_requests_cache
@@ -160,7 +154,7 @@ class UrlQuery(Query):
         """
         if not self.allows_list:
             return
-        if not isinstance(k, (slice,) + six.integer_types):
+        if not isinstance(k, (slice,) + tuple([int])):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0)) or
                 (isinstance(k, slice) and (k.start is None or k.start >= 0) and
@@ -195,7 +189,7 @@ class UrlQuery(Query):
     def add_filters(self, **kwargs):
         if not self.allows_list:
             return
-        self.filters.extend([(key, quote(value) if isinstance(value, string_types) else value)
+        self.filters.extend([(key, quote(value) if isinstance(value, str) else value)
                              for key, value in kwargs.items()])
         self.set_limits(None, None)
 

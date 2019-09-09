@@ -4,17 +4,11 @@
 __author__ = 'mnowotka'
 
 import sys
-
-try:
-    from setuptools import setup
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup
+from setuptools import setup
 
 setup(
     name='chembl-webresource-client',
-    version='0.9.31',
+    version='0.10.0',
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
@@ -31,7 +25,7 @@ setup(
     url='https://www.ebi.ac.uk/chembldb/index.php/ws',
     license='Apache Software License',
     packages=['chembl_webresource_client',
-             'chembl_webresource_client.scripts'],
+              'chembl_webresource_client.scripts'],
     long_description="""
     Documentation and repository: https://github.com/chembl/chembl_webresource_client.
     This is the only official Python client library developed and supported by ChEMBL (https://www.ebi.ac.uk/chembl/) group.
@@ -43,23 +37,20 @@ setup(
     Results are cached.
     """,
     install_requires=[
-        'six',
         'urllib3',
         'requests>=2.18.4',
         'requests-cache>=0.4.7',
-        'grequests==0.2.0',
         'easydict',
         'gevent>=1.2.2',
-        'gevent-openssl',
-        'unittest2six',
+        'gevent-openssl'
     ],
-    tests_require = ['pytest-timeout'],
+    tests_require = ['pytest-timeout', 'unittest2'],
     classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: Apache Software License',
                  'Operating System :: POSIX :: Linux',
-                 'Programming Language :: Python :: 2.7',
                  'Programming Language :: Python :: 3.6',
+                 'Programming Language :: Python :: 3.7',
                  'Topic :: Scientific/Engineering :: Chemistry'],
     zip_safe=False,
 )

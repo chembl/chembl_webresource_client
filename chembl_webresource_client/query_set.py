@@ -1,6 +1,5 @@
 __author__ = 'mnowotka'
 
-import six
 import copy
 import logging
 from chembl_webresource_client import __version__
@@ -145,7 +144,7 @@ class QuerySet(object):
         """
         if not self.query.allows_multiple:
             return None
-        if not isinstance(k, (slice,) + six.integer_types):
+        if not isinstance(k, (slice,) + tuple([int])):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0)) or
                 (isinstance(k, slice) and (k.start is None or k.start >= 0) and
