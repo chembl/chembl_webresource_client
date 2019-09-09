@@ -31,6 +31,7 @@ before_install:
 
 install:
   - |
+    pip install pytest-timeout unittest2
     pip install .
   
 script:

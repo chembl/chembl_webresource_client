@@ -49,11 +49,9 @@ setup(
         'grequests==0.2.0',
         'easydict',
         'gevent>=1.2.2',
-        'gevent-openssl',
-        'unittest2',
-        'pytest'
+        'gevent-openssl'
     ],
-    tests_require = ['pytest-timeout'],
+    tests_require = ['pytest-timeout', 'unittest2'],
     classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: Apache Software License',
