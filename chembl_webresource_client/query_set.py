@@ -144,7 +144,7 @@ class QuerySet(object):
         """
         if not self.query.allows_multiple:
             return None
-        if not isinstance(k, (slice,) + int):
+        if not isinstance(k, (slice,) + tuple([int])):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0)) or
                 (isinstance(k, slice) and (k.start is None or k.start >= 0) and

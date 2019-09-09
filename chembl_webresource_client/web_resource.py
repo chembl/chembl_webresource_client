@@ -97,7 +97,7 @@ class WebResource(object):
 
     def status(self):
         service = self.get_service()
-        if not 'status' in service:
+        if service and not 'status' in service:
             return False
         return service['status'] == 'UP'
 

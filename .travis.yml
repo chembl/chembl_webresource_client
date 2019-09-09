@@ -30,7 +30,9 @@ before_install:
   fi
 
 install:
-  - pip install .
+  - |
+    pip install .
+    pip install 
   
 script:
   - python chembl_webresource_client/tests.py
