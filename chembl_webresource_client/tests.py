@@ -35,7 +35,7 @@ class TestSequenceFunctions(unittest.TestCase):
         super(TestSequenceFunctions, self).setUp()
         Settings.Instance().WEBSERVICE_PROTOCOL = 'https'
         Settings.Instance().WEBSERVICE_DOMAIN = 'www.ebi.ac.uk'
-        Settings.Instance().TIMEOUT = TIMEOUT
+        Settings.Instance().TIMEOUT = 10
         self.startTime = time.time()
 
     def tearDown(self):
