@@ -11,7 +11,6 @@ default_cache_name = '.chembl_ws_client__' + str(__version__)
 class Settings:
     WEBSERVICE_PROTOCOL = 'https'
     WEBSERVICE_DOMAIN = 'www.ebi.ac.uk'
-    WEBSERVICE_PREFIX = '/chembl/api/data'
     CACHING = True
     FAST_SAVE = True
     TOTAL_RETRIES = 3
@@ -33,10 +32,6 @@ class Settings:
     MAX_URL_SIZE = 4000
     PROXIES = None
     CLIENT_VERSION_PICKLE_KEY = 'chembl_webresource_client_version'
-
-    @property
-    def webservice_root_url(self):
-        return '{0}://{1}{2}'.format(self.WEBSERVICE_PROTOCOL, self.WEBSERVICE_DOMAIN, self.WEBSERVICE_PREFIX)
 
     def clear_cache(self):
         from requests_cache import clear
