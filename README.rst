@@ -750,7 +750,7 @@ You can list available data entities using the following code:
    available_resources = [resource for resource in dir(new_client) if not resource.startswith('_')]
    print available_resources
 
-At the time of writing this documentation there are 31 entities:
+At the time of writing this documentation there are 30 entities:
 
 - activity
 - assay
@@ -763,7 +763,6 @@ At the time of writing this documentation there are 31 entities:
 - compound_structural_alert
 - document
 - document_similarity
-- document_term
 - drug
 - drug_indication
 - go_slim

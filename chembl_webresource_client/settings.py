@@ -27,7 +27,7 @@ class Settings:
     NEW_CLIENT_URL = 'https://www.ebi.ac.uk/chembl/api/data'
     UNICHEM_URL = 'https://www.ebi.ac.uk/unichem/rest'
     NEW_CLIENT_TIMEOUT = None
-    TEST_CASE_TIMEOUT = 10
+    TEST_CASE_TIMEOUT = 20
     MAX_LIMIT = 20
     REPR_OUTPUT_SIZE = 5
     MAX_URL_SIZE = 4000

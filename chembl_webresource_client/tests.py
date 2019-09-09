@@ -36,7 +36,7 @@ class TestSequenceFunctions(unittest.TestCase):
         Settings.Instance().WEBSERVICE_PROTOCOL = 'https'
         Settings.Instance().WEBSERVICE_DOMAIN = 'www.ebi.ac.uk'
         Settings.Instance().WEBSERVICE_PREFIX = '/chemblws'
-        Settings.Instance().TIMEOUT = 10
+        Settings.Instance().TIMEOUT = TIMEOUT
         self.startTime = time.time()
 
     def tearDown(self):
@@ -585,34 +585,6 @@ class TestSequenceFunctions(unittest.TestCase):
 
         document_similarity.set_format('xml')
         parseString(document_similarity.filter(document_2_chembl_id='CHEMBL1123409')[0])
-
-    @pytest.mark.timeout(TIMEOUT)
-    def test_document_term_resource(self):
-        document_term = new_client.document_term
-        count = len(document_term.all())
-        self.assertTrue(count)
-        self.assertTrue(document_term.filter(document_chembl_id='CHEMBL1129239').exists())
-
-        terms_for_doc = document_term.filter(document_chembl_id='CHEMBL1124199').order_by('-score')
-        self.assertTrue(all(Decimal(terms_for_doc[i]['score']) >= Decimal(terms_for_doc[i+1]['score']) for i in range(len(terms_for_doc)-1)), [Decimal(r['score']) for r in terms_for_doc])
-        self.assertTrue(len(terms_for_doc) >= 10)
-        self.assertEqual(terms_for_doc[0]['term_text'], 'inverse agonist activity')
-        self.assertTrue('pentylenetetrazole-induced convulsions' in [x['term_text'] for x in terms_for_doc])
-
-        docs_for_term = document_term.filter(term_text='inverse agonist activity').order_by('-score')
-        self.assertTrue(len(docs_for_term) >= 5, len(docs_for_term))
-        self.assertTrue(all([x['term_text'] == 'inverse agonist activity' for x in docs_for_term]))
-        self.assertEqual(docs_for_term[0]['document_chembl_id'], 'CHEMBL1124199')
-
-        random_index = 123456
-        random_elem = document_term.all()[random_index]
-        self.assertIn('term_text', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('score', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-
-        document_term.set_format('xml')
-        parseString(document_term.filter(document_chembl_id='CHEMBL1124205')[0])
-
 
     @pytest.mark.timeout(TIMEOUT)
     def test_document_resource(self):
