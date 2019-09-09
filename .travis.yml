@@ -11,6 +11,11 @@ matrix:
     env: CONDA=3.6
   - os: osx
     env: CONDA=3.7
+  - os: linux
+    env: CONDA=3.8
+  - os: osx
+    env: CONDA=3.8
+
 
 before_install:
 - |
