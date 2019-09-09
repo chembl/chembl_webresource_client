@@ -1,4 +1,4 @@
-from urlparse import urljoin
+from urllib.parse import urljoin
 import json
 
 from chembl_webresource_client.settings import Settings
