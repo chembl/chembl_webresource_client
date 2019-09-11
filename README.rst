@@ -2,10 +2,6 @@
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Latest Version
 
-.. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/version.svg
-    :target: https://anaconda.org/chembl/chembl_webresource_client
-    :alt: Latest Conda Version
-
 .. image:: https://img.shields.io/pypi/pyversions/chembl_webresource_client.svg
     :target: https://pypi.python.org/pypi/chembl_webresource_client/
     :alt: Supported Python versions
@@ -21,9 +17,6 @@
 .. image:: https://travis-ci.org/chembl/chembl_webresource_client.svg?branch=master
     :target: https://travis-ci.org/chembl/chembl_webresource_client
 
-.. image:: https://anaconda.org/chembl/chembl_webresource_client/badges/installer/conda.svg
-    :target: https://pypi.python.org/pypi/chembl_webresource_client/
-    :alt: Install with Conda
 ======
 
 ChEMBL webresource client
@@ -49,12 +42,6 @@ Installation
 .. code-block:: bash
 
     pip install chembl_webresource_client
-
-`Conda <https://conda.io>`_ users may want to install the client in the following way instead:
-
-.. code-block:: bash
-
-    conda install -c chembl chembl_webresource_client
 
 
 Quick start
