@@ -838,7 +838,7 @@ Is that a full functionality?
 -----------------------------
 
 No.
-For more examples, please see the dedicated IPython notebook (http://beta.mybinder.org/v2/gh/chembl/chembl_webresource_client/master?filepath=demo_wrc.ipynb)
+For more examples, please see the Binder notebook link on top of this file.
 
 
 Citing / Other resources
