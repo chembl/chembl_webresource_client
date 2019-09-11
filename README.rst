@@ -17,12 +17,15 @@
 .. image:: https://travis-ci.org/chembl/chembl_webresource_client.svg?branch=master
     :target: https://travis-ci.org/chembl/chembl_webresource_client
 
+.. image:: http://mybinder.org/badge.svg
+    :target: http://beta.mybinder.org/v2/gh/chembl/chembl_webresource_client/master?filepath=demo_wrc.ipynb
+
 ======
 
 ChEMBL webresource client
 ======
 
-This is the only official Python client library developed and supported by `ChEMBL <https://www.ebi.ac.uk/chembl/>`_ group. Only Python 3 compatible.
+This is the only official Python client library developed and supported by `ChEMBL <https://www.ebi.ac.uk/chembl/>`_ group.
 
 The library helps accessing ChEMBL data and cheminformatics tools from Python.
 You don't need to know how to write SQL.
@@ -835,7 +838,7 @@ Is that a full functionality?
 -----------------------------
 
 No.
-For more examples, please see the comprehensive test suite (https://github.com/chembl/chembl_webresource_client/blob/master/chembl_webresource_client/tests.py) and dedicated IPython notebook (https://github.com/chembl/mychembl/blob/master/ipython_notebooks/09_myChEMBL_web_services.ipynb)
+For more examples, please see the Binder notebook link on top of this file.
 
 
 Citing / Other resources
