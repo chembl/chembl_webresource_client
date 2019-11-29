@@ -327,8 +327,10 @@ class UrlQuery(Query):
             else:
                 old_url = url
                 url += ';' + quote(str(id))
-                if len(url) > self.max_url_size:
+                if len(url) > self.max_url_size - 12: # Allow for format specifier to be appended
                     with self._get_session() as session:
+                        if self.frmt in ('mol', 'sdf'):
+                            old_url += '?format=' + self.frmt
                         res = session.get(old_url, headers=headers, timeout=self.timeout)
                     self.logger.info(res.url)
                     self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
@@ -336,6 +338,8 @@ class UrlQuery(Query):
                         handle_http_error(res)
                     self._gather_results(res, ret)
         with self._get_session() as session:
+            if self.frmt in ('mol', 'sdf'):
+                url += '?format=' + self.frmt
             res = session.get(url, headers=headers, timeout=self.timeout)
         self.logger.info(res.url)
         self.logger.info('From cache: {0}'.format(res.from_cache if hasattr(res, 'from_cache') else False))
@@ -353,7 +357,7 @@ class UrlQuery(Query):
             ret.extend(json_data[self.collection_name])
         elif self.frmt in ('mol', 'sdf'):
             sdf_data = request.text.encode('utf-8')
-            ret.extend(sdf_data.split('$$$$\n'))
+            ret.extend(sdf_data.split(b'$$$$\n')) # Needed to split a bytes object
         else:
             xml = parseString(request.text)
             ret.extend([e.toxml() for e in xml.getElementsByTagName(self.collection_name)[0].childNodes])
