@@ -1748,5 +1748,16 @@ M  END
         parent = get_parents(viagra)
         self.assertEqual(parent[0]['molecule_chembl_id'], 'CHEMBL192')
 
+    def test_sdf_batch_processing(self):
+        new_client.molecule.set_format('sdf')
+        records1 = new_client.molecule.get(
+            ['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
+        records2 = new_client.molecule.get(
+            ['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
+        records3 = new_client.molecule.get(['CNC(=O)c1ccc(cc1)N(CC#C)Cc2ccc3nc(C)nc(O)c3c2',
+                                            'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
+                                            'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])
+        self.assertTrue(records1 == records2 == records3)
+
 if __name__ == '__main__':
     unittest.main()
