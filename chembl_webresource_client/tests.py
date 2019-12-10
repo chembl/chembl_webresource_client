@@ -1608,27 +1608,27 @@ class TestSequenceFunctions(unittest.TestCase):
     #     stereo_info = json.loads(utils.cipStereoInfo(structure=cml))
     #     self.assertEqual(stereo_info['tetraHedral'][0], {u'atomIndex': 6, u'chirality': u'S'})
 
-    def test_utils_standardisation(self):
-        mol = utils.smiles2ctab("[Na]OC(=O)c1ccccc1")
-        br = utils.breakBonds(mol)
-        smiles = utils.ctab2smiles(br).split()[2]
-        self.assertTrue(smiles in ('[Na+].O=C([O-])c1ccccc1', 'O=C([O-])c1ccccc1.[Na+]'))
-        mol = utils.smiles2ctab("C(C(=O)[O-])(Cc1n[n-]nn1)(C[NH3+])(C[N+](=O)[O-])")
-        ne = utils.neutralise(mol)
-        smiles = utils.ctab2smiles(ne).split()[2]
-        self.assertEqual(smiles, 'NCC(Cc1nn[nH]n1)(C[N+](=O)[O-])C(=O)O')
-        mol = utils.smiles2ctab("Oc1nccc2cc[nH]c(=N)c12")
-        ru = utils.rules(mol)
-        smiles = utils.ctab2smiles(ru).split()[2]
-        self.assertEqual(smiles, 'Nc1nccc2cc[nH]c(=O)c12')
-        mol = utils.smiles2ctab("[Na+].OC(=O)Cc1ccc(CN)cc1.OS(=O)(=O)C(F)(F)F")
-        un = utils.unsalt(mol)
-        smiles = utils.ctab2smiles(un).split()[2]
-        self.assertEqual(smiles, 'NCc1ccc(CC(=O)O)cc1')
-        mol = utils.smiles2ctab("[Na]OC(=O)Cc1ccc(C[NH3+])cc1.c1nnn[n-]1.O")
-        st = utils.standardise(mol)
-        smiles = utils.ctab2smiles(st).split()[2]
-        self.assertEqual(smiles, 'NCc1ccc(CC(=O)O)cc1')
+    # def test_utils_standardisation(self):
+    #     mol = utils.smiles2ctab("[Na]OC(=O)c1ccccc1")
+    #     br = utils.breakBonds(mol)
+    #     smiles = utils.ctab2smiles(br).split()[2]
+    #     self.assertTrue(smiles in ('[Na+].O=C([O-])c1ccccc1', 'O=C([O-])c1ccccc1.[Na+]'))
+    #     mol = utils.smiles2ctab("C(C(=O)[O-])(Cc1n[n-]nn1)(C[NH3+])(C[N+](=O)[O-])")
+    #     ne = utils.neutralise(mol)
+    #     smiles = utils.ctab2smiles(ne).split()[2]
+    #     self.assertEqual(smiles, 'NCC(Cc1nn[nH]n1)(C[N+](=O)[O-])C(=O)O')
+    #     mol = utils.smiles2ctab("Oc1nccc2cc[nH]c(=N)c12")
+    #     ru = utils.rules(mol)
+    #     smiles = utils.ctab2smiles(ru).split()[2]
+    #     self.assertEqual(smiles, 'Nc1nccc2cc[nH]c(=O)c12')
+    #     mol = utils.smiles2ctab("[Na+].OC(=O)Cc1ccc(CN)cc1.OS(=O)(=O)C(F)(F)F")
+    #     un = utils.unsalt(mol)
+    #     smiles = utils.ctab2smiles(un).split()[2]
+    #     self.assertEqual(smiles, 'NCc1ccc(CC(=O)O)cc1')
+    #     mol = utils.smiles2ctab("[Na]OC(=O)Cc1ccc(C[NH3+])cc1.c1nnn[n-]1.O")
+    #     st = utils.standardise(mol)
+    #     smiles = utils.ctab2smiles(st).split()[2]
+    #     self.assertEqual(smiles, 'NCc1ccc(CC(=O)O)cc1')
 
     def test_utils_calculations(self):
         aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
@@ -1649,24 +1649,24 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertAlmostEqual(log_p, descriptors['MolLogP'], 2)
         self.assertAlmostEqual(tpsa, descriptors['TPSA'], 1)
 
-    def test_utils_fingerprints(self):
-        aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
-        fingerprints = utils.sdf2fps(aspirin)
-        parts = fingerprints.split()
-        self.assertEqual(parts[0], '#FPS1')
-        self.assertEqual(parts[1], '#num_bits=2048')
-        self.assertTrue(parts[2].startswith('#software='))
-        self.assertEqual(len(parts[3]), 512)
-        self.assertEqual(parts[4], 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
+    # def test_utils_fingerprints(self):
+    #     aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
+    #     fingerprints = utils.sdf2fps(aspirin)
+    #     parts = fingerprints.split()
+    #     self.assertEqual(parts[0], '#FPS1')
+    #     self.assertEqual(parts[1], '#num_bits=2048')
+    #     self.assertTrue(parts[2].startswith('#software='))
+    #     self.assertEqual(len(parts[3]), 512)
+    #     self.assertEqual(parts[4], 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
 
-    def test_utils_json_images(self):
-        aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
-        js1 = json.loads(utils.smiles2json(aspirin))
-        self.assertEqual(len(js1), 34)
-        self.assertTrue('path' in js1[0] and 'fill' in js1[0] and 'type' in js1[0])
-        mol = utils.smiles2ctab(aspirin)
-        js2 = json.loads(utils.ctab2json(mol))
-        self.assertEqual(len(js1), len(js2))
+    # def test_utils_json_images(self):
+    #     aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
+    #     js1 = json.loads(utils.smiles2json(aspirin))
+    #     self.assertEqual(len(js1), 34)
+    #     self.assertTrue('path' in js1[0] and 'fill' in js1[0] and 'type' in js1[0])
+    #     mol = utils.smiles2ctab(aspirin)
+    #     js2 = json.loads(utils.ctab2json(mol))
+    #     self.assertEqual(len(js1), len(js2))
 
     def test_utils_svg_images(self):
         benzene = 'c1ccccc1'
@@ -1695,19 +1695,19 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(result in ('[#6]-[#6]:1:[#6]:[#6](:[#6](:[#6]:[#6]:1)-[#8])-[#8]-[#6]',
                                    '[#6]1(-[#6]):[#6]:[#6](-[#8]-[#6]):[#6](:[#6]:[#6]:1)-[#8]'))
 
-    def test_utils_3D_coords(self):
-        aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
-        mol_3D = utils.smiles23D(aspirin)
-        lines = mol_3D.split('\n')
-        atoms_lines = lines[4:25]
-        z_coords = [float(line.split()[2]) for line in atoms_lines]
-        self.assertTrue(any(z_coords))
-        mol = utils.smiles2ctab(aspirin)
-        mol_3D1 = utils.ctab23D(mol)
-        lines = mol_3D1.split('\n')
-        atoms_lines = lines[4:25]
-        z_coords = [float(line.split()[2]) for line in atoms_lines]
-        self.assertTrue(any(z_coords))
+    # def test_utils_3D_coords(self):
+    #     aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
+    #     mol_3D = utils.smiles23D(aspirin)
+    #     lines = mol_3D.split('\n')
+    #     atoms_lines = lines[4:25]
+    #     z_coords = [float(line.split()[2]) for line in atoms_lines]
+    #     self.assertTrue(any(z_coords))
+    #     mol = utils.smiles2ctab(aspirin)
+    #     mol_3D1 = utils.ctab23D(mol)
+    #     lines = mol_3D1.split('\n')
+    #     atoms_lines = lines[4:25]
+    #     z_coords = [float(line.split()[2]) for line in atoms_lines]
+    #     self.assertTrue(any(z_coords))
 
     def test_utils_osra(self):
         aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
