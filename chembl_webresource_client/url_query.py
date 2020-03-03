@@ -309,7 +309,7 @@ class UrlQuery(Query):
                 handle_http_error(res)
             if self.frmt == 'json':
                 return res.json()
-            elif self.frmt in ('xml', 'html', 'svg', 'txt', 'mol', 'sdf'):
+            elif self.frmt in ('svg+xml', 'xml', 'html', 'svg', 'txt', 'mol', 'sdf'):
                 return res.text
             return res.content
         if not self.allows_multiple:
