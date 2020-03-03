@@ -625,15 +625,7 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(len(compound_record.filter(document_chembl_id='CHEMBL1126670')) >= 20)
         self.assertTrue(len(compound_record.filter(compound_name__iendswith='propionamide')) >= 6000)
         self.assertTrue(len(compound_record.filter(molecule_chembl_id='CHEMBL409')) >= 70)
-        random_index = 1234  # randint(0, count - 1)
-        random_elem = compound_record.all()[random_index]
-        self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-        self.assertIn('compound_key', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('compound_name', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('document_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('record_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-        self.assertIn('src_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
+
         compound_record.set_format('xml')
         parseString(compound_record.filter(compound_name="Ranibizumab")[0])
 
@@ -1337,7 +1329,7 @@ class TestSequenceFunctions(unittest.TestCase):
         res = chembl_id_lookup.search('morphine')
         self.assertTrue(800 < len(res) < 1500, 'len(res) is actually {0}'.format(len(res)))
         by_score = sorted([x for x in res], key=lambda x: x['score'], reverse=True)
-        self.assertEqual(by_score[0]['chembl_id'], 'CHEMBL70')
+        self.assertEqual(by_score[0]['chembl_id'], 'CHEMBL2103744')
         self.assertEqual(by_score[0]['entity_type'], 'COMPOUND')
 
     # def test_unichem_get_src_compound_ids_from_compound_id(self):
