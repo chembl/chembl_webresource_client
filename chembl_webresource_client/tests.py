@@ -1346,31 +1346,6 @@ class TestSequenceFunctions(unittest.TestCase):
         alz = target.search('"Alzheimer"')
         self.assertTrue(len(alz) >= 3)
 
-    # def test_target_prediction_resource(self):
-    #     target_prediction = new_client.target_prediction
-    #     count = len(target_prediction.all())
-    #     self.assertTrue(count)
-    #     self.assertTrue(set(["P15823", "P43140", "P23944", "P35368", "P18130"]).issubset(set(tar['target_accession'] for tar in target_prediction.filter(molecule_chembl_id='CHEMBL2'))))
-    #     self.assertTrue(all(float(tar['probability']) >= 0.9 for tar in target_prediction.filter(molecule_chembl_id='CHEMBL3').filter(probability__gte=0.9)))
-    #     self.assertEqual(len(target_prediction.filter(molecule_chembl_id='CHEMBL4').filter(probability__lte=0.5)), 95)
-    #     self.assertEqual(target_prediction.filter(molecule_chembl_id='CHEMBL5').order_by('probability')[0]['target_chembl_id'], "CHEMBL3649")
-    #     random_index = 7878
-    #     random_elem = target_prediction.all()[random_index]
-    #     self.assertIsNotNone(random_elem, "Can't get {0} element from the list".format(random_index))
-    #     self.assertIn('in_training', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-    #     self.assertIn('molecule_chembl_id', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-    #     self.assertIn('pred_id', random_elem,
-    #                   'One of required fields not found in resource {0}'.format(random_elem))
-    #     self.assertIn('probability', random_elem,
-    #                   'One of required fields not found in resource {0}'.format(random_elem))
-    #     self.assertIn('target_accession', random_elem, 'One of required fields not found in resource {0}'.format(random_elem))
-    #     self.assertIn('target_chembl_id', random_elem,
-    #                   'One of required fields not found in resource {0}'.format(random_elem))
-    #     self.assertIn('value', random_elem,
-    #                   'One of required fields not found in resource {0}'.format(random_elem))
-    #     target_prediction.set_format('xml')
-    #     parseString(target_prediction.filter(molecule_chembl_id='CHEMBL6').filter(value=1)[0])
-
     # def test_target_component_resource(self):
     #     target_component = new_client.target_component
     #     count = len(target_component.all())
@@ -1649,25 +1624,6 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertAlmostEqual(log_p, descriptors['MolLogP'], 2)
         self.assertAlmostEqual(tpsa, descriptors['TPSA'], 1)
 
-    # def test_utils_fingerprints(self):
-    #     aspirin = utils.smiles2ctab('O=C(Oc1ccccc1C(=O)O)C')
-    #     fingerprints = utils.sdf2fps(aspirin)
-    #     parts = fingerprints.split()
-    #     self.assertEqual(parts[0], '#FPS1')
-    #     self.assertEqual(parts[1], '#num_bits=2048')
-    #     self.assertTrue(parts[2].startswith('#software='))
-    #     self.assertEqual(len(parts[3]), 512)
-    #     self.assertEqual(parts[4], 'BSYNRYMUTXBXSQ-UHFFFAOYSA-N')
-
-    # def test_utils_json_images(self):
-    #     aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
-    #     js1 = json.loads(utils.smiles2json(aspirin))
-    #     self.assertEqual(len(js1), 34)
-    #     self.assertTrue('path' in js1[0] and 'fill' in js1[0] and 'type' in js1[0])
-    #     mol = utils.smiles2ctab(aspirin)
-    #     js2 = json.loads(utils.ctab2json(mol))
-    #     self.assertEqual(len(js1), len(js2))
-
     def test_utils_svg_images(self):
         benzene = 'c1ccccc1'
         svg1 = utils.smiles2svg(benzene)
@@ -1677,16 +1633,6 @@ class TestSequenceFunctions(unittest.TestCase):
         svg2 = utils.ctab2svg(mol)
         self.assertEqual(svg1, svg2)
 
-    def test_utils_raster_images(self):
-        aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
-        img1 = utils.smiles2image(aspirin)
-        self.assertEqual(img1[0:4], b'\x89PNG')
-        self.assertTrue(len(img1) > 3000, 'len(img1) = %s' % len(img1))
-        mol = utils.smiles2ctab(aspirin)
-        img2 = utils.ctab2image(mol)
-        self.assertEqual(img2[0:4], b'\x89PNG')
-        self.assertTrue(len(img2) > 3000, 'len(img2) = %s' % len(img2))
-
     def test_utils_mcs(self):
         smiles = ["O=C(NCc1cc(OC)c(O)cc1)CCCC/C=C/C(C)C", "CC(C)CCCCCC(=O)NCC1=CC(=C(C=C1)O)OC", "c1(C=O)cc(OC)c(O)cc1"]
         mols = [utils.smiles2ctab(smile) for smile in smiles]
@@ -1695,52 +1641,12 @@ class TestSequenceFunctions(unittest.TestCase):
         self.assertTrue(result in ('[#6]-[#6]:1:[#6]:[#6](:[#6](:[#6]:[#6]:1)-[#8])-[#8]-[#6]',
                                    '[#6]1(-[#6]):[#6]:[#6](-[#8]-[#6]):[#6](:[#6]:[#6]:1)-[#8]'))
 
-    # def test_utils_3D_coords(self):
-    #     aspirin = 'O=C(Oc1ccccc1C(=O)O)C'
-    #     mol_3D = utils.smiles23D(aspirin)
-    #     lines = mol_3D.split('\n')
-    #     atoms_lines = lines[4:25]
-    #     z_coords = [float(line.split()[2]) for line in atoms_lines]
-    #     self.assertTrue(any(z_coords))
-    #     mol = utils.smiles2ctab(aspirin)
-    #     mol_3D1 = utils.ctab23D(mol)
-    #     lines = mol_3D1.split('\n')
-    #     atoms_lines = lines[4:25]
-    #     z_coords = [float(line.split()[2]) for line in atoms_lines]
-    #     self.assertTrue(any(z_coords))
-
-    def test_utils_osra(self):
-        aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
-        im = utils.smiles2image(aspirin)
-        mol = utils.image2ctab(im)
-        smiles = utils.ctab2smiles(mol).split()[2]
-        self.assertEqual(smiles, aspirin)
-
-    def test_utis_kekulize(self):
-        aromatic = '''
-  Mrv0541 08191414212D
-
-  6  6  0  0  0  0            999 V2000
-   -1.7679    1.5616    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.4823    1.1491    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -2.4823    0.3241    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.7679   -0.0884    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.0534    0.3241    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.0534    1.1491    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
-  1  2  4  0  0  0  0
-  1  6  4  0  0  0  0
-  2  3  4  0  0  0  0
-  3  4  4  0  0  0  0
-  4  5  4  0  0  0  0
-  5  6  4  0  0  0  0
-M  END
-
-'''
-        kek = utils.kekulize(aromatic)
-        lines = kek.split('\n')
-        bond_lines = lines[10:16]
-        bond_types = [int(line.split()[2]) for line in bond_lines]
-        self.assertFalse(any([x == 4 for x in bond_types]))
+    # def test_utils_osra(self):
+    #     aspirin = 'CC(=O)Oc1ccccc1C(=O)O'
+    #     im = utils.smiles2image(aspirin)
+    #     mol = utils.image2ctab(im)
+    #     smiles = utils.ctab2smiles(mol).split()[2]
+    #     self.assertEqual(smiles, aspirin)
 
     def test_command_line_tools(self):
         viagra = resolve('viagra')
