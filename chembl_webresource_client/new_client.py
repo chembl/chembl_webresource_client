@@ -55,7 +55,7 @@ def client_from_url(url, base_url=None):
             continue
         model = Model(name, collection_name, formats, searchable)
         qs = QuerySet(model=model)
-        if default_format in ('xml', 'image/svg+xml'):
+        if default_format not in ('xml', 'svg+xml'):
             qs.set_format(default_format)
         setattr(client, name, qs)
 
