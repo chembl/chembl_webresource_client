@@ -479,7 +479,7 @@ class TestSequenceFunctions(unittest.TestCase):
         res = document.search('activators')
         self.assertTrue('activators' in (res[0]['abstract'].lower() + res[0]['title'].lower()))
         act_count = len(res)
-        self.assertTrue(act_count > 38000)
+        self.assertTrue(act_count >= 10000)
         self.assertTrue(act_count < count)
         res = document.filter(abstract__icontains="activators")
         self.assertTrue('activators' in res[0]['abstract'])
@@ -578,7 +578,7 @@ class TestSequenceFunctions(unittest.TestCase):
     def test_image_resource(self):
         image = new_client.image
         image.set_format('svg')
-        self.assertTrue(len(image.get('CHEMBL1')) > 1000)
+        self.assertTrue(len(image.get('CHEMBL25')) > 1000)
 
     def test_mechanism_resource(self):
         mechanism = new_client.mechanism
@@ -1558,9 +1558,9 @@ class TestSequenceFunctions(unittest.TestCase):
             ['CHEMBL6498', 'CHEMBL6499', 'CHEMBL6505'])
         records2 = new_client.molecule.get(
             ['XSQLHVPPXBBUPP-UHFFFAOYSA-N', 'JXHVRXRRSSBGPY-UHFFFAOYSA-N', 'TUHYVXGNMOGVMR-GASGPIRDSA-N'])
-        records3 = new_client.molecule.get(['CNC(=O)c1ccc(cc1)N(CC#C)Cc2ccc3nc(C)nc(O)c3c2',
-                                            'Cc1cc2SC(C)(C)CC(C)(C)c2cc1\\N=C(/S)\\Nc3ccc(cc3)S(=O)(=O)N',
-                                            'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]3CCCN3C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])
+        records3 = new_client.molecule.get(['C#CCN(Cc1ccc2nc(C)nc(O)c2c1)c1ccc(C(=O)NC)cc1',
+                                            'Cc1cc2c(cc1/N=C(\S)Nc1ccc(S(N)(=O)=O)cc1)C(C)(C)CC(C)(C)S2',
+                                            'CC(C)C[C@H](NC(=O)[C@@H](NC(=O)[C@H](Cc1c[nH]c2ccccc12)NC(=O)[C@H]1CCCN1C(=O)C(CCCCN)CCCCN)C(C)(C)C)C(=O)O'])
         self.assertTrue(records1 == records2 == records3)
 
 if __name__ == '__main__':
