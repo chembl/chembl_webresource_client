@@ -1020,7 +1020,7 @@ class TestSequenceFunctions(unittest.TestCase):
         _ = len(res)
         most_similar = res[0]
         self.assertEqual(Decimal(most_similar['similarity']), Decimal(100.0))
-        self.assertTrue('molecule_hierarchy' in res.filter(molecule_properties__acd_logp__gte=3.4).filter(molecule_properties__hbd__lte=5)[0])
+        self.assertTrue('molecule_hierarchy' in res.filter(molecule_properties__cx_logp__gte=2.8).filter(molecule_properties__hbd__lte=5)[0])
 
     def test_similarity_resource_d(self):
         similarity = new_client.similarity
