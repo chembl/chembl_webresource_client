@@ -192,6 +192,9 @@ class UrlQuery(Query):
         self.filters.extend([(key, quote(value) if isinstance(value, str) else value)
                              for key, value in kwargs.items()])
         self.set_limits(None, None)
+        self.current_chunk = None
+        self.current_index = 0
+        self.current_page = 0
 
 # ----------------------------------------------------------------------------------------------------------------------
 

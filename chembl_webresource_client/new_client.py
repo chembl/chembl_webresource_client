@@ -2,8 +2,6 @@ __author__ = 'mnowotka'
 
 from urllib.parse import urlparse
 import requests
-import requests_cache
-from chembl_webresource_client.spore_client import Client, make_spore_function
 from chembl_webresource_client.query_set import QuerySet
 from chembl_webresource_client.query_set import Model
 from chembl_webresource_client.settings import Settings
