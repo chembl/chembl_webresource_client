@@ -5,7 +5,22 @@ python:
   - "3.8"
   - "3.9-dev"
   - "nightly"
+# command to install dependencies
 install:
   - pip install -r requirements.txt
+# command to run tests
 script:
   - python chembl_webresource_client/tests.py
+
+  language: python
+  python:
+    - "3.6"
+    - "3.7"
+    - "3.8"
+    - "3.9-dev"
+    - "nightly"
+  install:
+    - pip install -r requirements.txt
+    - pip install .
+  script:
+    - python chembl_webresource_client/tests.py
