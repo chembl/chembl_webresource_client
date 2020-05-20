@@ -9,11 +9,11 @@ def get_session():
     s = Settings.Instance()
     if s.CACHING:
         session = requests_cache.CachedSession(s.CACHE_NAME, backend='sqlite',
-                                                        fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST'))
+                                               fast_save=s.FAST_SAVE, allowable_methods=('GET', 'POST'))
     else:
         session = requests.Session()
     adapter = requests.adapters.HTTPAdapter(pool_connections=s.CONCURRENT_SIZE,
-                                                        pool_maxsize=s.CONCURRENT_SIZE, max_retries=3, pool_block=True)
+                                            pool_maxsize=s.CONCURRENT_SIZE, max_retries=3, pool_block=True)
     session.mount('http://', adapter)
     session.mount('https://', adapter)
     return session
