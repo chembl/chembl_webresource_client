@@ -119,8 +119,8 @@ Some most frequent use cases below.
             for i in range(0, len(val), chunk_size):
                 targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(
                     ['target_components'])
-                uniprots |= set(
-                    sum([[comp['accession'] for comp in t['target_components']] for t in targets],[]))
+                uniprots |= {comp['accession'] for t in targets for comp in t['target_components']}
+
             compounds2targets[key] = uniprots
 
         # Finally write it to the output csv file
@@ -187,8 +187,8 @@ Some most frequent use cases below.
         for i in range(0, len(val), chunk_size):
             targets = new_client.target.filter(target_chembl_id__in=lval[i:i + chunk_size]).only(
                 ['target_components'])
-            uniprots = uniprots.union(
-                set(sum([[comp['accession'] for comp in t['target_components']] for t in targets],[])))
+            uniprots |= {comp['accession'] for t in targets for comp in t['target_components']}
+
         compounds2targets[key] = uniprots
 
     print('\t'.join(('chembl', 'target')))
