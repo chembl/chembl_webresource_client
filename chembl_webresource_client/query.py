@@ -4,7 +4,6 @@ import requests
 import requests_cache
 from chembl_webresource_client.cache import monkeypatch_requests_cache
 from requests.packages.urllib3.util import Retry
-from requests.adapters import HTTPAdapter
 
 monkeypatch_requests_cache()
 

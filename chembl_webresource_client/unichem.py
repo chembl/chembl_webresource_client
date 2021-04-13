@@ -2,8 +2,6 @@ __author__ = 'mnowotka'
 
 from chembl_webresource_client.settings import Settings
 
-from urllib.parse import urlencode
-from urllib.parse import quote
 import re
 import os
 import logging
@@ -13,7 +11,6 @@ import mimetypes
 from chembl_webresource_client.cache import monkeypatch_requests_cache
 from chembl_webresource_client.http_errors import handle_http_error
 from requests.packages.urllib3.util import Retry
-from requests.adapters import HTTPAdapter
 
 inchi_key_regex = re.compile('[A-Z]{14}-[A-Z]{10}-[A-Z]')
 
