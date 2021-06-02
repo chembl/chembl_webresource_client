@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='chembl-webresource-client',
-    version='0.10.3',
+    version='0.10.4',
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
@@ -38,7 +38,7 @@ setup(
     install_requires=[
         'urllib3',
         'requests>=2.18.4',
-        'requests-cache>=0.4.7',
+        'requests-cache>=0.6.0',
         'easydict',
     ],
     classifiers=['Development Status :: 4 - Beta',
