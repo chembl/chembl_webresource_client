@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='chembl-webresource-client',
-    version='0.10.6',
+    version='0.10.7',
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
