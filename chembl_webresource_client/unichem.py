@@ -8,7 +8,6 @@ import logging
 import requests
 import requests_cache
 import mimetypes
-from chembl_webresource_client.cache import monkeypatch_requests_cache
 from chembl_webresource_client.http_errors import handle_http_error
 from requests.packages.urllib3.util import Retry
 
@@ -17,7 +16,6 @@ inchi_key_regex = re.compile('[A-Z]{14}-[A-Z]{10}-[A-Z]')
 #-----------------------------------------------------------------------------------------------------------------------
 
 mimetypes.init()
-monkeypatch_requests_cache()
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +43,8 @@ class UniChemClient(object):
             home_directory = os.path.expanduser('~')
             self.session = requests_cache.CachedSession(os.path.join(home_directory, s.CACHE_NAME), backend='sqlite',
                 expire_after=s.CACHE_EXPIRE, fast_save=s.FAST_SAVE,
-                allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
+                allowable_methods=('GET', 'POST'),
+                include_get_headers=True) if s.CACHING else requests.Session()
             if s.PROXIES:
                 self.session.proxies = s.PROXIES
             self.session.mount('http://', adapter)

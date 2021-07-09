@@ -2,10 +2,7 @@ from chembl_webresource_client.settings import Settings
 import os, os.path
 import requests
 import requests_cache
-from chembl_webresource_client.cache import monkeypatch_requests_cache
 from requests.packages.urllib3.util import Retry
-
-monkeypatch_requests_cache()
 
 
 class Query(object):
@@ -28,7 +25,8 @@ class Query(object):
                 backend='sqlite',
                 expire_after=s.CACHE_EXPIRE,
                 fast_save=s.FAST_SAVE,
-                allowable_methods=('GET', 'POST')) if s.CACHING else requests.Session()
+                allowable_methods=('GET', 'POST'),
+                include_get_headers=True) if s.CACHING else requests.Session()
             if s.PROXIES:
                 self.session.proxies = s.PROXIES
             self.session.headers.update({"X-HTTP-Method-Override": "GET"})
