@@ -8,12 +8,10 @@ from urllib.parse import urlencode
 from urllib.parse import quote
 import logging
 import mimetypes
-from chembl_webresource_client.cache import monkeypatch_requests_cache
 from chembl_webresource_client.http_errors import handle_http_error
 
 mimetypes.init()
 mimetypes.add_type('application/json', '.json')
-monkeypatch_requests_cache()
 
 
 # ----------------------------------------------------------------------------------------------------------------------
