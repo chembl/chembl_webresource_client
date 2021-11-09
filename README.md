@@ -18,6 +18,9 @@ The client handles interaction with the HTTPS protocol and caches all results in
 pip install chembl_webresource_client
 ```
 
+## Live Jupyter notebook with examples
+
+[Click here](http://beta.mybinder.org/v2/gh/chembl/chembl_webresource_client/master?filepath=demo_wrc.ipynb)
 
 ## Available filters
 
@@ -56,11 +59,15 @@ For many 2 many relationships only will not make any SQL join optimisation.
 
 In order to use settings you need to import them before using the client:
 
+```python
 from chembl_webresource_client.settings import Settings
+```
 
 Settings object is a singleton that exposes Instance method, for example:
 
+```python
 Settings.Instance().TIMEOUT = 10
+```
 
 Most important options:
 
@@ -72,6 +79,6 @@ Most important options:
     FAST_SAVE: Speedup cache saving up to 50 times but with possibility of data loss (default is True)
 
 
-## Citing / Other resources
+## Citing
 
-    https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4489243/
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4489243/
