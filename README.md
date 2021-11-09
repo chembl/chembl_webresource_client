@@ -22,7 +22,7 @@ pip install chembl_webresource_client
 
 [Click here](http://beta.mybinder.org/v2/gh/chembl/chembl_webresource_client/master?filepath=demo_wrc.ipynb)
 
-## Available filters
+## Available filters
 
 The design of the client is based on Django QuerySet (https://docs.djangoproject.com/en/1.11/ref/models/querysets) and most important lookup types are supported. These are:
 
@@ -46,7 +46,7 @@ The design of the client is based on Django QuerySet (https://docs.djangoproject
 - search
 
 
-## Only operator
+## Only operator
 
 `only` is a special method allowing to limit the results to a selected set of fields. only should take a single argument: a list of fields that should be included in result. Specified fields have to exists in the endpoint against which only is executed. Using only will usually make an API call faster because less information returned will save bandwidth. The API logic will also check if any SQL joins are necessary to return the specified field and exclude unnecessary joins with critically improves performance.
 
