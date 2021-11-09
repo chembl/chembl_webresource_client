@@ -6,9 +6,6 @@
 
 # ChEMBL webresource client
 
-Latest Version Supported Python versions Development Status License https://travis-ci.org/chembl/chembl_webresource_client.svg?branch=master
-ChEMBL webresource client
-
 This is the only official Python client library developed and supported by ChEMBL group.
 
 The library helps accessing ChEMBL data and cheminformatics tools from Python. You don't need to know how to write SQL. You don't need to know how to interact with REST APIs. You don't need to compile or install any cheminformatics frameworks. Results are cached.
@@ -17,7 +14,9 @@ The client handles interaction with the HTTPS protocol and caches all results in
 
 ## Installation
 
+```bash
 pip install chembl_webresource_client
+```
 
 
 ## Available filters
@@ -42,6 +41,7 @@ The design of the client is based on Django QuerySet (https://docs.djangoproject
 - regex
 - iregex
 - search
+
 
 ## Only operator
 
