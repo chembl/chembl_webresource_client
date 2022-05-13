@@ -23,7 +23,7 @@ class Settings:
     UTILS_SPORE_URL = 'https://www.ebi.ac.uk/chembl/api/utils/spore'
     ELASTIC_URL = 'https://wwwdev.ebi.ac.uk/chembl/glados-es'
     NEW_CLIENT_URL = 'https://www.ebi.ac.uk/chembl/api/data'
-    UNICHEM_URL = 'https://www.ebi.ac.uk/unichem/rest'
+    UNICHEM_URL = 'https://www.ebi.ac.uk/unichem/legacy/rest'
     NEW_CLIENT_TIMEOUT = None
     TEST_CASE_TIMEOUT = 10
     MAX_LIMIT = 20

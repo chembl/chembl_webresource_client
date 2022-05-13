@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='chembl-webresource-client',
-    version='0.10.7',
+    version='0.10.8',
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
@@ -18,8 +18,8 @@ setup(
             'chembl_act=chembl_webresource_client.scripts.chembl_act:main',
         ]
     },
-    author='Michal Nowotka',
-    author_email='mnowotka@ebi.ac.uk',
+    author='Michal Nowotka, Eloy Felix',
+    author_email='chembl-help@ebi.ac.uk',
     description='Python client fot accessing ChEMBL webservices.',
     url='https://www.ebi.ac.uk/chembl/api/data/docs',
     license='Apache Software License',
