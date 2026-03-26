@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='chembl-webresource-client',
-    version='0.10.9',
+    version='0.10.10',
     entry_points={
         'console_scripts': [
             'chembl_ids=chembl_webresource_client.scripts.chembl_ids:main',
@@ -45,10 +45,11 @@ setup(
                  'Intended Audience :: Developers',
                  'License :: OSI Approved :: Apache Software License',
                  'Operating System :: POSIX :: Linux',
-                 'Programming Language :: Python :: 3.8',
                  'Programming Language :: Python :: 3.9',
                  'Programming Language :: Python :: 3.10',
                  'Programming Language :: Python :: 3.11',
+                 'Programming Language :: Python :: 3.12',
+                 'Programming Language :: Python :: 3.13',
                  'Topic :: Scientific/Engineering :: Chemistry'],
     zip_safe=False,
 )
